@@ -708,7 +708,7 @@
     gap: 8px;
   }
   .landing-hero-cta .landing-button {
-    flex: 1;
+    flex: 1 1 calc(50% - 4px);
     min-width: 0;
     font-size: 0.8rem;
     padding-inline: 12px;
