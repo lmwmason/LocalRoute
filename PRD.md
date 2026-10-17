@@ -11,6 +11,13 @@ LocalRoute is a travel itinerary scheduler built around a map of independently r
 
 **Product promise:** Find local places, understand why someone recommends them, and turn them into a trip without tedious research.
 
+### Initial live catalog and free starter itineraries
+- The initial published catalog contains source-checked real places collected by the operator. These are operator starter picks, never fabricated independent recommendations, reviews or verified visits. Keep their source links visible and allow genuine local contributions to build the differentiating layer.
+- With `FEATURE_STARTER_ITINERARIES=true`, generation requires the `planner-ai-v1` processing notice and an enabled server policy with cost exactly 0 LP. Do not issue promotional LP or debit the ledger for this mode. A nonzero policy disables starter generation; it must never silently become a paid request.
+- Gemini receives only the allowlisted trip settings and public place facts. Names, contact information, raw dietary restrictions, contributor prose and photographs are excluded from itinerary prompts. Menu-photo extraction is a separate, optional, explicitly consented flow with editable/manual entry and no automatic publication.
+- Approved licensed operator photographs are distinct from contributor-taken photographs. Display attribution and provenance; unavailable photographs remain empty. AI illustrations are not venue photographs and do not satisfy the registration photograph requirement.
+- The public Euljiro sample includes Hide Me Please Euljiro as a café. Its times are example planned visits, not verified opening hours or booking availability. Actual booking remains disabled until venue support, account permissions and product licensing are verified; displaying the sample does not submit a booking.
+
 ## 2. Problem and hypotheses
 - Travelers face repetitive, noisy restaurant search and difficulty turning scattered suggestions into feasible routes.
 - Existing place ratings do not tell travelers whether an individual recommendation is accurate for their needs.

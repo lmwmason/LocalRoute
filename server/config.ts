@@ -31,6 +31,7 @@ export function readConfig(env: NodeJS.ProcessEnv) {
     env.HEYYUMI_TERMS_VERIFIED === "true" &&
     Boolean(env.HEY_YUMI_API_KEY);
   return {
+    starterPlanning: env.FEATURE_STARTER_ITINERARIES === "true",
     destinations: readDestinationConfig(env),
     planning:
       live &&

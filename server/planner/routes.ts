@@ -38,9 +38,10 @@ export type PlannerDependencies = {
 const generateSchema = z.object({
   requestId: z.uuid(),
   input: tripSchema,
-  expectedCost: z.number().int().min(1),
+  expectedCost: z.number().int().min(0),
   policyVersion: z.string().min(1).max(100),
   consent: z.literal(true),
+  aiConsentVersion: z.literal("planner-ai-v1").optional(),
   sourcePlanId: z.uuid().optional(),
   pinIds: z.array(z.string().max(250)).max(40).default([]),
 });
@@ -55,15 +56,16 @@ function currentCatalog(
   places: Place[],
   activities: Candidate[],
   input: TripInput,
+  allowStarter = false,
 ) {
   // Keep canonical LocalRoute facts when the current sources share an ID.
   return deduplicateCandidates(
     [
       ...new Map(
-        [...activities, ...localCandidates(places, input)].map((candidate) => [
-          candidate.id,
-          candidate,
-        ]),
+        [
+          ...activities,
+          ...localCandidates(places, input, { allowStarter }),
+        ].map((candidate) => [candidate.id, candidate]),
       ).values(),
     ],
     places,
@@ -129,7 +131,18 @@ export function attachPlanner(
       });
       return;
     }
-    res.json(await repository!.planning(user, "balance", null, {}));
+    const quote = (await repository!.planning(
+      user,
+      "balance",
+      null,
+      {},
+    )) as Record<string, unknown>;
+    res.json({
+      ...quote,
+      starter: config.starterPlanning,
+      enabled:
+        quote.enabled === true && (!config.starterPlanning || quote.cost === 0),
+    });
   });
   app.get("/api/itineraries", async (req, res) => {
     const user = await actor(req);
@@ -158,6 +171,12 @@ export function attachPlanner(
     const user = await actor(req);
     if (!config.planning) throw new AppError(503, "PLANNING_DISABLED");
     const payload = generateSchema.parse(req.body);
+    if (
+      config.starterPlanning &&
+      (payload.expectedCost !== 0 ||
+        payload.aiConsentVersion !== "planner-ai-v1")
+    )
+      throw new AppError(400, "STARTER_CONSENT_REQUIRED");
     // Replays are resolved before provider calls; reserve validates the original payload fingerprint.
     try {
       const prior = (await repository!.planning(
@@ -214,6 +233,8 @@ export function attachPlanner(
       return;
     }
     try {
+      if (config.starterPlanning && reservation.cost !== 0)
+        throw new AppError(409, "STARTER_MUST_BE_FREE");
       const pins: PinnedStop[] = [];
       let original: Itinerary | undefined;
       if (payload.sourcePlanId) {
@@ -239,7 +260,12 @@ export function attachPlanner(
         repository!.places(undefined, canonicalInput.destination),
         deps.activities.search(canonicalInput),
       ]);
-      const catalog = currentCatalog(places, activities, canonicalInput);
+      const catalog = currentCatalog(
+        places,
+        activities,
+        canonicalInput,
+        config.starterPlanning,
+      );
       if (
         original &&
         pins.length &&
@@ -262,7 +288,7 @@ export function attachPlanner(
         createdAt: new Date().toISOString(),
         model: config.geminiModel,
         provenance: "gemini",
-        cost: reservation.cost || payload.expectedCost,
+        cost: reservation.cost ?? payload.expectedCost,
       };
       const saved = await repository!.planning(
         user,
@@ -328,9 +354,12 @@ export function attachPlanner(
       deps.activities.search(canonicalInput),
     ]);
     // Replacements remain within the original choice set, with current facts.
-    const catalog = currentCatalog(places, activities, canonicalInput).filter(
-      (candidate) => allowedIds.has(candidate.id),
-    );
+    const catalog = currentCatalog(
+      places,
+      activities,
+      canonicalInput,
+      config.starterPlanning,
+    ).filter((candidate) => allowedIds.has(candidate.id));
     const evaluation = evaluateSchedule(
       payload.schedule,
       canonicalInput,

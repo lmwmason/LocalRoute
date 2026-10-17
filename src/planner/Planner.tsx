@@ -284,6 +284,9 @@ export function Planner({
           expectedCost: quote.cost,
           policyVersion: quote.policyVersion,
           consent: true as const,
+          ...(quote.starter
+            ? { aiConsentVersion: "planner-ai-v1" as const }
+            : {}),
           ...(sourceId ? { sourcePlanId: sourceId, pinIds: pins } : {}),
         };
         persistPending(userId, payload);
@@ -712,11 +715,9 @@ export function Planner({
                 <div className="trip-review">
                   <h3>{t("planner.review")}</h3>
                   <p>
-                    {
-                      regionForDestination(input.destination || "seongsu")[
-                        language
-                      ]
-                    }{" "}
+                    {input.destination
+                      ? regionForDestination(input.destination)[language]
+                      : t("errors.DESTINATION_SELECTION_INVALID")}{" "}
                     · {input.startDate}{" "}
                     {input.endDate !== input.startDate
                       ? `— ${input.endDate}`
@@ -739,7 +740,7 @@ export function Planner({
                   <div>
                     <span>{t("planner.price")}</span>
                     <strong>
-                      {config.demo ? 0 : quote?.cost || 100} LP{" "}
+                      {config.demo ? 0 : (quote?.cost ?? "—")} LP{" "}
                       {config.demo && <small>DEMO</small>}
                     </strong>
                   </div>
@@ -766,8 +767,18 @@ export function Planner({
                 ) : !quote?.enabled ? (
                   <p className="notice-box">{t("planner.disabled")}</p>
                 ) : null}
+                {quote?.starter && (
+                  <p className="notice-box">
+                    {language === "ko"
+                      ? "무료 초기 일정 · 운영자가 수집한 실제 장소를 초기 추천으로 사용하며 독립적인 현지인 방문 후기는 아직 확인되지 않았어요. LP 발급·차감이나 실제 결제는 없어요. 여행 지역·날짜·취향은 Google Gemini로 전송해 일정을 만들며, 무료 API의 입력·출력은 서비스 개선과 검토에 사용될 수 있어요. 이름·연락처·식이 제한 원문은 전송하지 않아요."
+                      : "Free starter itinerary · Real source-based places are used as operator starter picks; independent local visits are not yet verified. No LP is issued or charged and no payment occurs. Trip areas, dates and preferences are sent to Google Gemini; free API inputs and outputs may be used for service improvement and review. Names, contact details and dietary text are excluded."}
+                  </p>
+                )}
                 <p className="fine-print">
-                  {t("planner.bufferHint")} {t("planner.provenance")}
+                  {t("planner.bufferHint")}{" "}
+                  {language === "ko"
+                    ? "입력 내용을 확인한 뒤 실제 장소 후보를 조회하고 일정의 시간·동선을 검증해요."
+                    : "After confirmation, we look up real candidates and validate the itinerary's timing and route."}
                 </p>
                 {input.dietary && (
                   <p className="notice-box">{t("planner.unknownDiet")}</p>
@@ -778,7 +789,13 @@ export function Planner({
                     checked={consent}
                     onChange={(e) => setConsent(e.target.checked)}
                   />
-                  <span>{t("planner.confirm")}</span>
+                  <span>
+                    {quote?.starter
+                      ? language === "ko"
+                        ? "초기 추천의 출처·미확인 정보와 Gemini 처리 안내를 확인하고 무료 일정 생성을 요청해요."
+                        : "I have read the starter-source, uncertainty and Gemini processing notice and request a free itinerary."
+                      : t("planner.confirm")}
+                  </span>
                 </label>
               </>
             )}
@@ -831,7 +848,7 @@ export function Planner({
                   ? t("common.next")
                   : config.demo
                     ? t("planner.demoGenerate")
-                    : t("planner.generate", { cost: quote?.cost || 100 })}
+                    : t("planner.generate", { cost: quote?.cost ?? "—" })}
                 <ArrowRight size={17} />
               </button>
             </div>

@@ -3,9 +3,10 @@ import { tripSchema } from "../../shared/planner";
 const schema = z.object({
   requestId: z.uuid(),
   input: tripSchema,
-  expectedCost: z.number().int().positive(),
+  expectedCost: z.number().int().nonnegative(),
   policyVersion: z.string().min(1),
   consent: z.literal(true),
+  aiConsentVersion: z.literal("planner-ai-v1").optional(),
   sourcePlanId: z.uuid().optional(),
   pinIds: z.array(z.string()).optional(),
 });

@@ -175,6 +175,8 @@ export const ko: Record<string, string> = {
   "quality.STATUS_NEEDS_VERIFICATION":
     "영업 상태를 먼저 확인해야 하는 장소예요.",
   "quality.HOURS_UNKNOWN": "영업시간 미확인",
+  "quality.STARTER_RECOMMENDATION":
+    "운영자 초기 추천 · 독립 현지인 방문 후기 미확인",
   "quality.ROUTE_TIME_UNAVAILABLE": "경로 소요 시간 미확인",
   "quality.ACCESSIBILITY_UNKNOWN": "휠체어 접근성 미확인",
   "quality.PRICES_UNVERIFIED": "메뉴·입장료 미확인. 예산은 보장되지 않아요.",
@@ -359,6 +361,8 @@ export const en: Record<string, string> = {
   "quality.STATUS_NEEDS_VERIFICATION":
     "The operating status needs checking first.",
   "quality.HOURS_UNKNOWN": "Opening hours unverified",
+  "quality.STARTER_RECOMMENDATION":
+    "Operator starter pick · independent local visit unverified",
   "quality.ROUTE_TIME_UNAVAILABLE": "Route duration unavailable",
   "quality.ACCESSIBILITY_UNKNOWN": "Wheelchair access unverified",
   "quality.PRICES_UNVERIFIED":

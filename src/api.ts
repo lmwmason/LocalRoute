@@ -72,6 +72,7 @@ export const api = {
   quote: () =>
     request<{
       enabled: boolean;
+      starter?: boolean;
       cost: number;
       promo: number | null;
       earned: number | null;
@@ -91,6 +92,7 @@ export const api = {
       expectedCost: number;
       policyVersion: string;
       consent: true;
+      aiConsentVersion?: "planner-ai-v1";
       sourcePlanId?: string;
       pinIds?: string[];
     },
