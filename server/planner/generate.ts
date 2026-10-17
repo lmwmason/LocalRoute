@@ -1,5 +1,10 @@
 import type { Gemini } from "../gemini";
 import { AppError } from "../errors";
+import { assessTransport } from "./transport";
+import type {
+  TransportLegResult,
+  TransportRequest,
+} from "../../shared/transport";
 import {
   evaluateSchedule,
   scheduleSchema,
@@ -21,7 +26,8 @@ export async function generateValidated(
   input: TripInput,
   catalog: Candidate[],
   pins: PinnedStop[] = [],
-): Promise<Pick<Itinerary, "schedule" | "evaluation">> {
+  lookup?: (request: TransportRequest) => Promise<TransportLegResult>,
+): Promise<Pick<Itinerary, "schedule" | "evaluation" | "transport">> {
   const days = tripDates(input.startDate, input.endDate).length;
   const restaurants = catalog.filter(
     (c) => c.kind === "restaurant" && c.endorsements.length,
@@ -76,9 +82,21 @@ export async function generateValidated(
     }
     if (input.language === "en" && /[가-힣]/.test(schedule.summary))
       evaluation.errors.push({ code: "LANGUAGE_MISMATCH" });
+    const checked =
+      evaluation.errors.length === 0 && lookup
+        ? await assessTransport(schedule, input, catalog, lookup)
+        : undefined;
+    if (checked) {
+      evaluation.errors.push(...checked.errors);
+      evaluation.warnings.push(...checked.warnings);
+    }
     evaluation.valid = evaluation.errors.length === 0;
-    if (evaluation.valid) return { schedule, evaluation };
-    issues = evaluation.errors;
+    if (evaluation.valid)
+      return { schedule, evaluation, transport: checked?.transport };
+    issues = {
+      errors: evaluation.errors,
+      currentTransportEvidence: checked?.transport,
+    };
   }
   throw new AppError(422, "SCHEDULE_QUALITY_FAILED");
 }

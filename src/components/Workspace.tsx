@@ -2,6 +2,7 @@ import { useI18n } from "../i18n";
 import { useEffect, useState } from "react";
 import type { Workspace as WorkspaceData } from "../../shared/community";
 import { api } from "../api";
+import { requestLegalConsent } from "../legal/client";
 import { localitySchema, type Locality } from "../../shared/locality";
 import { HomeRegionFields } from "./HomeRegionFields";
 export function Workspace() {
@@ -14,13 +15,15 @@ export function Workspace() {
       homeArea: "",
       localityScope: "auto",
     }),
-    [publicLocalArea, setPublicLocalArea] = useState(false),
     [editing, setEditing] = useState<string | null>(null),
     [text, setText] = useState(""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [notice, setNotice] = useState("");
-  const [coverage,setCoverage]=useState<Awaited<ReturnType<typeof api.localityCoverage>>['coverage']>(null);
+  const [coverage, setCoverage] =
+    useState<Awaited<ReturnType<typeof api.localityCoverage>>["coverage"]>(
+      null,
+    );
   useEffect(() => {
     api
       .me()
@@ -32,8 +35,10 @@ export function Workspace() {
           homeArea: v.homeArea || "",
           localityScope: v.localityScope || "auto",
         });
-        setPublicLocalArea(v.publicLocalArea === true);
-        void api.localityCoverage().then(result=>setCoverage(result.coverage)).catch(()=>setCoverage(null));
+        void api
+          .localityCoverage()
+          .then((result) => setCoverage(result.coverage))
+          .catch(() => setCoverage(null));
       })
       .catch((e) => setError(e.message));
   }, []);
@@ -58,15 +63,24 @@ export function Workspace() {
       </label>
       <HomeRegionFields value={locality} onChange={setLocality} />
       <p className="fine-print">{t("profile.regionHelp")}</p>
-      {coverage&&<p className="notice-box">{t(coverage.widened?'profile.coverageWidened':'profile.coverage',{area:coverage.label,n:coverage.available})}</p>}
-      <label className="checkbox-label">
-        <input
-          type="checkbox"
-          checked={publicLocalArea}
-          onChange={(e) => setPublicLocalArea(e.target.checked)}
-        />
-        <span>{t("profile.regionPublic")}</span>
-      </label>
+      {coverage && (
+        <p className="notice-box">
+          {t(
+            coverage.widened ? "profile.coverageWidened" : "profile.coverage",
+            { area: coverage.label, n: coverage.available },
+          )}
+        </p>
+      )}
+      <a
+        className="text-button"
+        href="#consent-settings"
+        onClick={() => {
+          const settings = document.getElementById("consent-settings");
+          if (settings instanceof HTMLDetailsElement) settings.open = true;
+        }}
+      >
+        {t("profile.regionPublic")} · {t("profile.consentSettings")}
+      </a>
       <button
         className="secondary full"
         disabled={busy || !localitySchema.safeParse(locality).success}
@@ -76,7 +90,7 @@ export function Workspace() {
             await api.profile(
               name,
               localitySchema.parse(locality),
-              publicLocalArea,
+              (await requestLegalConsent()).publicLocalArea,
             );
             setCoverage((await api.localityCoverage()).coverage);
             setNotice(t("profile.saved"));

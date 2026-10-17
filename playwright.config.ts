@@ -1,4 +1,5 @@
 import { defineConfig } from "@playwright/test";
+const built = process.env.E2E_PRODUCTION === "true";
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
@@ -6,7 +7,7 @@ export default defineConfig({
   reporter: "list",
   use: {
     locale: "ko-KR",
-    baseURL: "http://127.0.0.1:5173",
+    baseURL: built ? "http://127.0.0.1:3101" : "http://127.0.0.1:5173",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
@@ -30,8 +31,8 @@ export default defineConfig({
     { name: "desktop", use: { viewport: { width: 1440, height: 1000 } } },
   ],
   webServer: {
-    command: "npm run dev",
-    url: "http://127.0.0.1:5173",
+    command: built ? "node scripts/e2e-built.mjs" : "npm run dev",
+    url: built ? "http://127.0.0.1:3101" : "http://127.0.0.1:5173",
     reuseExistingServer: !process.env.CI,
     env: { VITE_DATA_MODE: "demo" },
     timeout: 30000,

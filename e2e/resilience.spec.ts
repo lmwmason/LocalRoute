@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {attachTestPhoto} from './photo-fixture';
+import { attachTestPhoto } from "./photo-fixture";
 test("storage failures remain visible instead of being overwritten by success", async ({
   page,
 }) => {
@@ -25,7 +25,7 @@ test("storage failures remain visible instead of being overwritten by success", 
 });
 test("draft survives closing and reloading the page without carrying consent", async ({
   page,
-}, info) => {
+}) => {
   await page.route("https://tiles.openfreemap.org/**", (r) => r.abort());
   await page.goto("/?view=explore");
   await page.getByRole("button", { name: "소담한 식탁 자세히 보기" }).click();
@@ -37,15 +37,7 @@ test("draft survives closing and reloading the page without carrying consent", a
   await page.getByRole("button", { name: "미리 보기" }).click();
   await page.getByRole("checkbox").check();
   await page.reload();
-  if (info.project.name.startsWith("mobile"))
-    await page
-      .getByRole("navigation", { name: "모바일 메뉴" })
-      .getByRole("button", { name: "추천하기", exact: true })
-      .click();
-  else
-    await page
-      .getByRole("button", { name: "맛집 추천하기", exact: true })
-      .click();
+  await expect(page).toHaveURL(/\/contribute/);
   await expect(page.getByRole("dialog")).toContainText(
     "다시 열어도 이 추천 내용은 남아 있어야 해요.",
   );

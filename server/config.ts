@@ -1,4 +1,5 @@
 import { isLocalRouteSupabase } from "../shared/config";
+import { readDestinationConfig } from "./destinations";
 
 export type ServerConfig = ReturnType<typeof readConfig>;
 export function readConfig(env: NodeJS.ProcessEnv) {
@@ -23,6 +24,7 @@ export function readConfig(env: NodeJS.ProcessEnv) {
     env.HEYYUMI_TERMS_VERIFIED === "true" &&
     Boolean(env.HEY_YUMI_API_KEY);
   return {
+    destinations: readDestinationConfig(env),
     planning:
       live &&
       database &&
@@ -32,6 +34,13 @@ export function readConfig(env: NodeJS.ProcessEnv) {
       env.KAKAO_TERMS_VERIFIED === "true" &&
       Boolean(env.GEMINI_API_KEY && env.KAKAO_REST_API_KEY),
     kakaoKey: env.KAKAO_REST_API_KEY || "",
+    routing:
+      env.FEATURE_KAKAO_ROUTING === "true" &&
+      env.KAKAO_ROUTING_TERMS_VERIFIED === "true",
+    routingBudget: Math.max(
+      0,
+      Math.min(10000, Number(env.ROUTING_REQUESTS_PER_HOUR) || 0),
+    ),
     aiBudget: Math.max(
       1,
       Math.min(1000, Number(env.AI_REQUESTS_PER_HOUR) || 30),

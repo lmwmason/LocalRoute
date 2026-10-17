@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import {
-  regions,
+  regionForDestination,
   tripSchema,
+  scheduleSchema,
   evaluateSchedule,
   type Itinerary,
   type TripInput,
@@ -12,9 +14,14 @@ import { useI18n } from "../i18n";
 import { config } from "../config";
 import { api } from "../api";
 import { ItineraryEditor } from "./ItineraryEditor";
+import { toggleChoice } from "../../shared/preferences";
+import { DestinationSearch } from "./DestinationSearch";
 import { PlannerWelcome } from "./PlannerWelcome";
 import { readPending, persistPending } from "./pending";
 type Quote = Awaited<ReturnType<typeof api.quote>>;
+type TripDraft = Omit<TripInput, "destination"> & {
+  destination: TripInput["destination"] | null;
+};
 type PendingPayload = Parameters<typeof api.generate>[0];
 function initialTrip(language: "ko" | "en"): TripInput {
   const today = new Date().toLocaleDateString("sv-SE");
@@ -25,7 +32,7 @@ function initialTrip(language: "ko" | "en"): TripInput {
     startTime: "09:30",
     endTime: "20:00",
     purpose: "food",
-    activities: ["art", "nature"],
+    activities: ["food"],
     foodTypes: ["korean"],
     budget: "moderate",
     companions: "couple",
@@ -42,8 +49,26 @@ function readDemoPlan(): Itinerary | null {
     const data = JSON.parse(
       sessionStorage.getItem("localroute.demo.plan") || "null",
     );
-    return data?.provenance === "demo" && data?.schedule && data?.catalog
-      ? data
+    if (
+      data?.provenance !== "demo" ||
+      !tripSchema.safeParse(data.input).success ||
+      !scheduleSchema.safeParse(data.schedule).success ||
+      !Array.isArray(data.catalog)
+    )
+      return null;
+    if (
+      data.catalog.some(
+        (candidate: unknown) =>
+          !candidate ||
+          typeof candidate !== "object" ||
+          !("id" in candidate) ||
+          !demoCatalog.some((place) => place.id === candidate.id),
+      )
+    )
+      return null;
+    const evaluation = evaluateSchedule(data.schedule, data.input, demoCatalog);
+    return evaluation.valid
+      ? { ...data, catalog: demoCatalog, evaluation }
       : null;
   } catch {
     return null;
@@ -59,8 +84,27 @@ export function Planner({
   onLogin: () => void;
 }) {
   const { t, language } = useI18n();
-  const [step, setStep] = useState(0),
-    [input, setInput] = useState<TripInput>(() => initialTrip(language)),
+  const location = useLocation(),
+    navigate = useNavigate();
+  const routeStep = /^\/plan\/new\/([1-4])$/.exec(location.pathname);
+  const step = routeStep ? Number(routeStep[1]) : 0;
+  function setStep(next: number | ((current: number) => number)) {
+    const value = typeof next === "function" ? next(step) : next;
+    navigate(value > 0 ? `/plan/new/${value}` : "/plan");
+  }
+  const [input, setInput] = useState<TripDraft>(() => {
+      try {
+        const draft = tripSchema.safeParse(
+          JSON.parse(sessionStorage.getItem("localroute.trip.draft") || "null"),
+        );
+        if (draft.success) return draft.data;
+      } catch {
+        /* storage is optional until paid confirmation */
+      }
+      return config.demo
+        ? initialTrip(language)
+        : { ...initialTrip(language), destination: null };
+    }),
     [consent, setConsent] = useState(false),
     [quote, setQuote] = useState<Quote | null>(null),
     [busy, setBusy] = useState(false),
@@ -73,16 +117,45 @@ export function Planner({
     inFlight = useRef(false);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
+    try {
+      sessionStorage.setItem("localroute.trip.draft", JSON.stringify(input));
+    } catch {
+      /* optional draft persistence */
+    }
+  }, [input]);
+  useEffect(() => {
+    const id = location.pathname.match(/^\/itineraries\/([^/]+)$/)?.[1];
+    if (!id || result?.id === id) return;
+    const local = config.demo
+      ? readDemoPlan()
+      : savedPlans.find((plan) => plan.id === id);
+    if (local?.id === id) setResult(local);
+    else if (!config.demo && signedIn) {
+      let active = true;
+      api
+        .plan(id)
+        .then((plan) => {
+          if (active) setResult(plan);
+        })
+        .catch((error: Error) => {
+          if (active) setError(error.message);
+        });
+      return () => {
+        active = false;
+      };
+    }
+  }, [location.pathname, result?.id, savedPlans, signedIn]);
+  useEffect(() => {
     if (config.demo) return;
     const saved = readPending(userId);
     pending.current = saved;
     if (saved) {
       setInput(saved.input);
-      setStep(3);
+      navigate("/plan/new/4", { replace: true });
       setResult(null);
       setError(t("errors.REQUEST_STATUS_UNKNOWN"));
     }
-  }, [userId, t]);
+  }, [userId, t, navigate]);
   useEffect(() => {
     heading.current?.focus();
   }, [step]);
@@ -94,7 +167,7 @@ export function Planner({
         .catch(() => {});
   }, [signedIn]);
   useEffect(() => {
-    if (step !== 3) return;
+    if (step !== 4) return;
     setConsent(false);
     if (config.demo) {
       setQuote({
@@ -113,7 +186,7 @@ export function Planner({
         .then(setQuote)
         .catch((e) => setError(e.message));
   }, [step, signedIn]);
-  function update<K extends keyof TripInput>(key: K, value: TripInput[K]) {
+  function update<K extends keyof TripDraft>(key: K, value: TripDraft[K]) {
     if (pending.current) {
       setError(t("errors.REQUEST_STATUS_UNKNOWN"));
       return;
@@ -125,17 +198,24 @@ export function Planner({
     key: K,
     value: TripInput[K][number],
   ) {
-    update(
-      key,
-      (input[key].includes(value as never)
-        ? input[key].filter((v) => v !== value)
-        : [...input[key], value]) as TripInput[K],
-    );
+    if (pending.current) {
+      setError(t("errors.REQUEST_STATUS_UNKNOWN"));
+      return;
+    }
+    setInput((previous) => ({
+      ...previous,
+      [key]: toggleChoice<string>(previous[key], value),
+    }));
+    setError("");
   }
   function next() {
     const parsed = tripSchema.safeParse({ ...input, language });
     if (!parsed.success) {
-      setError(parsed.error.issues[0].message);
+      setError(
+        !input.destination
+          ? t("errors.DESTINATION_SELECTION_INVALID")
+          : parsed.error.issues[0].message,
+      );
       return;
     }
     setError("");
@@ -143,7 +223,7 @@ export function Planner({
   }
   async function complete(plan: Itinerary) {
     setResult(plan);
-    setStep(0);
+    navigate(`/itineraries/${plan.id}`);
     setPins([]);
     setSourceId(undefined);
     pending.current = null;
@@ -175,7 +255,7 @@ export function Planner({
         ) {
           throw new Error(t("planner.demoOneDay"));
         }
-        const trip = { ...input, language };
+        const trip = tripSchema.parse({ ...input, language });
         const schedule = demoSchedule(trip),
           evaluation = evaluateSchedule(schedule, trip, demoCatalog);
         if (!evaluation.valid)
@@ -198,7 +278,7 @@ export function Planner({
         if (!quote?.enabled) throw new Error(t("planner.disabled"));
         const payload = pending.current || {
           requestId: crypto.randomUUID(),
-          input: { ...input, language },
+          input: tripSchema.parse({ ...input, language }),
           expectedCost: quote.cost,
           policyVersion: quote.policyVersion,
           consent: true as const,
@@ -246,7 +326,7 @@ export function Planner({
       setBusy(false);
     }
   }
-  if (result && step === 0)
+  if (result && location.pathname === `/itineraries/${result.id}`)
     return (
       <>
         <ItineraryEditor
@@ -280,8 +360,7 @@ export function Planner({
       {step === 0 ? (
         <>
           <PlannerWelcome
-            input={input}
-            onPurpose={(value) => update("purpose", value)}
+            input={{ ...input, destination: input.destination || "seongsu" }}
             onActivity={(value) => toggle("activities", value)}
             onStart={() => {
               setStep(1);
@@ -295,12 +374,15 @@ export function Planner({
                 <button
                   className="saved-plan"
                   key={plan.id}
-                  onClick={() => setResult(plan)}
+                  onClick={() => {
+                    setResult(plan);
+                    navigate(`/itineraries/${plan.id}`);
+                  }}
                 >
                   <strong>{plan.schedule.title}</strong>
                   <span>
                     {plan.input.startDate} ·{" "}
-                    {regions[plan.input.destination][language]}
+                    {regionForDestination(plan.input.destination)[language]}
                   </span>
                   <ArrowRight size={17} />
                 </button>
@@ -310,13 +392,13 @@ export function Planner({
         </>
       ) : (
         <div className="wizard-shell">
-          <div className="wizard-progress" aria-label={`${step}/3`}>
-            {[1, 2, 3].map((n) => (
+          <div className="wizard-progress" aria-label={`${step}/4`}>
+            {[1, 2, 3, 4].map((n) => (
               <span key={n} className={n <= step ? "active" : ""} />
             ))}
           </div>
           <div className="wizard-heading">
-            <span className="eyebrow">{step} / 3</span>
+            <span className="eyebrow">{step} / 4</span>
             <h1 ref={heading} tabIndex={-1}>
               {t(`planner.step${step}`)}
             </h1>
@@ -324,31 +406,31 @@ export function Planner({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (step < 3) next();
+              if (step < 4) next();
               else void generate();
             }}
           >
             {step === 1 && (
               <>
-                <label>
-                  {t("planner.destination")}
-                  <select
-                    value={input.destination}
-                    onChange={(e) =>
-                      update(
-                        "destination",
-                        e.target.value as TripInput["destination"],
-                      )
+                {!config.demo && (
+                  <p className="fine-print">{t("planner.coverageRadius")}</p>
+                )}
+                {config.demo ? (
+                  <p className="notice-box">{t("planner.demoOneDay")}</p>
+                ) : (
+                  <DestinationSearch
+                    language={language}
+                    value={
+                      typeof input.destination === "object"
+                        ? input.destination
+                        : null
                     }
-                  >
-                    {Object.entries(regions).map(([id, region]) => (
-                      <option key={id} value={id}>
-                        {region[language]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <p className="fine-print">{t("planner.pilot")}</p>
+                    onChange={(destination) =>
+                      update("destination", destination)
+                    }
+                    disabled={busy || Boolean(pending.current)}
+                  />
+                )}
                 <div className="two-columns">
                   <label>
                     {t("planner.startDate")}
@@ -417,11 +499,13 @@ export function Planner({
                   <div className="choice-chips">
                     {(
                       [
+                        "food",
                         "art",
                         "nature",
                         "shopping",
                         "history",
                         "coffee",
+                        "hotspots",
                       ] as const
                     ).map((v) => (
                       <button
@@ -487,6 +571,10 @@ export function Planner({
                     </select>
                   </label>
                 </div>
+              </>
+            )}
+            {step === 3 && (
+              <>
                 <div className="two-columns">
                   <label>
                     {t("planner.mobility")}
@@ -558,12 +646,17 @@ export function Planner({
                 )}
               </>
             )}
-            {step === 3 && (
+            {step === 4 && (
               <>
                 <div className="trip-review">
                   <h3>{t("planner.review")}</h3>
                   <p>
-                    {regions[input.destination][language]} · {input.startDate}{" "}
+                    {
+                      regionForDestination(input.destination || "seongsu")[
+                        language
+                      ]
+                    }{" "}
+                    · {input.startDate}{" "}
                     {input.endDate !== input.startDate
                       ? `— ${input.endDate}`
                       : ""}
@@ -668,12 +761,12 @@ export function Planner({
                 disabled={
                   busy ||
                   Boolean(pending.current) ||
-                  (step === 3 &&
+                  (step === 4 &&
                     (!consent ||
                       (!config.demo && (!signedIn || !quote?.enabled))))
                 }
               >
-                {step < 3
+                {step < 4
                   ? t("common.next")
                   : config.demo
                     ? t("planner.demoGenerate")

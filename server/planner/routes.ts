@@ -13,9 +13,20 @@ import { AppError } from "../errors";
 import { Gemini } from "../gemini";
 import { KakaoActivities, localCandidates } from "./catalog";
 import { generateValidated, type PinnedStop } from "./generate";
+import { createKakaoRouting } from "../routing";
+import { assessTransport } from "./transport";
+import { KakaoDestinations } from "../destinations";
+import type {
+  TransportRequest,
+  TransportLegResult,
+} from "../../shared/transport";
 export type PlannerDependencies = {
   gemini: Pick<Gemini, "structured">;
   activities: Pick<KakaoActivities, "search">;
+  destinations?: Pick<KakaoDestinations, "verifySelection">;
+  routing?: {
+    lookup: (request: TransportRequest) => Promise<TransportLegResult>;
+  };
 };
 const generateSchema = z.object({
   requestId: z.uuid(),
@@ -48,6 +59,16 @@ export function attachPlanner(
     activities: new KakaoActivities(config.kakaoKey),
   },
 ) {
+  const destinations =
+    deps.destinations || new KakaoDestinations(config.destinations);
+  const routing =
+    deps.routing ||
+    createKakaoRouting({
+      enabled: config.routing,
+      carKey: config.kakaoKey,
+      transitKey: config.kakaoKey,
+      maxCalls: config.routingBudget,
+    });
   app.get("/api/planning/quote", async (req, res) => {
     const user = await actor(req);
     if (!config.planning) {
@@ -90,6 +111,43 @@ export function attachPlanner(
     const user = await actor(req);
     if (!config.planning) throw new AppError(503, "PLANNING_DISABLED");
     const payload = generateSchema.parse(req.body);
+    // Replays are resolved before provider calls; reserve validates the original payload fingerprint.
+    try {
+      const prior = (await repository!.planning(
+        user,
+        "status",
+        payload.requestId,
+        {},
+      )) as Reservation;
+      if (prior.status === "ready" || prior.status === "generating") {
+        const replay = (await repository!.planning(
+          user,
+          "reserve",
+          payload.requestId,
+          payload,
+        )) as Reservation;
+        if (replay.status === "ready") {
+          res.json(replay.result);
+          return;
+        }
+        res
+          .status(202)
+          .json({ status: "generating", requestId: payload.requestId });
+        return;
+      }
+      if (prior.status === "failed")
+        throw new AppError(409, "PREVIOUS_REQUEST_FAILED");
+    } catch (error) {
+      if (!(error instanceof AppError && error.status === 404)) throw error;
+    }
+    if (typeof payload.input.destination === "string")
+      throw new AppError(400, "DESTINATION_SELECTION_INVALID");
+    const canonicalInput = {
+      ...payload.input,
+      destination: await destinations.verifySelection(
+        payload.input.destination,
+      ),
+    };
     const reservation = (await repository!.planning(
       user,
       "reserve",
@@ -116,7 +174,9 @@ export function attachPlanner(
           id: payload.sourcePlanId,
         })) as Itinerary;
         if (
-          original.input.destination !== payload.input.destination ||
+          (typeof original.input.destination === "string"
+            ? original.input.destination
+            : original.input.destination.id) !== payload.input.destination.id ||
           original.input.startDate !== payload.input.startDate ||
           original.input.endDate !== payload.input.endDate
         )
@@ -132,13 +192,13 @@ export function attachPlanner(
         );
       } else if (payload.pinIds.length) throw new AppError(400, "INVALID_PIN");
       const [places, activities] = await Promise.all([
-        repository!.places(),
-        deps.activities.search(payload.input),
+        repository!.places(undefined, canonicalInput.destination),
+        deps.activities.search(canonicalInput),
       ]);
       const catalog = [
         ...new Map(
           [
-            ...localCandidates(places, payload.input),
+            ...localCandidates(places, canonicalInput),
             ...activities,
             ...pinnedCatalog,
           ].map((c) => [c.id, c]),
@@ -146,14 +206,15 @@ export function attachPlanner(
       ];
       const generated = await generateValidated(
         deps.gemini,
-        payload.input,
+        canonicalInput,
         catalog,
         pins,
+        routing.lookup,
       );
       const itinerary: Itinerary = {
         id: reservation.id,
         revision: 1,
-        input: payload.input,
+        input: canonicalInput,
         catalog,
         ...generated,
         createdAt: new Date().toISOString(),
@@ -209,11 +270,31 @@ export function attachPlanner(
         .json({ error: "SCHEDULE_QUALITY_FAILED", issues: evaluation.errors });
       return;
     }
+    const checked = await assessTransport(
+      payload.schedule,
+      original.input,
+      original.catalog,
+      routing.lookup,
+    );
+    evaluation.errors.push(...checked.errors);
+    evaluation.warnings.push(...checked.warnings);
+    evaluation.valid = evaluation.errors.length === 0;
+    if (!evaluation.valid) {
+      res
+        .status(422)
+        .json({ error: "SCHEDULE_QUALITY_FAILED", issues: evaluation.errors });
+      return;
+    }
     res.json(
       await repository!.planning(user, "save", null, {
         id,
         revision: payload.revision,
-        result: { ...original, schedule: payload.schedule, evaluation },
+        result: {
+          ...original,
+          schedule: payload.schedule,
+          evaluation,
+          transport: checked.transport,
+        },
       }),
     );
   });

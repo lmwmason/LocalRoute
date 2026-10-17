@@ -8,19 +8,23 @@ import {
   Pin,
   Printer,
   RefreshCw,
+  Share2,
   Utensils,
 } from "lucide-react";
 import type { Itinerary, Schedule } from "../../shared/planner";
 import {
   distanceMeters,
   evaluateSchedule,
-  regions,
+  regionForDestination,
   stopTimestamp,
+  minutes,
 } from "../../shared/planner";
 import type { Place } from "../../shared/domain";
 import { useI18n } from "../i18n";
 import { api } from "../api";
 import { PlacePhoto } from "../components/PlacePhoto";
+import { ShareItinerary } from "./ShareItinerary";
+import { TransportLeg } from "./TransportLeg";
 const PlaceMap = lazy(() => import("../components/Map"));
 export function ItineraryEditor({
   itinerary,
@@ -32,6 +36,7 @@ export function ItineraryEditor({
   onRegenerate: (pins: string[]) => void;
 }) {
   const { t, language } = useI18n();
+  const [sharing, setSharing] = useState(false);
   const [view, setView] = useState<"timeline" | "map">("timeline");
   const [schedule, setSchedule] = useState<Schedule>(() =>
       structuredClone(itinerary.schedule),
@@ -135,13 +140,23 @@ export function ItineraryEditor({
           <h1>{schedule.title}</h1>
           <p className="intro-copy">{schedule.summary}</p>
         </div>
-        <button
-          className="icon-button print-button"
-          aria-label={t("planner.print")}
-          onClick={() => window.print()}
-        >
-          <Printer size={20} />
-        </button>
+        <div className="result-tools">
+          <button
+            className="icon-button"
+            aria-label={t("sharing.title")}
+            disabled={dirty || busy}
+            onClick={() => setSharing(true)}
+          >
+            <Share2 size={20} />
+          </button>
+          <button
+            className="icon-button print-button"
+            aria-label={t("planner.print")}
+            onClick={() => window.print()}
+          >
+            <Printer size={20} />
+          </button>
+        </div>
       </div>
       {itinerary.provenance === "demo" && (
         <p className="demo-banner">{t("planner.demoNotice")}</p>
@@ -197,23 +212,44 @@ export function ItineraryEditor({
             const previous = index
               ? byId.get(day.stops[index - 1].candidateId)
               : undefined;
+            const transport =
+              !dirty && previous
+                ? itinerary.transport?.find(
+                    (leg) =>
+                      leg.date === day.date &&
+                      leg.fromId === previous.id &&
+                      leg.toId === candidate.id,
+                  )
+                : undefined;
             return (
               <div className="timeline-entry" key={`${day.date}:${index}`}>
-                {index > 0 && (
-                  <div className="transfer-note">
-                    <span className="transfer-line" />
-                    <span>
-                      {t("planner.transfer", {
-                        n: itinerary.input.transferBufferMinutes,
-                      })}
-                      <small>
-                        {t("planner.routeUnknown")}
-                        {previous
-                          ? ` · ${t("planner.straightDistance", { n: (distanceMeters(previous, candidate) / 1000).toFixed(1) })}`
-                          : ""}
-                      </small>
-                    </span>
-                  </div>
+                {index > 0 && transport ? (
+                  <TransportLeg
+                    leg={transport.leg}
+                    availableSeconds={
+                      (minutes(stop.start) -
+                        minutes(day.stops[index - 1].end)) *
+                      60
+                    }
+                    bufferSeconds={itinerary.input.transferBufferMinutes * 60}
+                  />
+                ) : (
+                  index > 0 && (
+                    <div className="transfer-note">
+                      <span className="transfer-line" />
+                      <span>
+                        {t("planner.transfer", {
+                          n: itinerary.input.transferBufferMinutes,
+                        })}
+                        <small>
+                          {t("planner.routeUnknown")}
+                          {previous
+                            ? ` · ${t("planner.straightDistance", { n: (distanceMeters(previous, candidate) / 1000).toFixed(1) })}`
+                            : ""}
+                        </small>
+                      </span>
+                    </div>
+                  )
                 )}
                 <article
                   className={`schedule-stop ${selected === candidate.id ? "is-selected" : ""}`}
@@ -382,10 +418,12 @@ export function ItineraryEditor({
               selected={selected}
               onSelect={(p) => setSelected(p.id)}
               center={[
-                regions[itinerary.input.destination].lng,
-                regions[itinerary.input.destination].lat,
+                regionForDestination(itinerary.input.destination).lng,
+                regionForDestination(itinerary.input.destination).lat,
               ]}
-              caption={regions[itinerary.input.destination][language]}
+              caption={
+                regionForDestination(itinerary.input.destination)[language]
+              }
             />
           </Suspense>
           <p className="fine-print">{t("planner.provenance")}</p>
@@ -444,6 +482,12 @@ export function ItineraryEditor({
             {t("planner.regenerate")}
           </button>
         </div>
+      )}
+      {sharing && (
+        <ShareItinerary
+          itinerary={itinerary}
+          onClose={() => setSharing(false)}
+        />
       )}
     </section>
   );

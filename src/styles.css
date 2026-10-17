@@ -1922,3 +1922,71 @@ small {
     color: #475569;
   }
 }
+
+.map-fallback-info {
+  position: absolute;
+  z-index: 500;
+  left: 10px;
+  bottom: 34px;
+  max-width: calc(100% - 20px);
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 12px;
+  box-shadow: 0 2px 10px #0002;
+}
+.map-fallback-info summary {
+  cursor: pointer;
+}
+.map-fallback-info > :not(summary) {
+  margin: 6px 0;
+}
+.raster-map {
+  z-index: 0;
+}
+.raster-pin {
+  width: max-content !important;
+}
+.raster-pin .map-pin {
+  white-space: nowrap;
+}
+.raster-warning {
+  position: absolute;
+  z-index: 500;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  background: white;
+  font-size: 12px;
+}
+
+.legal-site {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+.legal-page-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.legal-page-links a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  color: #5c697d;
+}
+.legal-page-links a[aria-current] {
+  color: #246bea;
+  font-weight: 700;
+}
+.consent-settings summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 700;
+}

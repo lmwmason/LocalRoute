@@ -18,6 +18,7 @@ test("compact planning home, explicit free demo consent, editable itinerary and 
     .click();
   await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "다음", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   const create = page.getByRole("button", {
     name: "가상 일정 만들기 · 무료",
     exact: true,
@@ -64,6 +65,7 @@ test("English planning and email-verification signup include city-sensitive loca
     page.getByRole("heading", { name: "What kind of trip feels like you?" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Plan my trip", exact: true }).click();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await expect(

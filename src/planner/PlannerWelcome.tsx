@@ -9,12 +9,10 @@ import { PlacePhoto } from "../components/PlacePhoto";
 const PlaceMap = lazy(() => import("../components/Map"));
 export function PlannerWelcome({
   input,
-  onPurpose,
   onActivity,
   onStart,
 }: {
   input: TripInput;
-  onPurpose: (value: TripInput["purpose"]) => void;
   onActivity: (value: TripInput["activities"][number]) => void;
   onStart: () => void;
 }) {
@@ -54,34 +52,30 @@ export function PlannerWelcome({
               <X size={17} />
             </button>
           </div>
-          <div className="preference-chips">
-            {(["food", "culture", "relax"] as const).map((p) => (
+          <div
+            className="preference-chips"
+            role="group"
+            aria-label={t("planner.multipleActivities")}
+          >
+            {(
+              [
+                ["food", "preference.food"],
+                ["art", "preference.culture"],
+                ["nature", "preference.relax"],
+                ["shopping", "activity.shopping"],
+                ["hotspots", "preference.explore"],
+                ["coffee", "preference.coffee"],
+              ] as const
+            ).map(([value, label]) => (
               <button
-                key={p}
-                aria-pressed={input.purpose === p}
-                onClick={() => onPurpose(p)}
+                type="button"
+                key={value}
+                aria-pressed={input.activities.includes(value)}
+                onClick={() => onActivity(value)}
               >
-                {t(`preference.${p}`)}
+                {t(label)}
               </button>
             ))}
-            <button
-              aria-pressed={input.activities.includes("shopping")}
-              onClick={() => onActivity("shopping")}
-            >
-              {t("activity.shopping")}
-            </button>
-            <button
-              aria-pressed={input.purpose === "explore"}
-              onClick={() => onPurpose("explore")}
-            >
-              {t("preference.explore")}
-            </button>
-            <button
-              aria-pressed={input.activities.includes("coffee")}
-              onClick={() => onActivity("coffee")}
-            >
-              {t("preference.coffee")}
-            </button>
           </div>
         </section>
       ) : (

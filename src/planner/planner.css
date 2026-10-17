@@ -1285,3 +1285,74 @@
     padding: 0;
   }
 }
+
+.share-itinerary {
+  display: grid;
+  gap: 16px;
+}
+.share-preview {
+  border: 1px solid var(--line, #e5e8ed);
+  border-radius: 14px;
+  padding: 12px;
+}
+.share-preview summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 700;
+}
+.share-preview pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  font-size: 13px;
+  max-height: 40vh;
+  overflow: auto;
+}
+.share-links article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line, #e5e8ed);
+}
+.share-links article p {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.shared-itinerary-page main {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+.shared-itinerary-page h1 {
+  margin: 16px 0;
+  font-size: 28px;
+  letter-spacing: -0.035em;
+}
+.shared-view-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 24px 0;
+}
+.shared-itinerary-page .reference-stop-copy {
+  min-width: 0;
+}
+.shared-itinerary-page .reference-stop-copy p {
+  overflow-wrap: anywhere;
+}
+.shared-itinerary-page .reference-map {
+  height: 420px;
+}
+.shared-itinerary-page .map-panel,
+.shared-itinerary-page .map-canvas {
+  height: 100%;
+}
+.shared-itinerary-page .reference-timeline {
+  margin: 28px 0;
+}

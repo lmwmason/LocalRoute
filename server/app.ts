@@ -5,6 +5,11 @@ import { maxPhotoBytes, preparePlacePhoto, type PhotoTarget } from "./photos";
 import { demoPlaces } from "../shared/demo";
 import { bookingProfileSchema } from "../shared/booking";
 import { AppError } from "./errors";
+import { attachShares } from "./sharing";
+import { attachLegal, createLegalStore } from "./legal";
+import { KakaoDestinations, attachDestinations } from "./destinations";
+import { attachBooking } from "./booking";
+import { readBookingSettings, bookingEnabled } from "./booking/config";
 import { localitySchema, resolveLocalityCoverage } from "../shared/locality";
 import type { ServerConfig } from "./config";
 import { HeyYumi, providerPlace } from "./heyyumi";
@@ -25,16 +30,26 @@ export function createApp(
   plannerDependencies?: PlannerDependencies,
 ) {
   const app = express();
+  const bookingConfig = {
+    ...config,
+    live: config.live && config.database,
+    booking: readBookingSettings(process.env),
+  };
   const candidates = candidateSigner();
   const resUser = new WeakMap<Request, Actor>();
   app.disable("x-powered-by");
-  app.use((_req, res, next) => {
+  app.use((req, res, next) => {
     res.set("X-Content-Type-Options", "nosniff");
     res.set("Referrer-Policy", "strict-origin-when-cross-origin");
     res.set("Cache-Control", "no-store");
+    if (req.path.startsWith("/s/"))
+      res
+        .set("Referrer-Policy", "strict-origin-when-cross-origin")
+        .set("X-Robots-Tag", "noindex, nofollow, noarchive");
     next();
   });
   app.use(express.json({ limit: "256kb" }));
+  attachDestinations(app, new KakaoDestinations(config.destinations));
   const buckets = new Map<string, { count: number; expires: number }>();
   function limit(key: string, maximum: number, seconds: number) {
     const now = Date.now();
@@ -53,6 +68,25 @@ export function createApp(
         String(Math.ceil((value.expires - now) / 1000)),
       );
   }
+  const legal = attachLegal(app, {
+    store: config.database ? createLegalStore(config) : undefined,
+    limit,
+  });
+  if (config.live && config.database) {
+    app.use("/api/me", legal.requireConsent);
+    app.put("/api/me", legal.requirePublicAreaChoice);
+    app.post("/api/contributions", legal.requireConsent);
+    app.post("/api/place-photos/:requestId", legal.requireConsent);
+    app.put("/api/endorsements/:id", legal.requireConsent);
+    app.post("/api/feedback", legal.requireConsent);
+    app.post("/api/reports", legal.requireConsent);
+    app.use("/api/admin", legal.requireConsent);
+    app.post("/api/planning/generate", legal.requireConsent);
+    app.get("/api/planning/status/:requestId", legal.requireConsent);
+    app.use("/api/itineraries", legal.requireConsent);
+    app.use("/api/itinerary-shares", legal.requireConsent);
+    app.post("/api/booking/reservations", legal.requireConsent);
+  }
   async function actor(req: Request): Promise<Actor> {
     if (!config.live || !repository)
       throw new AppError(503, "실제 저장 기능이 아직 연결되지 않았어요.");
@@ -70,12 +104,21 @@ export function createApp(
         search: config.heyyumi,
         menuExtraction: false,
         moderation: false,
-        booking: false,
-        lp: false,
+        booking: bookingEnabled(bookingConfig),
+        lp: config.planning,
       },
       warnings: config.warnings,
     }),
   );
+  attachBooking(app, bookingConfig, actor);
+  app.get("/api/places/:id", async (req, res) => {
+    const id = z.uuid().parse(req.params.id);
+    const place = config.live
+      ? (await repository?.places(id))?.[0]
+      : demoPlaces.find((place) => place.id === id);
+    if (!place) throw new AppError(404, "장소를 찾을 수 없어요.");
+    res.json(place);
+  });
   app.get("/api/places", async (_req, res) => {
     if (!config.live) {
       res.json({ places: demoPlaces, mode: "demo" });
@@ -324,6 +367,7 @@ export function createApp(
     );
   });
   attachPlanner(app, config, repository, actor, plannerDependencies);
+  attachShares(app, repository, actor, limit);
   app.use("/api", (_req, _res, next) =>
     next(new AppError(404, "요청한 기능을 찾을 수 없어요.")),
   );

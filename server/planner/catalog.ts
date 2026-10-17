@@ -1,7 +1,7 @@
 import { z } from "zod";
 import {
   distanceMeters,
-  regions,
+  regionForDestination,
   type Candidate,
   type TripInput,
 } from "../../shared/planner";
@@ -21,7 +21,7 @@ export function localCandidates(
   places: Place[],
   input: TripInput,
 ): Candidate[] {
-  const center = regions[input.destination];
+  const center = regionForDestination(input.destination);
   return places
     .filter(
       (p) =>
@@ -77,7 +77,7 @@ export class KakaoActivities {
     }
     if ((this.requests += 2) > 30)
       throw new AppError(429, "ACTIVITY_SEARCH_LIMIT", "60");
-    const center = regions[input.destination];
+    const center = regionForDestination(input.destination);
     const lists = await Promise.all(
       ["AT4", "CT1"].map(async (code) => {
         const url = new URL(

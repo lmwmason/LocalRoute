@@ -1,4 +1,12 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   ArrowDown,
   ArrowRight,
@@ -16,6 +24,8 @@ import {
   Star,
   X,
 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { panelPaths, readAppRoute, type Panel } from "./navigation";
 import type { Session } from "@supabase/supabase-js";
 import { demoPlaces } from "../shared/demo";
 import { filterPlaces, moveStop, type Place } from "../shared/domain";
@@ -35,46 +45,136 @@ import { ReportForm } from "./components/ReportForm";
 import { BookingProfile } from "./components/BookingProfile";
 import { PlacePhoto } from "./components/PlacePhoto";
 import { LanguageSwitch, useI18n } from "./i18n";
+import { LegalConsentGate } from "./legal";
+import { BookingButton } from "./booking/BookingButton";
+import { bookingApi } from "./booking/client";
 
 const Map = lazy(() => import("./components/Map"));
 const Planner = lazy(() =>
   import("./planner/Planner").then((module) => ({ default: module.Planner })),
 );
 const categories = ["전체", "한식", "일식", "양식", "카페", "혼밥"];
-type Panel =
-  | "contribute"
-  | "login"
-  | "profile"
-  | "bookingSetup"
-  | "feedback"
-  | "correction"
-  | "report"
-  | null;
-
+function MemberConsent({
+  userId,
+  children,
+}: {
+  userId?: string;
+  children: ReactNode;
+}) {
+  return !config.demo && userId ? (
+    <LegalConsentGate userId={userId}>{children}</LegalConsentGate>
+  ) : (
+    <>{children}</>
+  );
+}
 export default function App() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const browserLocation = useLocation(),
+    navigate = useNavigate();
+  const route = readAppRoute(
+    browserLocation.pathname,
+    browserLocation.search,
+    browserLocation.state,
+  );
+  const routeRef = useRef(route);
+  routeRef.current = route;
+  const { tab, panel, loginOverlay } = route;
   const [places, setPlaces] = useState<Place[]>(config.demo ? demoPlaces : []);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("전체");
-  const [tab, setTab] = useState<"plan" | "explore" | "trip">(() =>
-    new URLSearchParams(location.search).get("view") === "explore"
-      ? "explore"
-      : "plan",
-  );
   const [saved, setSaved] = useState(readSaved);
-  const [selected, setSelected] = useState<Place | null>(null);
-  const [panel, setPanel] = useState<Panel>(() =>
-    new URLSearchParams(window.location.search).has("code") && readDraft()
-      ? "contribute"
-      : null,
-  );
-  const [loginOverlay, setLoginOverlay] = useState(false);
-  const [contributePlace, setContributePlace] = useState<Place>();
+  const selected = route.placeId
+    ? places.find((place) => place.id === route.placeId) || null
+    : null;
+  const [rememberedPlace, setContributePlace] = useState<Place>();
+  const contributePlace = route.targetId
+    ? places.find((place) => place.id === route.targetId)
+    : rememberedPlace;
   const [session, setSession] = useState<Session | null>(null);
   const [notice, setNotice] = useState("");
   const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(!config.demo);
   const [reload, setReload] = useState(0);
+  useEffect(() => {
+    const id = route.placeId || route.targetId;
+    if (config.demo || !id || places.some((place) => place.id === id)) return;
+    let active = true;
+    api
+      .place(id)
+      .then((place) => {
+        if (active)
+          setPlaces((old) =>
+            old.some((item) => item.id === place.id) ? old : [...old, place],
+          );
+      })
+      .catch((error: Error) => {
+        if (active) setNotice(error.message);
+      });
+    return () => {
+      active = false;
+    };
+  }, [route.placeId, route.targetId, places]);
+  const closeOverlay = useCallback(() => {
+    const current = routeRef.current;
+    if (current.overlay) navigate(-1);
+    else navigate(current.background, { replace: true });
+  }, [navigate]);
+  function setTab(next: "plan" | "explore" | "trip") {
+    navigate(
+      next === "plan" ? "/plan" : next === "trip" ? "/saved" : "/discover",
+    );
+  }
+  function setSelected(place: Place | null) {
+    if (!place) {
+      if (routeRef.current.placeId) closeOverlay();
+      return;
+    }
+    navigate(`/places/${encodeURIComponent(place.id)}`, {
+      state: {
+        overlay: true,
+        backgroundPath: routeRef.current.path + routeRef.current.search,
+      },
+    });
+  }
+  const setPanel = useCallback(
+    (value: Panel | ((current: Panel) => Panel)) => {
+      const current = routeRef.current,
+        next = typeof value === "function" ? value(current.panel) : value;
+      if (next === current.panel) return;
+      if (!next) {
+        if (current.panel) closeOverlay();
+        return;
+      }
+      const id = current.placeId || current.targetId || rememberedPlace?.id;
+      navigate(
+        panelPaths[next] +
+          (id &&
+          ["contribute", "feedback", "correction", "report"].includes(next)
+            ? `?place=${encodeURIComponent(id)}`
+            : ""),
+        {
+          state: {
+            overlay: true,
+            backgroundPath: current.path + current.search,
+          },
+        },
+      );
+    },
+    [navigate, rememberedPlace?.id, closeOverlay],
+  );
+  const setLoginOverlay = useCallback(
+    (open: boolean) => {
+      if (open) {
+        navigate("/login", {
+          state: {
+            overlay: true,
+            backgroundPath: routeRef.current.path + routeRef.current.search,
+          },
+        });
+      } else if (routeRef.current.path === "/login") closeOverlay();
+    },
+    [navigate, closeOverlay],
+  );
   useEffect(() => {
     if (
       config.demo ||
@@ -96,7 +196,7 @@ export default function App() {
     return () => {
       active = false;
     };
-  }, [session]);
+  }, [session, setPanel]);
 
   useEffect(() => {
     if (config.demo) return;
@@ -124,7 +224,7 @@ export default function App() {
         if (active) {
           if (error)
             setNotice(t("로그인 링크가 만료되었어요. 다시 요청해 주세요."));
-          window.history.replaceState({}, "", window.location.pathname);
+          navigate(readDraft() ? "/contribute" : "/plan", { replace: true });
         }
       });
     void supabase.auth.getSession().then(({ data }) => {
@@ -136,14 +236,13 @@ export default function App() {
       setSession(next);
       if (next) {
         setLoginOverlay(false);
-        setPanel((current) => (current === "login" ? null : current));
       }
     });
     return () => {
       active = false;
       subscription.unsubscribe();
     };
-  }, [t]);
+  }, [t, navigate, setLoginOverlay]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 4500);
@@ -173,7 +272,6 @@ export default function App() {
     .map((id) => places.find((p) => p.id === id))
     .filter((p): p is Place => Boolean(p));
   function openContribution(place?: Place) {
-    setSelected(null);
     setContributePlace(place);
     setPanel("contribute");
   }
@@ -257,11 +355,13 @@ export default function App() {
           )}
           {tab === "plan" ? (
             <Suspense fallback={<p role="status">{t("planner.checking")}</p>}>
-              <Planner
-                signedIn={Boolean(session)}
-                userId={session?.user.id}
-                onLogin={() => setLoginOverlay(true)}
-              />
+              <MemberConsent userId={session?.user.id}>
+                <Planner
+                  signedIn={Boolean(session)}
+                  userId={session?.user.id}
+                  onLogin={() => setLoginOverlay(true)}
+                />
+              </MemberConsent>
             </Suspense>
           ) : tab === "explore" ? (
             <>
@@ -315,7 +415,7 @@ export default function App() {
                 </label>
                 <div className="neighborhood">
                   <MapPin size={16} />
-                  <span>{t("서울 성수")}</span>
+                  <span>{config.demo ? t("서울 성수") : t("장소 지도")}</span>
                   <span className="neighborhood-dot" />
                 </div>
               </div>
@@ -338,7 +438,7 @@ export default function App() {
                     ) : c === "혼밥" ? (
                       <Heart size={15} />
                     ) : null}
-                    {c}
+                    {t(c)}
                   </button>
                 ))}
                 <span className="free-note">{t("발견은 언제나 무료")}</span>
@@ -494,6 +594,12 @@ export default function App() {
                       places={filtered}
                       selected={selected?.id || null}
                       onSelect={setSelected}
+                      center={
+                        filtered[0]
+                          ? [filtered[0].lng, filtered[0].lat]
+                          : undefined
+                      }
+                      caption={config.demo ? undefined : t("장소 지도")}
                     />
                   </Suspense>
                   <div className="map-bottom-note">
@@ -608,6 +714,20 @@ export default function App() {
             LocalRoute <span>© {new Date().getFullYear()}</span>
           </span>
           <p>{t("누군가의 동네가, 당신의 좋은 여행이 되도록.")}</p>
+          <div className="legal-page-links">
+            <a href="/legal/privacy">
+              {language === "ko" ? "개인정보 처리방침" : "Privacy"}
+            </a>
+            <a href="/legal/terms">
+              {language === "ko" ? "이용약관" : "Terms"}
+            </a>
+            <a href="/legal/transfers">
+              {language === "ko" ? "국외 이전 안내" : "Overseas processing"}
+            </a>
+            <a href="/legal/location">
+              {language === "ko" ? "위치정보 안내" : "Location"}
+            </a>
+          </div>
           <button
             className="text-button"
             onClick={() => {
@@ -761,11 +881,17 @@ export default function App() {
                 <Plus size={18} /> {t("나도 추천하기")}
               </button>
             </div>
+            {!config.demo && session && (
+              <BookingButton
+                api={bookingApi}
+                placeId={selected.id}
+                language={language}
+              />
+            )}
             <button
               className="secondary full"
               onClick={() => {
                 setContributePlace(selected);
-                setSelected(null);
                 setPanel("feedback");
               }}
             >
@@ -776,7 +902,6 @@ export default function App() {
                 className="text-button"
                 onClick={() => {
                   setContributePlace(selected);
-                  setSelected(null);
                   setPanel("correction");
                 }}
               >
@@ -786,7 +911,6 @@ export default function App() {
                 className="text-button"
                 onClick={() => {
                   setContributePlace(selected);
-                  setSelected(null);
                   setPanel("report");
                 }}
               >
@@ -798,35 +922,49 @@ export default function App() {
       )}
       {panel === "contribute" && (
         <Modal title={t("맛집 추천하기")} onClose={() => setPanel(null)}>
-          <ContributionForm
-            places={places}
-            initial={contributePlace}
-            loggedIn={Boolean(session)}
-            onLogin={() => setLoginOverlay(true)}
-          />
+          <MemberConsent userId={session?.user.id}>
+            <ContributionForm
+              places={places}
+              initial={contributePlace}
+              loggedIn={Boolean(session)}
+              onLogin={() => setLoginOverlay(true)}
+            />
+          </MemberConsent>
         </Modal>
       )}
-      {(panel === "login" || loginOverlay) && (
+      {(panel === "login" ||
+        loginOverlay ||
+        (["profile", "bookingSetup"].includes(panel || "") && !session)) && (
         <Modal
           title={t("LocalRoute 로그인")}
           onClose={() => {
-            setLoginOverlay(false);
-            if (panel === "login") setPanel(null);
+            if (panel === "profile" || panel === "bookingSetup") setPanel(null);
+            else setLoginOverlay(false);
           }}
         >
           <Login />
         </Modal>
       )}
-      {panel === "profile" && (
+      {panel === "profile" && session && (
         <Modal title={t("나의 LocalRoute")} onClose={() => setPanel(null)}>
           <div className="profile-panel">
             <h3>{t("반가워요, 동네 탐험가님")}</h3>
             <p>{session?.user.email}</p>
             {!config.demo && (
-              <>
+              <LegalConsentGate userId={session?.user.id || ""}>
                 <Workspace />
                 <BookingProfile />
-              </>
+                <details className="consent-settings" id="consent-settings">
+                  <summary>
+                    {language === "ko"
+                      ? "동의 설정 · 지역 공개 변경"
+                      : "Consent settings · home area publication"}
+                  </summary>
+                  <LegalConsentGate userId={session?.user.id || ""} settings>
+                    {null}
+                  </LegalConsentGate>
+                </details>
+              </LegalConsentGate>
             )}
             <div className="notice-box">
               {t(
@@ -851,7 +989,7 @@ export default function App() {
           </div>
         </Modal>
       )}
-      {panel === "bookingSetup" && (
+      {panel === "bookingSetup" && session && (
         <Modal
           title={t("booking.profileTitle")}
           onClose={() => {
@@ -859,7 +997,9 @@ export default function App() {
             setPanel(null);
           }}
         >
-          <BookingProfile onFinished={() => setPanel(null)} />
+          <MemberConsent userId={session.user.id}>
+            <BookingProfile onFinished={() => setPanel(null)} />
+          </MemberConsent>
         </Modal>
       )}
       {panel === "feedback" && contributePlace && (
@@ -870,11 +1010,13 @@ export default function App() {
             setReload((n) => n + 1);
           }}
         >
-          <Feedback
-            place={contributePlace}
-            userId={session?.user.id}
-            onLogin={() => setLoginOverlay(true)}
-          />
+          <MemberConsent userId={session?.user.id}>
+            <Feedback
+              place={contributePlace}
+              userId={session?.user.id}
+              onLogin={() => setLoginOverlay(true)}
+            />
+          </MemberConsent>
         </Modal>
       )}
       {panel === "correction" && (

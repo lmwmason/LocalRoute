@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {attachTestPhoto} from './photo-fixture';
+import { attachTestPhoto } from "./photo-fixture";
 
 test.beforeEach(async ({ page }) => {
   await page.route("https://tiles.openfreemap.org/**", (route) =>
@@ -74,9 +74,11 @@ test("save, reorder and remove a free itinerary; keep assumptions explicit", asy
   await page.getByRole("button", { name: "소담한 식탁 여행에서 삭제" }).click();
   await expect(page.locator(".trip-stop")).toHaveCount(1);
   await page.reload();
-  await expect(
-    page.getByRole("button", { name: "오후의 모퉁이 저장 해제", exact: true }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/saved$/);
+  await expect(page.locator(".trip-stop")).toHaveCount(1);
+  await expect(page.locator(".trip-stop").first()).toContainText(
+    "오후의 모퉁이",
+  );
 });
 test("recommendation preview, explicit consent, pending demo receipt and focus-safe modal", async ({
   page,
@@ -99,6 +101,9 @@ test("recommendation preview, explicit consent, pending demo receipt and focus-s
   ).toBeVisible();
   await expect(page.getByText("검토 대기", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "닫기", exact: true }).click();
+  await expect(page).toHaveURL(/\/places\//);
+  await expect(page.getByRole("dialog", { name: "동네의 발견" })).toBeVisible();
+  await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();
   expect(
     await page.evaluate(
@@ -111,7 +116,7 @@ test("map failure leaves discovery usable and reduced motion works", async ({
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(
-    page.getByText("지도를 불러오지 못했어요", { exact: true }),
+    page.getByText("기본 지도로 전환했어요", { exact: true }),
   ).toBeVisible({ timeout: 20000 });
   await page.getByRole("button", { name: "골목의 면 자세히 보기" }).click();
   await expect(

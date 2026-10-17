@@ -1,4 +1,17 @@
 export const photosKo: Record<string, string> = {
+  "profile.consentSettings": "동의 설정에서 변경",
+  "errors.DESTINATION_SELECTION_INVALID":
+    "여행 지역을 검색하고 정확한 지역을 선택해 주세요.",
+  "planner.coverageRadius":
+    "선택 지역의 대표 위치에서 현지 추천은 5km, 외부 여행 장소는 3km 이내를 찾아요. 지역 전체를 검색하는 것은 아니며 후보가 부족하면 LP를 사용하지 않아요.",
+  "quality.ROUTE_TIME_CONFLICT":
+    "이동 시간과 여유 시간을 확보하도록 방문 시간을 조정해 주세요.",
+  "quality.ROUTE_EVIDENCE_INVALID": "이동 경로를 다시 확인해야 해요.",
+  "quality.ROUTE_UNVERIFIED":
+    "일부 이동 경로를 확인하지 못했어요. 이동 시간을 직접 확인해 주세요.",
+  "planner.multipleActivities": "관심 활동 · 여러 개 선택 가능",
+  "activity.food": "맛집 탐방",
+  "activity.hotspots": "동네의 발견",
   "planner.editStop": "상세 · 시간과 순서 수정",
   "planner.preferencesTitle": "어떤 여행을 떠나고 싶나요?",
   "planner.hidePreferences": "여행 취향 닫기",
@@ -80,6 +93,19 @@ export const photosKo: Record<string, string> = {
   "profile.selfDeclared": "본인 입력 지역 · 거주 미인증",
 };
 export const photosEn: Record<string, string> = {
+  "profile.consentSettings": "Change in consent settings",
+  "errors.DESTINATION_SELECTION_INVALID":
+    "Search and select the exact travel region.",
+  "planner.coverageRadius":
+    "Local recommendations are searched within 5 km and external attractions within 3 km of the region's representative location. This does not cover the entire region. Insufficient candidates cost no LP.",
+  "quality.ROUTE_TIME_CONFLICT":
+    "Adjust visit times to allow for travel and your additional buffer.",
+  "quality.ROUTE_EVIDENCE_INVALID": "The route needs to be checked again.",
+  "quality.ROUTE_UNVERIFIED":
+    "Some routes are unverified. Check travel times before departure.",
+  "planner.multipleActivities": "Activities · choose any",
+  "activity.food": "Local food",
+  "activity.hotspots": "Local discoveries",
   "planner.editStop": "Details · edit time and order",
   "planner.preferencesTitle": "What kind of trip feels like you?",
   "planner.hidePreferences": "Hide travel preferences",
