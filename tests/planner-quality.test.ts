@@ -61,7 +61,7 @@ describe("server schedule quality pipeline", () => {
       ).errors.map((e) => e.code),
     ).toContain("DIETARY_UNVERIFIED");
   });
-  it("rejects missing meals, mismatched dates and excessive pace instead of optimizing away safety", () => {
+  it("rejects missing meals and mismatched dates while warning about preferred pace", () => {
     const schedule = demoSchedule(plannerInput);
     schedule.days[0].stops = schedule.days[0].stops.filter(
       (s) => s.purpose !== "dinner",
@@ -79,7 +79,7 @@ describe("server schedule quality pipeline", () => {
         demoSchedule(plannerInput),
         { ...plannerInput, pace: "relaxed" },
         demoCatalog,
-      ).errors.map((e) => e.code),
+      ).warnings.map((e) => e.code),
     ).toContain("PACE_OVERLOAD");
   });
   it("checks last entry and meal ordering cutoffs while accepting their exact boundary", () => {

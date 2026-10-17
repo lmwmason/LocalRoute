@@ -11,7 +11,6 @@ import {
   regionForDestination,
   requiredMeals,
   scheduleSchema,
-  tripDates,
   type Candidate,
   type Itinerary,
   type Schedule,
@@ -27,7 +26,7 @@ Select exact candidate IDs only. Never invent a venue, hours, prices, travel dur
 Some canonical places have starterRecommendation=true: these are operator-selected initial recommendations grounded in checked official source facts, NOT independent local endorsements or verified personal visits. They may be selected for meals when no independent endorsement is available. Explicitly describe every such selected stop as an operator starter recommendation with independent local feedback unavailable; never claim a contributor visited, reviewed, endorsed, enjoyed or recommended it. localEndorsementCount remains zero for these places. Prefer suitable independent local endorsements when available. Always preserve this distinction in explanations and summaries.
 Known opening intervals must contain the whole visit. Arrive no later than lastEntry when supplied; lunch and dinner must start no later than lastOrder when supplied. These cutoffs are inclusive and must never be invented.
 If neither meal window overlaps the trip by at least 45 minutes, a food-type preference is soft and unavailable; do not force a meal outside the trip. A food activity may still be satisfied by a restaurant visit without labeling it lunch or dinner.
-Create each requested date, no duplicate stops across dates. Include at least one non-food activity daily. Meals must use restaurant candidates with a positive localEndorsementCount OR starterRecommendation=true; never equate the two sources. Lunch starts 11:00-14:00, dinner 17:30-20:30 and lasts at least 45 minutes. Include exactly one lunch when the trip window overlaps 11:00-14:00 by at least 90 minutes, and exactly one dinner when it overlaps 17:30-20:30 by at least 90 minutes. The 90 minutes allow 45 minutes for eating and 45 for flexibility; meals still fit entirely inside the trip window. Never include more than one lunch or one dinner per day. Keep each stop within daily bounds. Visits last 20-240 minutes. Reserve at least transferBufferMinutes between stops; this is a user-reserved buffer, NOT a routing estimate. Keep walking legs below 1.8 km straight-line, wheelchair legs below 1 km, transit below 7 km, car below 12 km. Prefer geographically compact order over ticking boxes. Include a break or a gap of transferBufferMinutes+30 minutes for days of 8+ hours. Pace caps: relaxed 4, balanced 6, active 8 stops/day. Across the itinerary, select at least one preferred activity if any candidate matches a selected activity, and independently select at least one preferred food type as a lunch or dinner if any restaurant candidate matches a selected food type. The food activity matches restaurant kind; other activities and food types match exact tags. A food-type match must not substitute for a missing activity match. Preferences with no matching candidates are soft and should be disclosed as unavailable, never invented. Reflect purpose, companions and budget without inventing factual suitability. Respect known opening intervals; absent hours mean unknown. Never promise dietary or accessibility safety. Preserve all pinned stop dates, candidate IDs, times and purposes exactly. Original pinned explanations are private and will be restored by the server; return a generic explanation for those stops. If the constraints cannot be satisfied, do not fabricate new candidates.`;
+Create each requested date. Never repeat a place within the same day. Prefer varied places across dates, but revisiting the same verified place on a different day is allowed and must be disclosed clearly as a repeat visit. Include at least one non-food activity daily. Meals must use restaurant candidates with a positive localEndorsementCount OR starterRecommendation=true; never equate the two sources. Lunch starts 11:00-14:00, dinner 17:30-20:30 and lasts at least 45 minutes. Include exactly one lunch when the trip window overlaps 11:00-14:00 by at least 90 minutes, and exactly one dinner when it overlaps 17:30-20:30 by at least 90 minutes. The 90 minutes allow 45 minutes for eating and 45 for flexibility; meals still fit entirely inside the trip window. Never include more than one lunch or one dinner per day. Keep each stop within daily bounds. Visits last 20-240 minutes. Reserve at least transferBufferMinutes between stops; this is a user-reserved buffer, NOT a routing estimate. Keep walking legs below 1.8 km straight-line, wheelchair legs below 1 km, transit below 7 km, car below 12 km. Prefer geographically compact order over ticking boxes. Include a break or a gap of transferBufferMinutes+30 minutes for days of 8+ hours. Preferred pace targets: relaxed 4, balanced 6, active 8 stops/day. Exceeding a preferred pace target is allowed with a clear warning, up to the schema maximum of 8 stops/day; never compromise time, meal, opening-hour or route constraints. Across the itinerary, select at least one preferred activity if any candidate matches a selected activity, and independently select at least one preferred food type as a lunch or dinner if any restaurant candidate matches a selected food type. The food activity matches restaurant kind; other activities and food types match exact tags. A food-type match must not substitute for a missing activity match. Preferences with no matching candidates are soft and should be disclosed as unavailable, never invented. Reflect purpose, companions and budget without inventing factual suitability. Respect known opening intervals; absent hours mean unknown. Never promise dietary or accessibility safety. Preserve all pinned stop dates, candidate IDs, times and purposes exactly. Original pinned explanations are private and will be restored by the server; return a generic explanation for those stops. If the constraints cannot be satisfied, do not fabricate new candidates.`;
 
 // Keep this an explicit allowlist: trip restrictions, contributor prose, photos,
 // identities and provider metadata must never cross the model boundary.
@@ -95,10 +94,8 @@ export async function generateValidated(
   pins: PinnedStop[] = [],
   lookup?: (request: TransportRequest) => Promise<TransportLegResult>,
 ): Promise<Pick<Itinerary, "schedule" | "evaluation" | "transport">> {
-  const days = tripDates(input.startDate, input.endDate).length;
   const meals = requiredMeals(input);
-  const requiredRestaurantCount =
-    days * (Number(meals.lunch) + Number(meals.dinner));
+  const requiredRestaurantCount = Number(meals.lunch) + Number(meals.dinner);
   const restaurants = catalog.filter(isMealCandidate);
   if (
     restaurants.length < requiredRestaurantCount ||
@@ -143,6 +140,9 @@ export async function generateValidated(
     // Never send a private pinned explanation to Gemini or accept its rewrite.
     // Validate every other pinned field against the original after restoration.
     schedule = structuredClone(schedule);
+    // Repair ordering only: preserve every timestamp, date, identity and pinned field.
+    for (const day of schedule.days)
+      day.stops.sort((a, b) => a.start.localeCompare(b.start));
     for (const pin of pins) {
       const actual = schedule.days
         .find((d) => d.date === pin.date)

@@ -189,7 +189,7 @@ export type Itinerary = {
   evaluation: Evaluation;
   createdAt: string;
   model: string;
-  provenance: "gemini" | "demo";
+  provenance: "gemini" | "demo" | "operator_example";
   cost: number;
   transport?: {
     date: string;
@@ -288,6 +288,7 @@ export function evaluateSchedule(
   )
     errors.push({ code: "DATE_COVERAGE" });
   for (const day of schedule.days) {
+    const seenToday = new Set<string>();
     if (!dates.includes(day.date))
       errors.push({ code: "UNKNOWN_DATE", day: day.date });
     let previousEnd = minutes(input.startTime),
@@ -298,7 +299,7 @@ export function evaluateSchedule(
     const maxStops =
       input.pace === "relaxed" ? 4 : input.pace === "balanced" ? 6 : 8;
     if (day.stops.length > maxStops)
-      errors.push({ code: "PACE_OVERLOAD", day: day.date });
+      warnings.push({ code: "PACE_OVERLOAD", day: day.date });
     for (const stop of day.stops) {
       checks.stopCount++;
       const c = byId.get(stop.candidateId);
@@ -307,7 +308,11 @@ export function evaluateSchedule(
         errors.push({ code: "UNKNOWN_PLACE", ...issue });
         continue;
       }
-      if (seen.has(c.id)) errors.push({ code: "DUPLICATE_STOP", ...issue });
+      if (seenToday.has(c.id))
+        errors.push({ code: "DUPLICATE_STOP", ...issue });
+      else if (seen.has(c.id))
+        warnings.push({ code: "CROSS_DAY_REVISIT", ...issue });
+      seenToday.add(c.id);
       seen.add(c.id);
       const start = minutes(stop.start),
         end = minutes(stop.end),

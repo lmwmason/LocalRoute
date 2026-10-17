@@ -155,6 +155,7 @@ export const ko: Record<string, string> = {
   "quality.UNKNOWN_DATE": "선택하지 않은 날짜가 있어요.",
   "quality.UNKNOWN_PLACE": "확인되지 않은 장소가 있어요.",
   "quality.DUPLICATE_STOP": "같은 장소가 중복되었어요.",
+  "quality.CROSS_DAY_REVISIT": "다른 날 같은 장소를 다시 방문하는 일정이에요.",
   "quality.TIME_BOUNDS": "방문 시간이 하루 범위를 벗어나요.",
   "quality.TIME_CONFLICT": "방문 시간과 이동 여유가 겹쳐요.",
   "quality.UNREALISTIC_ROUTE": "장소 사이의 이동이 너무 멀어요.",
@@ -345,6 +346,8 @@ export const en: Record<string, string> = {
   "quality.UNKNOWN_DATE": "An unexpected travel date is included.",
   "quality.UNKNOWN_PLACE": "A stop is not in the identified candidate list.",
   "quality.DUPLICATE_STOP": "The same place is included more than once.",
+  "quality.CROSS_DAY_REVISIT":
+    "This itinerary revisits the same place on a different day.",
   "quality.TIME_BOUNDS": "A visit falls outside your daily window.",
   "quality.TIME_CONFLICT": "Visits overlap or leave too little travel buffer.",
   "quality.UNREALISTIC_ROUTE": "The next stop is too far away.",
