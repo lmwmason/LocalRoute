@@ -1,0 +1,53 @@
+.transport-leg {
+  min-width: 0;
+  max-width: 100%;
+  padding: 16px;
+  border: 1px solid #dce3ed;
+  border-radius: 16px;
+  background: #f7f9fc;
+  color: #263247;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.transport-leg p {
+  margin: 8px 0;
+}
+.transport-leg small {
+  display: block;
+  color: #48576b;
+}
+.transport-leg [role="alert"] {
+  color: #a12630;
+  font-weight: 600;
+}
+.transport-leg summary,
+.transport-leg button {
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.transport-leg summary {
+  margin-top: 8px;
+}
+.transport-leg button {
+  margin-top: 12px;
+  border: 1px solid #c7d4e5;
+  border-radius: 10px;
+  background: white;
+  color: #205cc4;
+  font: inherit;
+}
+.transport-leg summary:focus-visible,
+.transport-leg button:focus-visible {
+  outline: 3px solid #205cc4;
+  outline-offset: 2px;
+}
+.transport-leg ol {
+  padding-inline-start: 24px;
+}
+.transport-leg li + li {
+  margin-top: 12px;
+}
