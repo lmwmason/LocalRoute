@@ -24,7 +24,7 @@ export const euljiroExample = {
       purpose: "lunch" as const,
       openingHours: null,
       bookingAvailability: null,
-      canonicalPlaceId: null,
+      canonicalPlaceId: "5bdc3ee1-3ae8-4e25-a72d-c1842565643a",
       heyyumiPlaceId: null,
       sources: [
         {
@@ -47,7 +47,7 @@ export const euljiroExample = {
       purpose: "break" as const,
       openingHours: null,
       bookingAvailability: null,
-      canonicalPlaceId: null,
+      canonicalPlaceId: "5e5098cd-0fbd-43c7-b9f4-5b81d8e3720c",
       heyyumiPlaceId: null,
       sources: [
         { label: "HideMePlease", url: "https://hidemeplease.xyz/" },
@@ -71,7 +71,7 @@ export const euljiroExample = {
       purpose: "visit" as const,
       openingHours: null,
       bookingAvailability: null,
-      canonicalPlaceId: null,
+      canonicalPlaceId: "468d4c2f-0ee6-4fa3-a8f4-0c41742c6819",
       heyyumiPlaceId: null,
       sources: [
         {

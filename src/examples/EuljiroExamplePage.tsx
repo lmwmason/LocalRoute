@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowUpRight, Coffee, Copy, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Copy, MapPin } from "lucide-react";
 import { BrandLink } from "../components/BrandLink";
 import { LanguageSwitch, useI18n } from "../i18n";
 import type { Place } from "../../shared/domain";
@@ -11,6 +11,8 @@ import {
 } from "../../shared/euljiro-example";
 import "./euljiro-example.css";
 import { api } from "../api";
+import { EuljiroStopImage } from "./EuljiroStopImage";
+import { EuljiroBookingPanel } from "./EuljiroBookingPanel";
 
 const Map = lazy(() => import("../components/Map"));
 const mapPlaces: Place[] = euljiroExample.stops.map((stop) => ({
@@ -40,7 +42,6 @@ const copy = {
     planTime: "계획 시간 · 한국 시간",
     sourceListing: "출처를 확인한 운영자 예시 · 현지인 후기와 별도",
     hours: "당일 영업·개방 미확인",
-    photos: "실제 사진 미등록",
     source: "정보 출처",
     checked: "자료 확인",
     details: "LocalRoute 장소 보기",
@@ -79,7 +80,6 @@ const copy = {
     sourceListing:
       "Source-based operator example · separate from local feedback",
     hours: "Opening on your date unverified",
-    photos: "Real photo not registered",
     source: "Information source",
     checked: "Sources checked",
     details: "View LocalRoute place",
@@ -158,12 +158,7 @@ export default function EuljiroExamplePage({
             {euljiroExample.stops.map((stop, index) => {
               const id = `example:${stop.key}`;
               const matching = catalog.filter(
-                (place) =>
-                  place.name === stop.name &&
-                  place.address === stop.address &&
-                  place.officialSources?.some((source) =>
-                    stop.sources.some((known) => known.url === source.url),
-                  ),
+                (place) => place.id === stop.canonicalPlaceId,
               );
               const supplied = canonicalPlaceIds[stop.key];
               const canonicalId =
@@ -212,6 +207,10 @@ export default function EuljiroExamplePage({
                       </span>
                       <MapPin size={20} />
                     </button>
+                    <EuljiroStopImage
+                      key={stop.key}
+                      place={matching.length === 1 ? matching[0] : undefined}
+                    />
                     <div className="example-stop-body">
                       <p>{stop.address}</p>
                       <p>{text.summaries[index]}</p>
@@ -219,10 +218,6 @@ export default function EuljiroExamplePage({
                         {text.sourceListing}
                       </p>
                       <span className="example-unknown">{text.hours}</span>
-                      <div className="example-photo-empty">
-                        <Coffee size={20} aria-hidden="true" />
-                        <span>{text.photos}</span>
-                      </div>
                       <div className="example-place-actions">
                         <a
                           href={`https://map.kakao.com/link/to/${encodeURIComponent(stop.name)},${stop.lat},${stop.lng}`}
@@ -278,26 +273,13 @@ export default function EuljiroExamplePage({
             <p className="example-route-note">{text.unknownTravel}</p>
           </aside>
         </div>
-        <section
-          className="example-booking"
-          aria-labelledby="example-booking-title"
-        >
-          <Coffee size={24} />
-          <h2 id="example-booking-title">{text.booking}</h2>
-          <p id="example-booking-note">{text.bookingBody}</p>
-          <button disabled aria-describedby="example-booking-note">
-            {text.bookingDisabled}
-          </button>
-          <a
-            href="https://www.spacecloud.kr/space/59739"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {text.external}
-            <ArrowUpRight size={16} />
-          </a>
-          <small>{text.externalNote}</small>
-        </section>
+        <EuljiroBookingPanel
+          placeId={
+            catalog.find(
+              (place) => place.id === euljiroExample.stops[1].canonicalPlaceId,
+            )?.id
+          }
+        />
         <footer className="example-actions">
           <Link className="primary" to="/plan/new/1">
             {text.own}

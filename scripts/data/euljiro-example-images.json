@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "scope": "public Euljiro example only",
+  "generatedWith": "built-in image_gen",
+  "illustrations": [
+    {
+      "placeKey": "wooraeok",
+      "assetPath": "/example-images/lunch-ai.png",
+      "isActualPlacePhoto": false,
+      "prompt": "Use case: stylized-concept. Asset type: landscape 3:2 editorial illustration for a travel itinerary card. Subject: A bowl of Korean cold buckwheat noodles in clear broth on a minimal warm ceramic table, chopsticks, cucumber garnish. A generic illustration of lunch, not any restaurant's actual dish. Style: refined watercolor on textured paper, warm ivory, muted greens and restrained blue accents, natural appealing composition, visibly an illustration and not photorealistic. No people, venue names, brand marks, shop signs or invented interior. Main subject centered with breathing space. Add a permanent narrow cream caption band across bottom, fully visible and with safe margins. Exact dark navy Korean text: \"AI 일러스트 · 실제 매장 사진 아님\". Small English line below: \"AI illustration · Not a venue photo\". Clear legible lettering at thumbnail sizes. One image only.",
+      "sha256": "35afedeb1dca0dd13a7d9ad44fbb54301fc9c645929497453cc8500905adc1f6",
+      "bytes": 2958568
+    },
+    {
+      "placeKey": "hidemeplease-euljiro",
+      "assetPath": "/example-images/coffee-ai.png",
+      "isActualPlacePhoto": false,
+      "prompt": "Use case: stylized-concept. Asset type: landscape 3:2 editorial illustration for a travel itinerary card. Subject: A ceramic cup of coffee, a small pastry on a plate, and a soft leafy shadow on a warm minimal tabletop. A generic illustration of a cafe break, not any actual cafe's menu or interior. Style: refined watercolor on textured paper, warm ivory, muted greens and restrained blue accents, natural appealing composition, visibly an illustration and not photorealistic. No people, venue names, brand marks, shop signs or invented interior. Main subject centered with breathing space. Add a permanent narrow cream caption band across bottom, fully visible and with safe margins. Exact dark navy Korean text: \"AI 일러스트 · 실제 매장 사진 아님\". Small English line below: \"AI illustration · Not a venue photo\". Clear legible lettering at thumbnail sizes. One image only.",
+      "sha256": "6476645cefafd0055710a07c9451c0f1d3a51f2d67c2eee3da00e36b66853c71",
+      "bytes": 2908538
+    }
+  ],
+  "photos": [
+    {
+      "placeKey": "tapgol-park",
+      "assetPath": "/example-images/tapgol-park-tristan-surtel.jpg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Tapgol_Park,_Seoul.jpg",
+      "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/3/39/Tapgol_Park%2C_Seoul.jpg",
+      "author": "Tristan Surtel",
+      "title": "Tapgol Park, Seoul",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "capturedAt": "2019-07-31",
+      "checkedAt": "2026-10-17 05:25:53 UTC",
+      "visualReview": "Original opened with view_image; octagonal pavilion, mature pine and surrounding park scene match Commons description and geotag 37.571298,126.988071, near the public example park pin. This is a historic photo, not proof of today's condition.",
+      "changes": "Original downloaded bytes preserved without modification.",
+      "attribution": "Tapgol Park, Seoul — Tristan Surtel, 2019-07-31, CC BY-SA 4.0, via Wikimedia Commons; original unchanged.",
+      "sha256": "33081e9739a2a7b9ea7f1ce660c91a33c4476d7ed3d3363fc1c57a0915c0f430",
+      "bytes": 5427006
+    }
+  ]
+}

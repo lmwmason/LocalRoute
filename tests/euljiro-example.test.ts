@@ -30,7 +30,7 @@ describe("real-place public Euljiro example", () => {
     expect(euljiroExamplePath).toBe("/examples/euljiro");
     for (const stop of euljiroExample.stops) {
       expect(stop.heyyumiPlaceId).toBeNull();
-      expect(stop.canonicalPlaceId).toBeNull();
+      expect(stop.canonicalPlaceId).toMatch(/^[0-9a-f-]{36}$/);
       expect(stop.openingHours).toBeNull();
       expect(stop.bookingAvailability).toBeNull();
     }

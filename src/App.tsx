@@ -804,6 +804,7 @@ export default function App() {
                           <PlacePhoto
                             id={p.photo?.id}
                             sourcePhoto={p.sourcePhoto}
+                            displayMedia={p.displayMedia}
                             name={p.name}
                             className="place-art actual-place-photo"
                           />
@@ -1090,6 +1091,7 @@ export default function App() {
             <PlacePhoto
               id={selected.photo?.id}
               sourcePhoto={selected.sourcePhoto}
+              displayMedia={selected.displayMedia}
               name={selected.name}
               className="place-art actual-place-photo"
             />

@@ -265,11 +265,15 @@ export function ItineraryEditor({
                     <PlacePhoto
                       id={candidate.photo?.id}
                       sourcePhoto={candidate.sourcePhoto}
+                      displayMedia={candidate.displayMedia}
                       name={candidate.name}
                       className="stop-photo"
                     />
                     {!candidate.photo && (
-                      <PlaceOrigin sourcePhoto={candidate.sourcePhoto} />
+                      <PlaceOrigin
+                        sourcePhoto={candidate.sourcePhoto}
+                        displayMedia={candidate.displayMedia}
+                      />
                     )}
                     <div className="stop-title">
                       <button

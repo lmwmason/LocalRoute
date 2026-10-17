@@ -1,0 +1,24 @@
+.place-illustration {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  background: #fbf5e9;
+}
+.place-illustration > img {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  object-fit: contain;
+}
+.place-illustration-label {
+  display: block;
+  flex-shrink: 0;
+  padding: 4px 6px;
+  color: #444b56;
+  background: #fff9ee;
+  font: 500 10px/1.45 sans-serif;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
