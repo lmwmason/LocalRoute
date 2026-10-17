@@ -203,7 +203,8 @@ describe("Euljiro booking entry with existing reservation form (mock only)", () 
           .click();
         expect(await consent.isChecked()).toBe(false);
         await consent.check();
-        for (const control of await page.locator("button, a, input").all()) {
+        // The checkbox's entire label is its touch target, matching native input behavior.
+        for (const control of await page.locator("button, a, input:not([type=checkbox]), .lr-booking-consent").all()) {
           const box = await control.boundingBox();
           if (box) {
             expect(box.height).toBeGreaterThanOrEqual(44);

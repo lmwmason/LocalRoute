@@ -21,6 +21,9 @@ type Props = {
   onReservation?: (reservation: Reservation) => void;
 };
 export function BookingButton(props: Props) {
+  return <BookingSupport key={JSON.stringify([props.placeId, props.initialDate, props.initialTime])} {...props} />;
+}
+function BookingSupport(props: Props) {
   const { api, placeId, language = "ko" } = props;
   const t = messages[language];
   const [open, setOpen] = useState(false);
@@ -29,24 +32,45 @@ export function BookingButton(props: Props) {
   const [failure, setFailure] = useState("");
   const [retry, setRetry] = useState(0);
   const [fallback, setFallback] = useState<BookingVenue>();
+  const [existing, setExisting] = useState<Reservation | null>(null);
+  const [retryAt, setRetryAt] = useState(0);
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    if (retryAt <= Date.now()) return;
+    const timer = setInterval(() => {
+      const current = Date.now();
+      setNow(current);
+      if (current >= retryAt) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [retryAt]);
   useEffect(() => {
     let active = true;
     setChecking(true);
     setFailure("");
     setEnabled(false);
     setFallback(undefined);
-    api
-      .capabilities()
-      .then(async (v) => {
+    setExisting(null);
+    void (async () => {
+      if (props.initialDate && api.existing) {
+        const previous = await api.existing(placeId, props.initialDate);
+        if (previous) {
+          if (active) setExisting(previous);
+          return;
+        }
+      }
+      const v = await api.capabilities();
         if (!v.enabled) return;
         const venue = await api.venue(placeId);
         if (active) {
           setEnabled(venue.supported);
           setFallback(venue);
         }
-      })
+      })()
       .catch((error) => {
-        if (active)
+        if (active) {
+          if (error instanceof BookingApiError && error.retryAfter)
+            setRetryAt(Date.now() + error.retryAfter * 1000);
           setFailure(
             error instanceof BookingApiError && error.status === 401
               ? "auth"
@@ -54,6 +78,7 @@ export function BookingButton(props: Props) {
                 ? error.message
                 : "booking.unavailable",
           );
+        }
       })
       .finally(() => {
         if (active) setChecking(false);
@@ -61,7 +86,7 @@ export function BookingButton(props: Props) {
     return () => {
       active = false;
     };
-  }, [api, placeId, retry]);
+  }, [api, placeId, props.initialDate, retry]);
   if (checking)
     return (
       <p className="lr-booking-note" role="status">
@@ -86,11 +111,14 @@ export function BookingButton(props: Props) {
         {failure === "auth" && (
           <a href="/login">{language === "ko" ? "로그인하기" : "Sign in"}</a>
         )}
-        <button type="button" onClick={() => setRetry((n) => n + 1)}>
+        {retryAt > now && <p role="status">{language === "ko" ? `${Math.ceil((retryAt-now)/1000)}초 후 다시 확인할 수 있어요.` : `Retry in ${Math.ceil((retryAt-now)/1000)} seconds.`}</p>}
+        <button type="button" disabled={retryAt > now} onClick={() => setRetry((n) => n + 1)}>
           {language === "ko" ? "예약 정보 다시 확인" : "Retry booking details"}
         </button>
       </div>
     );
+  if (existing)
+    return <ExistingBooking api={api} reservation={existing} language={language} onChange={setExisting} />;
   // Host can render a separately verified contact route when disabled.
   if (!enabled)
     return (
@@ -112,11 +140,25 @@ export function BookingButton(props: Props) {
     </div>
   );
 }
+function ExistingBooking({api,reservation,language,onChange}:{api:BookingApi;reservation:Reservation;language:"ko"|"en";onChange:(reservation:Reservation)=>void}) {
+  const t=messages[language];
+  const [busy,setBusy]=useState(false),[error,setError]=useState("");
+  const active=useRef(true);
+  useEffect(()=>{active.current=true;return()=>{active.current=false;};},[]);
+  return <section className="lr-booking">
+    <p>{language==="ko"?"이 날짜에 기존 예약 요청이 있어요. 새 요청을 자동으로 보내지 않아요.":"An existing reservation request was found for this date. No new request is sent automatically."}</p>
+    <p role="status">{t[reservation.state as keyof typeof t] || t["booking.unavailable"]}</p>
+    <p>{new Date(reservation.reservationTime).toLocaleString(language==="ko"?"ko-KR":"en-GB",{timeZone:"Asia/Seoul"})} (KST) · {reservation.guestCount}</p>
+    {(reservation.reconciliationRequired||reservation.state==="unknown")&&<p>{t.reconcile}</p>}
+    <button type="button" disabled={busy} onClick={async()=>{if(busy)return;setBusy(true);setError("");try{const result=await api.refresh(reservation.id);if(active.current)onChange(result);}catch{if(active.current)setError(t["booking.unavailable"]);}finally{if(active.current)setBusy(false);}}}>{busy?t.busy:t.refresh}</button>
+    {error&&<p role="alert">{error}</p>}
+  </section>;
+}
 export function BookingForm(props: Props) {
   // Changing the itinerary context discards old lookups, errors, review and
   // consent. Cleanup guards prevent an earlier lookup from filling this form.
-  // The place-scoped opaque recovery ID is deliberately retained: changing
-  // dates must not bypass reconciliation of an ambiguous provider submission.
+  // Opaque recovery is scoped to the planned date; another date must remain
+  // bookable. Existing requests for that date are also recovered server-side.
   return (
     <BookingRequestForm
       key={JSON.stringify([
@@ -153,7 +195,7 @@ function BookingRequestForm({
   const [result, setResult] = useState<Reservation>();
   const [attempt, setAttempt] = useState<ReservationInput>();
   // Persist only an opaque request ID, never contact details or consent.
-  const storageKey = `localroute.booking.request.${placeId}`;
+  const storageKey = `localroute.booking.request.${placeId}${initialDate ? `.${initialDate}` : ""}`;
   const [recoveryId, setRecoveryId] = useState(() => {
     try {
       return sessionStorage.getItem(storageKey);

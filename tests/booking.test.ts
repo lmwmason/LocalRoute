@@ -121,6 +121,7 @@ function app(enabled = true) {
     },
   );
   const handler: ErrorRequestHandler = (e, _req, res, _next) => {
+    if (e instanceof AppError && e.retryAfter) res.set("Retry-After", e.retryAfter);
     res
       .status(
         e instanceof z.ZodError ? 400 : e instanceof AppError ? e.status : 500,
@@ -160,6 +161,46 @@ beforeEach(async () => {
     supported: true,
     phone: "0212345678",
   }));
+});
+
+describe("existing reservation recovery and independent rate limits", () => {
+  it("finds only the owner's active reservation on the Korean calendar date without provider submission", async () => {
+    const instance = app();
+    const body = { ...input(), reservationTime: "2099-12-01T00:30:00+09:00" };
+    const created = await request(instance).post("/api/booking/reservations").set("Authorization", "owner").send(body).expect(201);
+    const path = `/api/booking/reservations/existing?placeId=${place}&date=2099-12-01`;
+    const existing = await request(instance).get(path).set("Authorization", "owner").expect(200);
+    expect(existing.body.reservation.id).toBe(created.body.id);
+    expect(existing.body.reservation.state).toBe("pending");
+    expect(JSON.stringify(existing.body)).not.toContain("Private");
+    expect((await request(instance).get(path).set("Authorization", "other").expect(200)).body.reservation).toBeNull();
+    expect((await request(instance).get(path.replace("2099-12-01", "2099-11-30")).set("Authorization", "owner").expect(200)).body.reservation).toBeNull();
+    await request(instance).get(path).expect(401);
+    for (const state of ["submitting", "unknown", "confirmed"]) {
+      await db.query("update public.reservations set state=$1 where id=$2", [state, created.body.id]);
+      expect((await request(instance).get(path).set("Authorization", "owner")).body.reservation.state).toBe(state);
+    }
+    await db.query("update public.reservations set state='declined',reconciliation_required=false where id=$1", [created.body.id]);
+    expect((await request(instance).get(path).set("Authorization", "owner")).body.reservation).toBeNull();
+    await db.query("update public.reservations set reconciliation_required=true where id=$1", [created.body.id]);
+    expect((await request(instance).get(path).set("Authorization", "owner")).body.reservation.id).toBe(created.body.id);
+    expect(provider.submit).toHaveBeenCalledTimes(1);
+  });
+  it("allows 120 reads independently of mutations and returns a decreasing Retry-After", async () => {
+    const instance = app();
+    const path = `/api/booking/reservations/existing?placeId=${place}&date=2099-12-01`;
+    const now = Date.now();
+    const clock = vi.spyOn(Date, "now").mockReturnValue(now);
+    try {
+      for (let i=0;i<120;i++) await request(instance).get(path).set("Authorization","owner").expect(200);
+      clock.mockReturnValue(now+15000);
+      const limited=await request(instance).get(path).set("Authorization","owner").expect(429);
+      expect(limited.body.error).toBe("booking.limit");
+      expect(limited.headers["retry-after"]).toBe("45");
+      // Heavy status reads must not consume the separate mutation bucket.
+      await request(instance).post("/api/booking/reservations").set("Authorization","owner").send(input()).expect(201);
+    } finally { clock.mockRestore(); }
+  });
 });
 describe("booking access, consent and durable state", () => {
   it("recovers abandoned submitting state, honors provider expiry, and denies anonymous table access", async () => {

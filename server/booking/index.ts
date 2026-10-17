@@ -47,19 +47,21 @@ export function attachBooking(
       ? new HeyYumiBooking(config.heyyumiKey, config.booking?.budget)
       : undefined);
   const buckets = new Map<string, { count: number; expires: number }>();
-  function limit(id: string) {
+  function limit(id: string, mutation: boolean) {
     const now = Date.now();
     for (const [key, entry] of buckets)
       if (entry.expires <= now) buckets.delete(key);
-    const entry = buckets.get(id) || { count: 0, expires: now + 60000 };
-    buckets.set(id, entry);
-    if (++entry.count > 20) throw new AppError(429, "booking.limit", "60");
+    const key = `${mutation ? "write" : "read"}:${id}`;
+    const entry = buckets.get(key) || { count: 0, expires: now + 60000 };
+    buckets.set(key, entry);
+    if (++entry.count > (mutation ? 20 : 120))
+      throw new AppError(429, "booking.limit", String(Math.max(1, Math.ceil((entry.expires - now) / 1000))));
   }
   async function user(req: Request, sending = false) {
     const user = await actor(req); // Must use existing getUser + confirmed-email authenticator.
     if (!config.live || !store || (sending && (!enabled || !provider)))
       throw new AppError(503, "booking.disabled");
-    limit(user.id);
+    limit(user.id, req.method !== "GET");
     return user;
   }
   async function venue(userId: string, placeId: string): Promise<BookingVenue> {
@@ -174,6 +176,12 @@ export function attachBooking(
       row = await settle(u.id, row, result);
     }
     res.status(claim.created ? 201 : 200).json(publicReservation(row));
+  });
+  app.get("/api/booking/reservations/existing", async (req, res) => {
+    const u = await user(req);
+    const query = z.object({ placeId: z.uuid(), date: z.iso.date() }).parse(req.query);
+    const row = await store!.action(u.id, "existing", query);
+    res.json({ reservation: row ? publicReservation(parseRow(row)) : null });
   });
   app.get("/api/booking/reservations/:id", async (req, res) => {
     const u = await user(req);
