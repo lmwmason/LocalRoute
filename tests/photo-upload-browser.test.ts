@@ -52,7 +52,7 @@ describe("actual browser photo normalization", () => {
           'import {preparePhotoUpload} from "/src/photos/prepare-upload.ts"; globalThis.__preparePhotoFixture = preparePhotoUpload;',
       });
       await page.waitForFunction(() => "__preparePhotoFixture" in globalThis);
-      return await page.evaluate(
+      const normalized = await page.evaluate(
         async ({ source, type, fallback }) => {
           if (fallback)
             Object.defineProperty(globalThis, "createImageBitmap", {
@@ -70,23 +70,34 @@ describe("actual browser photo normalization", () => {
             { type },
           );
           const before = await original.arrayBuffer();
+          const beforeView = new Uint8Array(before);
           const result = await preparePhotoUpload(original);
           const after = await original.arrayBuffer();
+          const afterView = new Uint8Array(after);
+          const outputView = new Uint8Array(await result.arrayBuffer());
+          const binaryChunks: string[] = [];
+          for (let offset = 0; offset < outputView.length; offset += 0x8000)
+            binaryChunks.push(
+              String.fromCharCode(...outputView.subarray(offset, offset + 0x8000)),
+            );
           return {
-            bytes: Array.from(new Uint8Array(await result.arrayBuffer())),
+            bytesBase64: btoa(binaryChunks.join("")),
             type: result.type,
             name: result.name,
             size: result.size,
             originalUnchanged:
-              new Uint8Array(before).every(
-                (byte, index) => byte === new Uint8Array(after)[index],
-              ) &&
+              beforeView.length === afterView.length &&
+              beforeView.every((byte, index) => byte === afterView[index]) &&
               original.name === "PRIVATE_ORIGINAL_FILENAME" &&
               original.type === type,
           };
         },
         { source: bytes.toString("base64"), type, fallback },
       );
+      return {
+        ...normalized,
+        bytes: Buffer.from(normalized.bytesBase64, "base64"),
+      };
     } finally {
       await context.close();
     }
