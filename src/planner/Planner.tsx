@@ -455,14 +455,6 @@ export function Planner({
     <section className="planner-page">
       {step === 0 ? (
         <>
-          <PlannerWelcome
-            input={{ ...input, destination: input.destination || "seongsu" }}
-            onActivity={(value) => toggle("activities", value)}
-            onStart={() => {
-              setStep(1);
-              setResult(null);
-            }}
-          />
           {!config.demo && savedPlans.length > 0 && (
             <section className="saved-plans">
               <h2>{t("planner.savedSchedules")}</h2>
@@ -485,6 +477,14 @@ export function Planner({
               ))}
             </section>
           )}
+          <PlannerWelcome
+            input={{ ...input, destination: input.destination || "seongsu" }}
+            onActivity={(value) => toggle("activities", value)}
+            onStart={() => {
+              setStep(1);
+              setResult(null);
+            }}
+          />
         </>
       ) : (
         <div className="wizard-shell">

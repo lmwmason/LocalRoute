@@ -49,6 +49,7 @@ import { PlaceOrigin } from "./components/PlaceOrigin";
 import { LanguageSwitch, useI18n } from "./i18n";
 import { LegalConsentGate } from "./legal";
 import { MonthlyWallet } from "./components/MonthlyWallet";
+import { SavedItineraries } from "./components/SavedItineraries";
 import { VisitRewardRequestPanel } from "./visit-rewards/VisitRewards";
 import { visitRewardsApi } from "./visit-rewards/host-client";
 import { BookingButton } from "./booking/BookingButton";
@@ -917,9 +918,20 @@ export default function App() {
                 {t("나만의 하루로.")}
               </h1>
               <p className="intro-copy">
-                {t("가고 싶은 순서로 정리해 보세요. 이 브라우저에 저장돼요.")}
+                {language === "ko"
+                  ? "계정에 저장한 일정과 가고 싶은 장소를 모았어요."
+                  : "Your account itineraries and bookmarked places, together."}
               </p>
-              {tripPlaces.length === 0 ? (
+              {session?.user.email_confirmed_at && !config.demo && (
+                <MemberConsent userId={session.user.id}>
+                  <SavedItineraries
+                    key={session.user.id}
+                    userId={session.user.id}
+                  />
+                </MemberConsent>
+              )}
+              {tripPlaces.length === 0 && session ? null : tripPlaces.length ===
+                0 ? (
                 <div className="empty-state trip-empty">
                   <Bookmark size={32} />
                   <h3>{t("첫 번째 발견을 담아 보세요")}</h3>

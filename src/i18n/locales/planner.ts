@@ -115,7 +115,7 @@ export const ko: Record<string, string> = {
     "데모에서는 성수의 하루 일정(09:30–20:00)을 체험할 수 있어요.",
   "planner.notEnoughLP": "사용 가능한 LP가 부족해요.",
   "planner.noSchedules": "아직 저장한 AI 일정이 없어요.",
-  "planner.savedSchedules": "저장한 AI 일정",
+  "planner.savedSchedules": "저장한 여행 일정",
   "planner.how": "여행을 만드는 방식",
   "planner.how1": "1. 당신의 취향과 시간을 알려 주세요",
   "planner.how2": "2. 현지인 맛집과 주변 즐길 거리를 엮어요",
@@ -306,7 +306,7 @@ export const en: Record<string, string> = {
     "The demo supports a fictional day in Seongsu, from 09:30 to 20:00.",
   "planner.notEnoughLP": "You do not have enough available LP.",
   "planner.noSchedules": "You have no saved AI itineraries yet.",
-  "planner.savedSchedules": "Saved AI itineraries",
+  "planner.savedSchedules": "Saved itineraries",
   "planner.how": "A day that comes together",
   "planner.how1": "1. Tell us what you enjoy and when you are free",
   "planner.how2": "2. We connect local food with nearby discoveries",
@@ -455,6 +455,10 @@ for (const [key, [k, e]] of Object.entries(errors)) {
 ko["quality.PIN_CHANGED"] = "유지한 장소 또는 시간이 바뀌었어요.";
 en["quality.PIN_CHANGED"] = "A pinned place or time was changed.";
 ko["quality.INVALID_FORMAT"] = "날짜와 시간을 올바르게 입력해 주세요.";
+ko["errors.SCHEDULE_CONSTRAINTS_INFEASIBLE"] =
+  "선택한 지역의 장소와 영업시간으로 일정을 구성하기 어려워요. 날짜를 줄이거나 시간·고정 장소를 조정해 주세요. LP는 차감하지 않았어요.";
+en["errors.SCHEDULE_CONSTRAINTS_INFEASIBLE"] =
+  "The available places and opening times cannot fit this trip. Try fewer days or adjust your time window or pinned stops. No LP was charged.";
 ko["planner.requestMissing"] =
   "저장된 요청을 찾지 못했어요. 이전으로 돌아가 입력을 수정해 주세요. 상태 확인만으로 AI를 다시 호출하지 않아요.";
 ko["planner.validationRetries"] =
