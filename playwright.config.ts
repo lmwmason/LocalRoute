@@ -35,6 +35,6 @@ export default defineConfig({
     url: built ? "http://127.0.0.1:3101" : "http://127.0.0.1:5173",
     reuseExistingServer: !process.env.CI,
     env: { VITE_DATA_MODE: "demo" },
-    timeout: 30000,
+    timeout: built ? 180000 : 30000,
   },
 });

@@ -5,7 +5,7 @@ import {
   localRouteProjectRef,
 } from "../shared/config";
 function jwt(role: string, ref = localRouteProjectRef) {
-  return `${btoa("{}")}\.${btoa(JSON.stringify({ role, ref }))}.fake-signature`;
+  return `${btoa("{}")}.${btoa(JSON.stringify({ role, ref }))}.fake-signature`;
 }
 describe("public configuration allowlist", () => {
   it("accepts publishable and LocalRoute legacy anon keys only", () => {

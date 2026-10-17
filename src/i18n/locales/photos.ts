@@ -1,4 +1,6 @@
 export const photosKo: Record<string, string> = {
+  "errors.AUTH_ACCOUNT_CHANGED":
+    "로그인 계정이 바뀌었어요. 새 계정에서 내용을 확인하고 다시 진행해 주세요.",
   "profile.consentSettings": "동의 설정에서 변경",
   "errors.DESTINATION_SELECTION_INVALID":
     "여행 지역을 검색하고 정확한 지역을 선택해 주세요.",
@@ -93,6 +95,8 @@ export const photosKo: Record<string, string> = {
   "profile.selfDeclared": "본인 입력 지역 · 거주 미인증",
 };
 export const photosEn: Record<string, string> = {
+  "errors.AUTH_ACCOUNT_CHANGED":
+    "Your account changed. Review the request with the current account before continuing.",
   "profile.consentSettings": "Change in consent settings",
   "errors.DESTINATION_SELECTION_INVALID":
     "Search and select the exact travel region.",

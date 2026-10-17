@@ -10,8 +10,15 @@ import type {
   Feedback,
   Workspace,
 } from "../shared/community";
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = (await supabase?.auth.getSession())?.data.session?.access_token;
+async function request<T>(
+  path: string,
+  init: RequestInit = {},
+  expectedUserId?: string,
+): Promise<T> {
+  const session = (await supabase?.auth.getSession())?.data.session;
+  if (expectedUserId && session?.user.id !== expectedUserId)
+    throw new Error("AUTH_ACCOUNT_CHANGED");
+  const token = session?.access_token;
   const response = await fetch(`/api${path}`, {
     ...init,
     headers: {
@@ -76,18 +83,22 @@ export const api = {
     request<{ id: string; result: Itinerary; revision: number }[]>(
       "/itineraries",
     ),
-  generate: (payload: {
-    requestId: string;
-    input: TripInput;
-    expectedCost: number;
-    policyVersion: string;
-    consent: true;
-    sourcePlanId?: string;
-    pinIds?: string[];
-  }) =>
+  generate: (
+    payload: {
+      requestId: string;
+      input: TripInput;
+      expectedCost: number;
+      policyVersion: string;
+      consent: true;
+      sourcePlanId?: string;
+      pinIds?: string[];
+    },
+    expectedUserId?: string,
+  ) =>
     request<Itinerary | { status: "generating"; requestId: string }>(
       "/planning/generate",
       { method: "POST", body: JSON.stringify(payload) },
+      expectedUserId,
     ),
   planStatus: (id: string) =>
     request<{ status: "ready" | "generating" | "failed"; result?: Itinerary }>(
