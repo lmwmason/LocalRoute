@@ -62,7 +62,7 @@ export const discoveryEn: Record<string, string> = {
   추천하기: "Contribute",
   마이: "Me",
   "동네의 발견": "Local discovery",
-  "식당 만족도": "Restaurant satisfaction",
+  "장소 만족도": "Place satisfaction",
   "추천 도움 평가": "Recommendation helpfulness",
   "각 추천별로 확인해요": "Rated per recommendation",
   "현지인의 한마디": "A local’s recommendation",
@@ -168,7 +168,7 @@ Object.assign(discoveryEn, {
   "성수 데모 컬렉션": "Seongsu demo collection",
   "LocalRoute 추천": "LocalRoute recommendations",
   성수동: "Seongsu",
-  "식당 만족도 ·": "Restaurant rating ·",
+  "장소 만족도 ·": "Place satisfaction ·",
   개: "ratings",
   "저장 해제": "Unsave",
   저장: "Save",
@@ -209,8 +209,8 @@ Object.assign(discoveryEn, {
   "장소 지도": "Place map",
   "데모 후기를 남겼어요": "Demo review recorded",
   "후기를 남겼어요": "Review recorded",
-  "방문은 아직 검증되지 않았어요. 식당 만족도와 선택한 추천의 도움 평가는 별도로 기록하며, LP는 지급되지 않아요.":
-    "The visit is unverified. Restaurant satisfaction and the selected recommendation are recorded separately. No LP is paid.",
+  "방문은 아직 검증되지 않았어요. 장소 만족도와 선택한 추천의 도움 평가는 별도로 기록하며, LP는 지급되지 않아요.":
+    "The visit is unverified. Place satisfaction and the selected recommendation are recorded separately. No LP is paid.",
   "후기를 저장하지 못했어요.": "Could not save the review.",
   "에서의 경험은 어땠나요?": "— how was your visit?",
   "방문한 날짜": "Date of visit",

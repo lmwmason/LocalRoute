@@ -39,7 +39,7 @@ export function Feedback({
         </h3>
         <p>
           {t(
-            "방문은 아직 검증되지 않았어요. 식당 만족도와 선택한 추천의 도움 평가는 별도로 기록하며, LP는 지급되지 않아요.",
+            "방문은 아직 검증되지 않았어요. 장소 만족도와 선택한 추천의 도움 평가는 별도로 기록하며, LP는 지급되지 않아요.",
           )}
         </p>
       </div>
@@ -80,8 +80,8 @@ export function Feedback({
         {place.name}
         {t("에서의 경험은 어땠나요?")}
       </h3>
-      <label>{t("식당 만족도")}</label>
-      <div className="star-input" role="group" aria-label={t("식당 만족도")}>
+      <label>{t("장소 만족도")}</label>
+      <div className="star-input" role="group" aria-label={t("장소 만족도")}>
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             type="button"

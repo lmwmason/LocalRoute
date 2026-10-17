@@ -813,6 +813,31 @@ small {
 .maplibregl-ctrl-attrib {
   font-size: 10px !important;
 }
+.map-panel .maplibregl-ctrl-attrib.maplibregl-compact {
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 44px 0 8px;
+  max-width: calc(100% - 20px);
+}
+.map-panel .maplibregl-ctrl-bottom-right {
+  max-width: 100%;
+}
+.map-panel .maplibregl-ctrl-attrib-inner {
+  overflow-wrap: anywhere;
+}
+.map-panel .maplibregl-ctrl-attrib-button {
+  width: 44px;
+  height: 44px;
+  background-position: center;
+}
+.map-panel .maplibregl-ctrl-attrib a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
 .map-loading,
 .map-error,
 .map-placeholder {

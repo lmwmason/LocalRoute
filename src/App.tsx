@@ -825,7 +825,7 @@ export default function App() {
                               <Star size={13} fill="currentColor" />
                               <strong>{p.rating?.toFixed(1) || "—"}</strong>
                               <span>
-                                {t("식당 만족도 ·")}
+                                {t("장소 만족도 ·")}
                                 {p.reviewCount}
                                 {t("개")}
                               </span>
@@ -1115,7 +1115,7 @@ export default function App() {
                 <Star size={20} />
                 <strong>{selected.rating?.toFixed(1) || "—"}</strong>
                 <span>
-                  {t("식당 만족도")}
+                  {t("장소 만족도")}
                   <small>
                     {selected.reviewCount}
                     {t("개 후기")}
