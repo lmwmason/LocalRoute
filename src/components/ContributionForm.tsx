@@ -12,6 +12,9 @@ import { config } from "../config";
 import { api } from "../api";
 import { readDraft, saveDraft } from "../drafts";
 import { PlacePhoto } from "./PlacePhoto";
+import { MenuPhotoAssistant } from "../ai-assistance/MenuPhotoAssistant";
+import { aiAssistance } from "../ai-assistance/host-client";
+import type { ConfirmedMenu } from "../../shared/ai-assistance";
 
 export function ContributionForm({
   places,
@@ -24,7 +27,7 @@ export function ContributionForm({
   loggedIn: boolean;
   onLogin: () => void;
 }) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
 
   const [draft] = useState(() => {
     const saved = readDraft();
@@ -66,6 +69,10 @@ export function ContributionForm({
     return () => URL.revokeObjectURL(url);
   }, [photo]);
   const [text, setText] = useState(draft?.text || "");
+  const [menuDraft, setMenuDraft] = useState<ConfirmedMenu | undefined>(
+    draft?.menuDraft,
+  );
+  const [showMenu, setShowMenu] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -91,10 +98,24 @@ export function ContributionForm({
             kind,
             photoId,
             text,
+            menuDraft,
           },
     );
-  }, [step, selected, manual, name, address, lat, lng, text, kind, photoId]);
+  }, [
+    step,
+    selected,
+    manual,
+    name,
+    address,
+    lat,
+    lng,
+    text,
+    kind,
+    photoId,
+    menuDraft,
+  ]);
   function resetPhoto() {
+    setMenuDraft(undefined);
     setPhoto(null);
     setPhotoId(undefined);
     setPhotoConsent(false);
@@ -131,6 +152,7 @@ export function ContributionForm({
         ? { candidateToken: selected.candidateToken }
         : { placeId: selected?.id }),
     text,
+    menuDraft,
     confirmed: true,
   });
   useEffect(() => {
@@ -444,10 +466,51 @@ export function ContributionForm({
           <div className="optional-note">
             <strong>{t("메뉴 사진은 선택이에요")}</strong>
             <p>
-              {t(
-                "메뉴 사진 분석은 준비 중이에요. 실제 장소 사진은 아래에서 꼭 등록해 주세요.",
-              )}
+              {language === "ko"
+                ? "직접 입력하거나 사진으로 초안을 만들 수 있어요. 확인한 초안은 추천과 함께 비공개로 저장하며 검증된 메뉴 정보로 자동 게시하지 않아요."
+                : "Enter items or extract a photo draft. Confirmed drafts are saved privately with your contribution and are not automatically published as verified menu facts."}
             </p>
+            <button
+              type="button"
+              className="text-button"
+              onClick={() => setShowMenu((old) => !old)}
+            >
+              {language === "ko"
+                ? "선택 메뉴 초안 작성"
+                : "Optional menu draft"}
+            </button>
+            {showMenu && (
+              <MenuPhotoAssistant
+                language={language}
+                onExtract={(file, options) =>
+                  config.demo
+                    ? Promise.resolve({ status: "failed", code: "disabled" })
+                    : aiAssistance.extractMenu(file, options)
+                }
+                onConfirm={(draft) => {
+                  setMenuDraft(draft);
+                  setShowMenu(false);
+                  setConfirmed(false);
+                }}
+                onSkip={() => {
+                  setShowMenu(false);
+                }}
+              />
+            )}
+            {menuDraft && (
+              <p role="status">
+                {language === "ko"
+                  ? `확인한 메뉴 ${menuDraft.items.length}개 · 비공개 초안`
+                  : `${menuDraft.items.length} confirmed items · private draft`}{" "}
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => setMenuDraft(undefined)}
+                >
+                  {language === "ko" ? "초안 삭제" : "Remove draft"}
+                </button>
+              </p>
+            )}
           </div>
           <section className="photo-upload">
             <label>
@@ -542,6 +605,20 @@ export function ContributionForm({
               <p role="alert">{t("photos.reselect")}</p>
             )}
             <blockquote>“{text}”</blockquote>
+            {menuDraft && (
+              <div className="menu-draft-summary">
+                <strong>
+                  {language === "ko"
+                    ? "비공개 메뉴 초안 · 검증 전"
+                    : "Private menu draft · unverified"}
+                </strong>
+                {menuDraft.items.map((item, index) => (
+                  <p key={index}>
+                    {item.name} · {item.price ?? "?"} {item.currency ?? "?"}
+                  </p>
+                ))}
+              </div>
+            )}
             <span className="badge">{t("검토 후 공개")}</span>
           </article>
           <label className="checkbox-label">

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { confirmedMenuSchema } from "./ai-assistance";
 
 export type Endorsement = {
   localArea?: string;
@@ -55,6 +56,7 @@ export const placeTargetSchema = z
     { message: "장소를 하나 선택해 주세요." },
   );
 export const contributionSchema = placeTargetSchema.safeExtend({
+  menuDraft: confirmedMenuSchema.optional(),
   requestId: z.uuid(),
   photoId: z.uuid({ error: "실제 장소 사진을 등록해 주세요." }),
   text: z

@@ -414,7 +414,9 @@ export class SupabaseRepository implements Repository {
     providerVenue?: ProviderVenue,
   ) {
     const { data, error } = await this.admin.rpc(
-      "submit_photographed_contribution",
+      payload.menuDraft
+        ? "submit_contribution_with_menu"
+        : "submit_photographed_contribution",
       {
         p_actor: actor.id,
         p_request_id: payload.requestId,

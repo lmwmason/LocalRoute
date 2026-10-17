@@ -1,6 +1,8 @@
 import { z } from "zod";
+import { confirmedMenuSchema } from "../shared/ai-assistance";
 
 const draftSchema = z.object({
+  menuDraft: confirmedMenuSchema.optional(),
   expires: z.number(),
   requestId: z.uuid(),
   step: z.enum(["place", "write", "preview"]),

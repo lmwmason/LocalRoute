@@ -27,10 +27,19 @@ const community = (
   ]);
 // Public locality now requires versioned evidence, independently of profile metadata.
 const acceptLocality = (actor: string, publicLocalArea: boolean) =>
-  service("select public.legal_consent_action($1,'record',$2)value", [actor, {
-    requestId: crypto.randomUUID(), version: LEGAL_VERSION, language: "ko",
-    terms: true, privacy: true, supabaseTransfer: true, adult: true, publicLocalArea,
-  }]);
+  service("select public.legal_consent_action($1,'record',$2)value", [
+    actor,
+    {
+      requestId: crypto.randomUUID(),
+      version: LEGAL_VERSION,
+      language: "ko",
+      terms: true,
+      privacy: true,
+      supabaseTransfer: true,
+      adult: true,
+      publicLocalArea,
+    },
+  ]);
 const target = {
   manualPlace: {
     kind: "culture",
@@ -88,8 +97,14 @@ afterAll(async () => {
   await db?.close();
 });
 describe("private home area and required, attributed place photos", () => {
-  it('enables RLS on every exposed table, including private booking and photo records',async()=>{
-    expect((await db.query("select c.relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public'and c.relkind='r'and not c.relrowsecurity")).rows).toEqual([]);
+  it("enables RLS on every exposed table, including private booking and photo records", async () => {
+    expect(
+      (
+        await db.query(
+          "select c.relname from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public'and c.relkind='r'and not c.relrowsecurity",
+        )
+      ).rows,
+    ).toEqual([]);
   });
   it("stores optional booking contact details only for the owner and allows deletion without leaking them to audit or public identity", async () => {
     const call = (
@@ -345,15 +360,95 @@ describe("private home area and required, attributed place photos", () => {
       ).rows[0].public,
     ).toBe(false);
   });
-  it('counts the full city catalog and expires only unused or rejected photographs',async()=>{
-    await community(a,'profile',{displayName:'Local curator',homeCity:'충주시',homeArea:'살미면',localityScope:'auto',publicLocalArea:false});
-    await db.exec("insert into public.places(name,address,lat,lng,status)values('Test A','충청북도 충주시 테스트동 1',37,127,'published'),('Test B','충청북도 충주시 테스트동 2',37,127,'published')");
-    expect(await community(a,'locality_counts',{},null)).toEqual({city:2,area:0});
-    expect(await community(b,'locality_counts',{},null)).toEqual({city:0,area:0});
-    const expired=await service('select public.expire_place_photos(100)value');
+  it("counts the full city catalog and expires only unused or rejected photographs", async () => {
+    await community(a, "profile", {
+      displayName: "Local curator",
+      homeCity: "충주시",
+      homeArea: "살미면",
+      localityScope: "auto",
+      publicLocalArea: false,
+    });
+    await db.exec(
+      "insert into public.places(name,address,lat,lng,status)values('Test A','충청북도 충주시 테스트동 1',37,127,'published'),('Test B','충청북도 충주시 테스트동 2',37,127,'published')",
+    );
+    expect(await community(a, "locality_counts", {}, null)).toEqual({
+      city: 2,
+      area: 0,
+    });
+    expect(await community(b, "locality_counts", {}, null)).toEqual({
+      city: 0,
+      area: 0,
+    });
+    const expired = await service(
+      "select public.expire_place_photos(100)value",
+    );
     expect(Array.isArray(expired)).toBe(true);
-    const records=await db.query<{state:string;review:string}>('select state,review from public.place_photos');
-    expect(records.rows.some(record=>record.state==='expired')).toBe(true);
-    expect(records.rows.some(record=>record.state==='linked'&&record.review==='approved')).toBe(true);
+    const records = await db.query<{ state: string; review: string }>(
+      "select state,review from public.place_photos",
+    );
+    expect(records.rows.some((record) => record.state === "expired")).toBe(
+      true,
+    );
+    expect(
+      records.rows.some(
+        (record) => record.state === "linked" && record.review === "approved",
+      ),
+    ).toBe(true);
   });
+  it("saves a confirmed menu draft atomically, privately and without publishing facts", async () => {
+    const requestId = crypto.randomUUID(),
+      record = await photo(a, requestId);
+    const payload = {
+      ...target,
+      photoId: record.id,
+      text: "My own visit with an optional, corrected menu draft.",
+      menuDraft: {
+        confirmed: true,
+        source: "user_confirmed_draft",
+        items: [{ name: "Visible menu item", price: null, currency: null }],
+      },
+    };
+    const submit = (actor: string, value = payload) =>
+      service(
+        "select public.submit_contribution_with_menu($1,$2,$3,null)value",
+        [actor, requestId, value],
+      );
+    const result = await submit(a);
+    expect(await submit(a)).toEqual(result);
+    expect(
+      (
+        await db.query(
+          "select draft from public.contribution_menu_drafts where request_id=$1",
+          [requestId],
+        )
+      ).rows,
+    ).toEqual([{ draft: payload.menuDraft }]);
+    await expect(
+      submit(a, {
+        ...payload,
+        menuDraft: {
+          ...payload.menuDraft,
+          items: [{ name: "Changed draft", price: null, currency: null }],
+        },
+      }),
+    ).rejects.toThrow(/Menu request changed/);
+    await expect(submit(b)).rejects.toThrow(/photograph required/);
+    await db.transaction(async (tx) => {
+      await tx.exec(
+        `set local role authenticated;select set_config('request.jwt.claim.sub','${b}',true)`,
+      );
+      expect(
+        (await tx.query("select * from public.contribution_menu_drafts")).rows,
+      ).toHaveLength(0);
+    });
+    // Keep the pre-existing publication tests independent of this pending fixture.
+    await db.query(
+      "delete from public.contribution_menu_drafts where request_id=$1",
+      [requestId],
+    );
+    await db.query("delete from public.place_submissions where id=$1", [
+      result!.id,
+    ]);
+  });
+
 });
