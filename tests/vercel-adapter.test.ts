@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import request from "supertest";
-import { createVercelApp } from "../api/index";
+import { createVercelApp } from "../server/vercel-runtime";
 
 const deployment = JSON.parse(
   readFileSync(new URL("../vercel.json", import.meta.url), "utf8"),
@@ -62,7 +62,7 @@ describe("Vercel Node adapter", () => {
 describe("Vercel static/API routing contract", () => {
   it("uses the existing Vite build with a bounded Node function", () => {
     expect(deployment.framework).toBe("vite");
-    expect(deployment.buildCommand).toBe("npm run build");
+    expect(deployment.buildCommand).toBe("node scripts/build-vercel-api.mjs");
     expect(deployment.outputDirectory).toBe("dist");
     expect(deployment.functions["api/index.ts"].maxDuration).toBe(180);
     expect(deployment.functions["api/index.ts"].excludeFiles).toContain(".env");

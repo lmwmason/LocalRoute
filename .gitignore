@@ -9,3 +9,6 @@ test-results/
 .supabase/
 supabase/.temp/
 *.tsbuildinfo
+/server-runtime/*.cjs
+.vercel
+.env*

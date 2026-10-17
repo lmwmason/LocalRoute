@@ -2,12 +2,14 @@
 
 Vite builds the frontend into `dist`; one Node function at `api/index.ts` exports the existing Express application. It reuses `createApp`, `readConfig`, `SupabaseRepository`, authentication, legal gates and route validation. It does not start a port listener, load `.env`, serve application source or create another database. The only supported runtime database remains `pjdawapasozsrpnrtsfx`.
 
+The configured build command is `node scripts/build-vercel-api.mjs`. It first uses the existing Vite SSR builder to bundle `server/vercel-runtime.ts` into the private `server-runtime/index.cjs`, then runs the existing `npm run build` checks and frontend build. The small API entry imports that explicit CJS filename. This fixes the observed deployed `ERR_MODULE_NOT_FOUND` for extensionless server imports; source-level tests using TSX/Vite resolution alone did not catch it. Runtime package dependencies remain external and Vercel traces them. The generated runtime is gitignored, outside public `dist`, and rebuilt from current source on every deployment. A plain Node subprocess regression loads the actual API entry and checks health/unknown-route JSON without a TypeScript resolver.
+
 ## Project settings
 
-- Framework: **Vite**; repository root; install with the committed lockfile; build `npm run build`; output `dist`.
+- Framework: **Vite**; repository root; install with the committed lockfile; build `node scripts/build-vercel-api.mjs`; output `dist`.
 - Select supported Node **24.x** in the project settings. The existing package requires Node >=22.12; no new packages are required.
 - Use Fluid compute. The checked official limits permit up to **300 seconds on Hobby**; this function deliberately uses **180 seconds**, not the historical 10/60-second defaults. Two existing Gemini attempts can take 45 seconds each, with destination/activity/routing and database work in addition. This is an upper bound, not a promise that all requests complete within it. Provider budgets and timeouts still apply. [Function duration](https://vercel.com/docs/functions/configuring-functions/duration), [limits](https://vercel.com/docs/functions/limitations).
-- Configure the region deliberately before production. Supabase is currently in Mumbai, India; Vercel calls its Mumbai region `bom1`. No region is silently selected in this file. Update hosting/overseas-processing disclosures to reflect the selected provider and region. [Regions](https://vercel.com/docs/regions).
+- The function region is explicitly **Mumbai, India (`bom1`)**, matching the current Supabase `ap-south-1` database region to reduce database round trips. Update hosting/overseas-processing disclosures to reflect the provider and region. [Regions](https://vercel.com/docs/regions).
 
 ## Environment configuration
 
