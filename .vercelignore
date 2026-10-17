@@ -17,4 +17,8 @@ e2e/
 QA_REPORT.md
 *_HANDOFF*.md
 /*.png
+/*.jpg
+/*.jpeg
+/*.JPG
+/*.Jpg
 *.tsbuildinfo
