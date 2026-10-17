@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { api } from "../api";
 import { config } from "../config";
 import type { AdminData, QueueItem } from "../../shared/community";
 import { decisionSchema } from "../../shared/community";
 import { PlacePhoto } from "./PlacePhoto";
+import { ContributionReviewAid } from "../ai-assistance/ContributionReviewAid";
+import { aiAssistance } from "../ai-assistance/host-client";
+import type { ReviewAssistanceResult } from "../../shared/ai-assistance";
+import { useI18n } from "../i18n";
+import { VisitRewardAdminPanel } from "../visit-rewards/VisitRewards";
+import { visitRewardsApi } from "../visit-rewards/host-client";
 
 const sections = [
   ["전체", "/admin"],
@@ -15,6 +21,10 @@ const sections = [
   ["사용자", "/admin/users"],
 ];
 export function Admin() {
+  const { language } = useI18n();
+  const [aidAvailable, setAidAvailable] = useState(false),
+    [aidBusy, setAidBusy] = useState(false),
+    [aid, setAid] = useState<ReviewAssistanceResult>();
   const [data, setData] = useState<AdminData>({ queue: [], history: [] }),
     [error, setError] = useState(""),
     [loading, setLoading] = useState(true),
@@ -24,6 +34,21 @@ export function Admin() {
     [newPlace, setNewPlace] = useState(false),
     [busy, setBusy] = useState(false);
   const path = window.location.pathname;
+  const selection = useRef(selected);
+  selection.current = selected;
+  useEffect(() => {
+    let active = true;
+    if (!config.demo)
+      fetch("/api/health")
+        .then((response) => response.json())
+        .then((data) => {
+          if (active) setAidAvailable(data.capabilities?.moderation === true);
+        })
+        .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
   useEffect(() => {
     if (config.demo) {
       setData({
@@ -140,11 +165,15 @@ export function Admin() {
       )}
       {loading && <p role="status">권한과 대기 항목을 확인하는 중…</p>}
       {path.endsWith("/rewards") || path.endsWith("/users") ? (
-        <div className="notice-box">
-          {path.endsWith("/rewards")
-            ? "보상은 검증된 방문·추천 귀속·예산을 확인한 뒤 지급합니다. 보상 기능은 출시 검증 전 비활성 상태입니다."
-            : "사용자 권한은 서버의 user_roles에서 확인합니다. 클라이언트에서 역할을 승격하거나 자동 영구 차단하지 않습니다."}
-        </div>
+        path.endsWith("/rewards") && !config.demo ? (
+          <VisitRewardAdminPanel api={visitRewardsApi} language={language} />
+        ) : (
+          <div className="notice-box">
+            {path.endsWith("/rewards")
+              ? "보상은 검증된 방문·추천 귀속·예산을 확인한 뒤 지급합니다. 보상 기능은 출시 검증 전 비활성 상태입니다."
+              : "사용자 권한은 서버의 user_roles에서 확인합니다. 클라이언트에서 역할을 승격하거나 자동 영구 차단하지 않습니다."}
+          </div>
+        )
       ) : (
         <div className="admin-layout">
           <section className="admin-queue">
@@ -158,6 +187,7 @@ export function Admin() {
                 className="admin-item"
                 onClick={() => {
                   setSelected(item);
+                  setAid(undefined);
                   setReason("");
                   setTarget("");
                   setNewPlace(false);
@@ -177,6 +207,42 @@ export function Admin() {
                 <span className="eyebrow">EVIDENCE FIRST</span>
                 <h2>{selected.title}</h2>
                 <p className="evidence-text">{selected.body}</p>
+                {aidAvailable && (
+                  <>
+                    <button
+                      type="button"
+                      className="secondary full"
+                      disabled={aidBusy}
+                      onClick={async () => {
+                        const target = selected;
+                        setAidBusy(true);
+                        try {
+                          const result = await aiAssistance.assessContribution({
+                            id: target.id,
+                            kind: target.kind,
+                            language,
+                          });
+                          if (
+                            selection.current?.id === target.id &&
+                            selection.current?.kind === target.kind
+                          )
+                            setAid(result);
+                        } finally {
+                          setAidBusy(false);
+                        }
+                      }}
+                    >
+                      {language === "ko"
+                        ? "AI 검토 보조 요청"
+                        : "Request AI review aid"}
+                    </button>
+                    <ContributionReviewAid
+                      result={aid}
+                      loading={aidBusy}
+                      language={language}
+                    />
+                  </>
+                )}
                 {selected.kind === "photo" && (
                   <PlacePhoto
                     id={selected.id}
