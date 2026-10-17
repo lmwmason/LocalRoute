@@ -29,8 +29,17 @@ describe("LocalRoute authentication email setup", () => {
       expect(html).toContain('href="{{ .ConfirmationURL }}"');
       expect(html).toContain('lang="en"');
       expect(html).toMatch(/[가-힣]/);
+      expect(html).toContain('Local<span style="color: #2563eb">Route</span>');
+      expect(html).toContain("color: #202b3c");
+      expect(html).not.toMatch(/>\s*{{ \.ConfirmationURL }}\s*</);
       expect(html).not.toMatch(/{{\s*\.(?:Data|Email|Phone|Token|SiteURL)/);
     }
+    expect(payload.mailer_templates_confirmation_content).toContain(
+      "인증 페이지 직접 열기 · Open verification page",
+    );
+    expect(payload.mailer_templates_magic_link_content).toContain(
+      "로그인 페이지 직접 열기 · Open sign-in page",
+    );
   });
 
   it.each([

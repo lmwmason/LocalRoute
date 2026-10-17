@@ -33,12 +33,12 @@
         <td
           style="
             padding: 8px 12px 24px;
-            color: #225bdd;
+            color: #202b3c;
             font-size: 25px;
             font-weight: 700;
           "
         >
-          LocalRoute
+          Local<span style="color: #2563eb">Route</span>
         </td>
       </tr>
       <tr>
@@ -134,10 +134,8 @@
               line-height: 1.7;
             "
           >
-            버튼이 작동하지 않으면 아래 링크를 브라우저에 붙여넣어 주세요.<br /><span
-              lang="en"
-              >If the button does not work, copy this link into your
-              browser.</span
+            버튼이 작동하지 않으면 아래 링크를 눌러 주세요.<br /><span lang="en"
+              >If the button does not work, use the link below.</span
             >
           </p>
           <p
@@ -149,8 +147,17 @@
               line-height: 1.7;
             "
           >
-            <a href="{{ .ConfirmationURL }}" style="color: #225bdd"
-              >{{ .ConfirmationURL }}</a
+            <a
+              href="{{ .ConfirmationURL }}"
+              style="
+                display: inline-block;
+                padding: 12px 0;
+                color: #53657c;
+                font-size: 13px;
+                line-height: 20px;
+                text-decoration: underline;
+              "
+              >인증 페이지 직접 열기 · Open verification page</a
             >
           </p>
         </td>
