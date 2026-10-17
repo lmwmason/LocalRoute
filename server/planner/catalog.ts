@@ -28,12 +28,16 @@ export function localCandidates(
         p.source !== "demo" &&
         distanceMeters(center, p) < 5000 &&
         p.endorsements.length &&
-        !p.possiblyClosed,
+        !p.possiblyClosed &&
+        !p.externalIds?.some((external) => external.possiblyClosed),
     )
     .map((p) => ({
       id: p.id,
       name: p.name,
       photo: p.photo,
+      hours: p.hours,
+      hoursProvenance: p.hoursProvenance,
+      externalIds: p.externalIds,
       kind: p.kind || (p.category === "카페" ? "cafe" : "restaurant"),
       address: p.address,
       lat: p.lat,
@@ -48,6 +52,39 @@ export function localCandidates(
         .filter((e) => e.versionId)
         .map((e) => ({ versionId: e.versionId!, text: e.text })),
     }));
+}
+// Only a persisted provider-to-canonical mapping establishes shared identity.
+// Nearby coordinates or similar names never cause an automatic merge.
+export function deduplicateCandidates(
+  candidates: Candidate[],
+  places: Place[],
+): Candidate[] {
+  const byExternal = new Map<string, Set<string>>(),
+    blocked = new Set<string>();
+  for (const place of places)
+    for (const external of place.externalIds || []) {
+      const key = `${external.provider}:${external.externalId}`;
+      const ids = byExternal.get(key) || new Set<string>();
+      ids.add(place.id);
+      byExternal.set(key, ids);
+      if (place.possiblyClosed || external.possiblyClosed) blocked.add(key);
+    }
+  const canonical = new Set(
+    candidates
+      .filter((candidate) => candidate.source.provider === "localroute")
+      .map((candidate) => candidate.id),
+  );
+  const seen = new Set<string>();
+  return candidates.filter((candidate) => {
+    if (seen.has(candidate.id)) return false;
+    seen.add(candidate.id);
+    if (candidate.source.provider !== "kakao" || !candidate.source.externalId)
+      return true;
+    const key = `kakao:${candidate.source.externalId}`;
+    if (blocked.has(key)) return false;
+    const ids = byExternal.get(key);
+    return !(ids?.size === 1 && canonical.has([...ids][0]));
+  });
 }
 const kakaoSchema = z.object({
   documents: z.array(

@@ -1,5 +1,10 @@
 import { z } from "zod";
 import { confirmedMenuSchema } from "./ai-assistance";
+import type {
+  DateHours,
+  HoursProvenance,
+  PlaceExternalId,
+} from "./place-facts";
 
 export type Endorsement = {
   localArea?: string;
@@ -31,6 +36,9 @@ export type Place = {
   rating: number | null;
   reviewCount: number;
   possiblyClosed?: boolean;
+  hours?: DateHours;
+  hoursProvenance?: HoursProvenance;
+  externalIds?: PlaceExternalId[];
   observedAt?: string | null;
   confidence?: number | null;
   candidateToken?: string;

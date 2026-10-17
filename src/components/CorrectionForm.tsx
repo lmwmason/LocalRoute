@@ -4,6 +4,7 @@ import type { Place } from "../../shared/domain";
 import { correctionSchema } from "../../shared/community";
 import { api } from "../api";
 import { config } from "../config";
+import { hoursFactSchema } from "../../shared/place-facts";
 export function CorrectionForm({
   places,
   initial,
@@ -11,7 +12,35 @@ export function CorrectionForm({
   places: Place[];
   initial?: Place;
 }) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const hoursCopy =
+    language === "en"
+      ? {
+          date: "Date these hours apply",
+          closed: "Closed all day on this date",
+          open: "Opens",
+          close: "Closes",
+          lastEntry: "Last entry (optional)",
+          lastOrder: "Last food order (optional)",
+          split: "There is a break between two opening intervals",
+          interval: "Opening interval",
+          note: "Enter confirmed hours for one date in Korea Standard Time. Add a second interval for a break. Overnight hours need separate dates. Nothing changes until a moderator approves the evidence.",
+          invalid:
+            "Choose a date and valid opening intervals. Closing must follow opening; optional cutoffs must be within that interval. Two intervals must be ordered without overlap.",
+        }
+      : {
+          date: "영업시간을 적용할 날짜",
+          closed: "이 날짜는 종일 휴무예요",
+          open: "영업 시작",
+          close: "영업 종료",
+          lastEntry: "마지막 입장 (선택)",
+          lastOrder: "마지막 음식 주문 (선택)",
+          split: "중간 휴게시간으로 영업 구간이 두 번 나뉘어요",
+          interval: "영업 구간",
+          note: "한국 시간으로 직접 확인한 날짜별 영업시간을 적어 주세요. 휴게시간이 있으면 두 구간으로 나누고, 자정을 넘는 영업은 날짜별로 요청해 주세요. 근거를 운영자가 승인해야 반영돼요.",
+          invalid:
+            "날짜와 올바른 영업 구간을 입력해 주세요. 종료는 시작보다 늦어야 하고, 마지막 입장·주문은 영업 구간 안이어야 해요. 두 구간은 시간순으로 겹치지 않게 적어 주세요.",
+        };
 
   const [placeId, setPlaceId] = useState(initial?.id || ""),
     [field, setField] = useState("name"),
@@ -22,6 +51,13 @@ export function CorrectionForm({
     [busy, setBusy] = useState(false),
     [done, setDone] = useState(false),
     [error, setError] = useState("");
+  const [hoursDate, setHoursDate] = useState("");
+  const [closed, setClosed] = useState(false);
+  const [split, setSplit] = useState(false);
+  const [intervals, setIntervals] = useState([
+    { open: "", close: "", lastEntry: "", lastOrder: "" },
+    { open: "", close: "", lastEntry: "", lastOrder: "" },
+  ]);
   const requestId = useRef(crypto.randomUUID());
   if (done)
     return (
@@ -42,11 +78,36 @@ export function CorrectionForm({
     <form
       onSubmit={async (e) => {
         e.preventDefault();
+        let submittedValue = value;
+        if (field === "hours") {
+          const hours = hoursFactSchema.safeParse({
+            timezone: "Asia/Seoul",
+            dates: {
+              [hoursDate]: closed
+                ? []
+                : intervals.slice(0, split ? 2 : 1).map((interval) => ({
+                    open: interval.open,
+                    close: interval.close,
+                    ...(interval.lastEntry
+                      ? { lastEntry: interval.lastEntry }
+                      : {}),
+                    ...(interval.lastOrder
+                      ? { lastOrder: interval.lastOrder }
+                      : {}),
+                  })),
+            },
+          });
+          if (!hours.success) {
+            setError(hoursCopy.invalid);
+            return;
+          }
+          submittedValue = JSON.stringify(hours.data);
+        }
         const parsed = correctionSchema.safeParse({
           requestId: requestId.current,
           placeId,
           field,
-          value,
+          value: submittedValue,
           evidence,
           contact,
           consent,
@@ -97,15 +158,79 @@ export function CorrectionForm({
           <option value="other">{t("기타")}</option>
         </select>
       </label>
-      <label>
-        {t("올바른 내용")}
-        <textarea
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          maxLength={1000}
-          required
-        />
-      </label>
+      {field === "hours" ? (
+        <fieldset style={{ minWidth: 0, padding: 0, border: 0 }}>
+          <legend>{t("영업시간")}</legend>
+          <p className="muted">{hoursCopy.note}</p>
+          <label>
+            {hoursCopy.date}
+            <input
+              type="date"
+              required
+              value={hoursDate}
+              onChange={(event) => setHoursDate(event.target.value)}
+            />
+          </label>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={closed}
+              onChange={(event) => setClosed(event.target.checked)}
+            />
+            <span>{hoursCopy.closed}</span>
+          </label>
+          {!closed && (
+            <>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={split}
+                  onChange={(event) => setSplit(event.target.checked)}
+                />
+                <span>{hoursCopy.split}</span>
+              </label>
+              {intervals.slice(0, split ? 2 : 1).map((interval, index) => (
+                <fieldset key={index} style={{ minWidth: 0 }}>
+                  <legend>
+                    {hoursCopy.interval} {index + 1}
+                  </legend>
+                  {(["open", "close", "lastEntry", "lastOrder"] as const).map(
+                    (key) => (
+                      <label key={key}>
+                        {hoursCopy[key]}
+                        <input
+                          type="time"
+                          required={key === "open" || key === "close"}
+                          value={interval[key]}
+                          onChange={(event) =>
+                            setIntervals((current) =>
+                              current.map((item, itemIndex) =>
+                                itemIndex === index
+                                  ? { ...item, [key]: event.target.value }
+                                  : item,
+                              ),
+                            )
+                          }
+                        />
+                      </label>
+                    ),
+                  )}
+                </fieldset>
+              ))}
+            </>
+          )}
+        </fieldset>
+      ) : (
+        <label>
+          {t("올바른 내용")}
+          <textarea
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            maxLength={1000}
+            required
+          />
+        </label>
+      )}
       <label>
         {t("확인할 수 있는 근거")}
         <textarea

@@ -5,6 +5,7 @@ import { AppError } from "./errors";
 import type { ProviderVenue } from "./heyyumi";
 import type { PhotoTarget, ProcessedPhoto } from "./photos";
 import { localitySchema } from "../shared/locality";
+import { approvedPlaceHours, placeExternalIds } from "../shared/place-facts";
 
 export type Actor = { id: string; role: "traveler" | "moderator" | "admin" };
 export interface Repository {
@@ -287,7 +288,7 @@ export class SupabaseRepository implements Repository {
     let query = this.auth
       .from("places")
       .select(
-        "id,name,kind,category,address,lat,lng,created_at,place_reviews(rating,verification_state),endorsements!endorsements_place_id_fkey(id,user_id,endorsement_versions!endorsement_versions_endorsement_id_fkey(id,text,endorsement_ratings(helpfulness)))",
+        "id,name,kind,category,address,lat,lng,created_at,place_facts(id,field,value,source,status,observed_at),place_external_ids(provider,external_id,possibly_closed,observed_at),place_reviews(rating,verification_state),endorsements!endorsements_place_id_fkey(id,user_id,endorsement_versions!endorsement_versions_endorsement_id_fkey(id,text,endorsement_ratings(helpfulness)))",
       )
       .eq("status", "published")
       .limit(100);
@@ -330,6 +331,11 @@ export class SupabaseRepository implements Repository {
     if (photos.error || identities.error)
       throw new AppError(503, "장소 사진과 추천자 정보를 불러오지 못했어요.");
     return (data || []).map((p) => ({
+      ...approvedPlaceHours(p.place_facts || []),
+      externalIds: placeExternalIds(p.place_external_ids || []),
+      possiblyClosed: (p.place_external_ids || []).some(
+        (external) => external.possibly_closed === true,
+      ),
       photo: (() => {
         const photo = photos.data?.find((ph) => ph.place_id === p.id);
         return photo

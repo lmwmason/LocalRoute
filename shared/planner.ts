@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { destinationSchema, type Destination } from "./destinations";
+import type { HoursProvenance, PlaceExternalId } from "./place-facts";
 
 export const regions = {
   seongsu: {
@@ -133,6 +134,8 @@ export type Candidate = {
     { open: string; close: string; lastEntry?: string; lastOrder?: string }[]
   >;
   dietaryVerified?: string[];
+  hoursProvenance?: HoursProvenance;
+  externalIds?: PlaceExternalId[];
   possiblyClosed?: boolean;
   accessibilityVerified?: boolean;
 };
