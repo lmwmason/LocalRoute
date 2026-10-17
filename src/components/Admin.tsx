@@ -11,6 +11,7 @@ import type { ReviewAssistanceResult } from "../../shared/ai-assistance";
 import { useI18n } from "../i18n";
 import { VisitRewardAdminPanel } from "../visit-rewards/VisitRewards";
 import { visitRewardsApi } from "../visit-rewards/host-client";
+import { AdminAutomation } from "./AdminAutomation";
 
 const sections = [
   ["전체", "/admin"],
@@ -73,27 +74,55 @@ export function Admin() {
         history: [],
       });
       setLoading(false);
-      return () => { active = false; };
+      return () => {
+        active = false;
+      };
     }
     api
       .admin()
-      .then((value) => { if (active) setData(value); })
-      .catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "ADMIN_UNAVAILABLE"); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+      .then((value) => {
+        if (active) setData(value);
+      })
+      .catch((cause) => {
+        if (active)
+          setError(
+            cause instanceof Error ? cause.message : "ADMIN_UNAVAILABLE",
+          );
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [attempt]);
-  const needsConsent = /LEGAL_CONSENT_REQUIRED|LEGAL_INVALID_OR_OUTDATED/.test(error);
-  const needsLogin = !needsConsent && /LEGAL_VERIFIED_EMAIL_REQUIRED|AUTH_ACCOUNT_CHANGED|AUTH_SESSION|AUTH_REQUIRED|401|로그인|이메일 인증/i.test(error);
-  const needsRole = !needsConsent && !needsLogin && /403|관리자 권한|운영자 권한|FORBIDDEN|permission denied/i.test(error);
+  const needsConsent = /LEGAL_CONSENT_REQUIRED|LEGAL_INVALID_OR_OUTDATED/.test(
+    error,
+  );
+  const needsLogin =
+    !needsConsent &&
+    /LEGAL_VERIFIED_EMAIL_REQUIRED|AUTH_ACCOUNT_CHANGED|AUTH_SESSION|AUTH_REQUIRED|401|로그인|이메일 인증/i.test(
+      error,
+    );
+  const needsRole =
+    !needsConsent &&
+    !needsLogin &&
+    /403|관리자 권한|운영자 권한|FORBIDDEN|permission denied/i.test(error);
   const errorMessage = needsLogin
     ? ko
       ? "현재 주소에서 로그인을 확인해 주세요. localhost와 배포 주소의 로그인 세션은 별도예요. 이 주소에서 이메일 인증을 완료한 계정으로 로그인한 뒤 다시 확인해 주세요."
       : "Please verify your sign-in on this address. Localhost and the deployed site have separate sessions. Sign in here with your email-verified account, then retry."
     : needsConsent
-      ? ko ? "회원 필수 동의를 확인해야 해요. 계정에서 동의를 완료한 뒤 다시 확인해 주세요." : "Current required consent is needed. Complete consent in your account, then retry."
+      ? ko
+        ? "회원 필수 동의를 확인해야 해요. 계정에서 동의를 완료한 뒤 다시 확인해 주세요."
+        : "Current required consent is needed. Complete consent in your account, then retry."
       : needsRole
-        ? ko ? "이 계정의 관리자 권한을 확인하지 못했어요. 관리자에게 권한을 요청하거나 올바른 계정으로 로그인해 주세요." : "This account does not have verified administrator access. Ask an administrator for access or sign in with the correct account."
-        : ko ? "관리자 정보를 불러오거나 처리하지 못했어요. 연결을 확인한 뒤 다시 확인해 주세요." : "Could not load or process administrator information. Check your connection and retry.";
+        ? ko
+          ? "이 계정의 관리자 권한을 확인하지 못했어요. 관리자에게 권한을 요청하거나 올바른 계정으로 로그인해 주세요."
+          : "This account does not have verified administrator access. Ask an administrator for access or sign in with the correct account."
+        : ko
+          ? "관리자 정보를 불러오거나 처리하지 못했어요. 연결을 확인한 뒤 다시 확인해 주세요."
+          : "Could not load or process administrator information. Check your connection and retry.";
   const queue = data.queue.filter((i) =>
     path.endsWith("/places")
       ? ["place", "submission", "correction", "photo"].includes(i.kind)
@@ -181,12 +210,52 @@ export function Admin() {
       {error && (
         <div role="alert" className="error-message">
           <p>{errorMessage}</p>
-          {(needsLogin || needsRole) && <a className="secondary" style={{display:"inline-flex",alignItems:"center",minHeight:44}} href="/login">{ko ? "현재 주소에서 로그인" : "Sign in on this site"}</a>}
-          {needsConsent && <a className="secondary" style={{display:"inline-flex",alignItems:"center",minHeight:44}} href="/account">{ko ? "계정에서 동의 확인" : "Review account consent"}</a>}
-          <button className="secondary" style={{minHeight:44}} disabled={loading} onClick={() => setAttempt(value => value + 1)}>{ko ? "다시 확인" : "Retry"}</button>
+          {(needsLogin || needsRole) && (
+            <a
+              className="secondary"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                minHeight: 44,
+              }}
+              href="/login"
+            >
+              {ko ? "현재 주소에서 로그인" : "Sign in on this site"}
+            </a>
+          )}
+          {needsConsent && (
+            <a
+              className="secondary"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                minHeight: 44,
+              }}
+              href="/account"
+            >
+              {ko ? "계정에서 동의 확인" : "Review account consent"}
+            </a>
+          )}
+          <button
+            className="secondary"
+            style={{ minHeight: 44 }}
+            disabled={loading}
+            onClick={() => setAttempt((value) => value + 1)}
+          >
+            {ko ? "다시 확인" : "Retry"}
+          </button>
         </div>
       )}
-      {loading && <p role="status">{ko ? "권한과 대기 항목을 확인하는 중…" : "Checking access and review items…"}</p>}
+      {loading && (
+        <p role="status">
+          {ko
+            ? "권한과 대기 항목을 확인하는 중…"
+            : "Checking access and review items…"}
+        </p>
+      )}
+      {!loading && !error && !config.demo && aidAvailable && (
+        <AdminAutomation />
+      )}
       {path.endsWith("/rewards") || path.endsWith("/users") ? (
         path.endsWith("/rewards") && !config.demo ? (
           <VisitRewardAdminPanel api={visitRewardsApi} language={language} />

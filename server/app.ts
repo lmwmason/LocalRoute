@@ -7,6 +7,7 @@ import { bookingProfileSchema } from "../shared/booking";
 import { AppError } from "./errors";
 import { attachShares } from "./sharing";
 import { attachTestCheckout } from "./testcheckout";
+import { attachAdminAutomation } from "./admin-automation";
 import { attachVisitRewards, readVisitRewardSettings } from "./visit-rewards";
 import {
   createAiAssistance,
@@ -390,27 +391,30 @@ export function createApp(
   });
   if (repository) {
     const enabled = aiEnabled;
-    attachAiAssistance(
-      app,
-      createAiAssistance({
-        repository,
-        enabled,
-        menuEnabled: config.menuExtraction,
-        reviewEnabled: config.moderation,
-        model: enabled
-          ? createAssistanceModel({
-              key: config.geminiKey,
-              model: config.geminiModel,
-              budget: config.aiBudget,
-              timeoutMs: 15000,
-            })
-          : undefined,
-        maxCalls: enabled ? config.aiBudget : 0,
-        perUserCalls: 3,
-        timeoutMs: 15000,
-        maxConcurrent: 2,
-      }),
-    );
+    const assistance = createAiAssistance({
+      repository,
+      enabled,
+      menuEnabled: config.menuExtraction,
+      reviewEnabled: config.moderation,
+      model: enabled
+        ? createAssistanceModel({
+            key: config.geminiKey,
+            model: config.geminiModel,
+            budget: config.aiBudget,
+            timeoutMs: 15000,
+          })
+        : undefined,
+      maxCalls: enabled ? config.aiBudget : 0,
+      perUserCalls: 3,
+      timeoutMs: 15000,
+      maxConcurrent: 2,
+    });
+    attachAiAssistance(app, assistance);
+    attachAdminAutomation(app, {
+      repository,
+      assistance,
+      enabled: aiEnabled && config.moderation,
+    });
   }
   attachPlanner(app, config, repository, actor, plannerDependencies);
   attachVisitRewards(
