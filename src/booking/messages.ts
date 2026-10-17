@@ -33,7 +33,8 @@ export const messages = {
     failed: "예약 요청 실패",
     no_show: "제공자 표시: 미방문",
     draft: "예약 초안",
-    "booking.disabled": "예약 기능은 권한 확인 후 제공됩니다.",
+    "booking.disabled":
+      "현재 예약 기능을 이용할 수 없어요. 잠시 후 다시 확인해 주세요.",
     "booking.unsupported":
       "헤이유미 예약을 지원하지 않는 식당이에요. 식당에 직접 확인해 주세요.",
     "booking.duplicate":
@@ -84,7 +85,8 @@ export const messages = {
     failed: "Request failed",
     no_show: "Provider reported no-show",
     draft: "Draft",
-    "booking.disabled": "Bookings will be available after access verification.",
+    "booking.disabled":
+      "Booking is currently unavailable. Please check again later.",
     "booking.unsupported":
       "This restaurant does not support HeyYumi bookings. Contact the restaurant directly.",
     "booking.duplicate":

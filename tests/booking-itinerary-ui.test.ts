@@ -175,6 +175,43 @@ describe("itinerary booking prefills (mock API only)", () => {
     await page.getByRole("checkbox").check();
   }
 
+  for (const ko of [true, false]) {
+    it(`${ko ? "ko" : "en"}: a failed booking lookup offers retry and recovers without submitting a reservation`, async () => {
+      const { page, context, calls } = await setup(ko, 390, "form");
+      try {
+        await page
+          .getByRole("button", { name: labels(ko).open, exact: true })
+          .waitFor();
+        let attempts = 0;
+        await context.route("**/api/booking/venues/*", async (route) => {
+          attempts++;
+          await route.fulfill(
+            attempts === 1
+              ? { status: 503, json: { error: "booking.unavailable" } }
+              : { json: venue },
+          );
+        });
+        await page.reload();
+        const retry = page.getByRole("button", {
+          name: ko ? "예약 정보 다시 확인" : "Retry booking details",
+          exact: true,
+        });
+        await retry.waitFor();
+        expect(await page.getByRole("alert").innerText()).not.toContain(
+          "권한 확인 후",
+        );
+        await retry.click();
+        await page
+          .getByRole("button", { name: labels(ko).open, exact: true })
+          .waitFor();
+        expect(attempts).toBe(2);
+        expect(submissions(calls)).toHaveLength(0);
+      } finally {
+        await context.close();
+      }
+    }, 30000);
+  }
+
   for (const ko of [true, false])
     for (const width of [360, 390]) {
       it(`${ko ? "ko" : "en"} ${width}px: each October 20–23 plan passes its actual day and 13:15, editable before review`, async () => {
@@ -214,7 +251,9 @@ describe("itinerary booking prefills (mock API only)", () => {
               ),
             ).toBe(true);
             for (const c of await page
-              .locator(".lr-booking button,.lr-booking input")
+              .locator(
+                ".lr-booking button,.lr-booking input:not([type=checkbox]),.lr-booking-consent",
+              )
               .all()) {
               const box = await c.boundingBox();
               if (box) expect(box.height).toBeGreaterThanOrEqual(44);

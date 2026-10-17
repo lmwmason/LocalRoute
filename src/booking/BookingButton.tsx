@@ -25,9 +25,16 @@ export function BookingButton(props: Props) {
   const t = messages[language];
   const [open, setOpen] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [failure, setFailure] = useState("");
+  const [retry, setRetry] = useState(0);
   const [fallback, setFallback] = useState<BookingVenue>();
   useEffect(() => {
     let active = true;
+    setChecking(true);
+    setFailure("");
+    setEnabled(false);
+    setFallback(undefined);
     api
       .capabilities()
       .then(async (v) => {
@@ -38,11 +45,52 @@ export function BookingButton(props: Props) {
           setFallback(venue);
         }
       })
-      .catch(() => {});
+      .catch((error) => {
+        if (active)
+          setFailure(
+            error instanceof BookingApiError && error.status === 401
+              ? "auth"
+              : error instanceof Error
+                ? error.message
+                : "booking.unavailable",
+          );
+      })
+      .finally(() => {
+        if (active) setChecking(false);
+      });
     return () => {
       active = false;
     };
-  }, [api, placeId]);
+  }, [api, placeId, retry]);
+  if (checking)
+    return (
+      <p className="lr-booking-note" role="status">
+        {language === "ko"
+          ? "예약 지원 여부를 확인하고 있어요…"
+          : "Checking booking support…"}
+      </p>
+    );
+  if (failure)
+    return (
+      <div className="lr-booking" role="alert">
+        <p>
+          {failure === "auth"
+            ? language === "ko"
+              ? "현재 주소에서 이메일 인증을 마친 계정으로 로그인해 주세요."
+              : "Sign in with a verified email on this site to book."
+            : t[failure as keyof typeof t] ||
+              (language === "ko"
+                ? "예약 정보를 불러오지 못했어요. 다시 확인해 주세요."
+                : "Could not load booking details. Please retry.")}
+        </p>
+        {failure === "auth" && (
+          <a href="/login">{language === "ko" ? "로그인하기" : "Sign in"}</a>
+        )}
+        <button type="button" onClick={() => setRetry((n) => n + 1)}>
+          {language === "ko" ? "예약 정보 다시 확인" : "Retry booking details"}
+        </button>
+      </div>
+    );
   // Host can render a separately verified contact route when disabled.
   if (!enabled)
     return (
