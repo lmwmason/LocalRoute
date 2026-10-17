@@ -1,6 +1,44 @@
 import { z } from "zod";
 import { AppError } from "./errors";
 
+// Gemini accepts a subset of JSON Schema. Zod's date regex and string-length
+// keywords can reject the entire request; retain full validation after output.
+export function geminiResponseSchema(schema: z.ZodType): unknown {
+  function compatible(value: unknown): unknown {
+    if (Array.isArray(value)) return value.map(compatible);
+    if (!value || typeof value !== "object") return value;
+    const entries = Object.entries(value);
+    return Object.fromEntries(
+      entries
+        .filter(
+          ([key]) =>
+            ![
+              "$schema",
+              "pattern",
+              "minLength",
+              "maxLength",
+              "format",
+              "minItems",
+              "maxItems",
+              "additionalProperties",
+            ].includes(key),
+        )
+        .map(([key, entry]) => [
+          key,
+          key === "properties" && entry && typeof entry === "object"
+            ? Object.fromEntries(
+                Object.entries(entry).map(([name, child]) => [
+                  name,
+                  compatible(child),
+                ]),
+              )
+            : compatible(entry),
+        ]),
+    );
+  }
+  return compatible(z.toJSONSchema(schema));
+}
+
 export class Gemini {
   private used = 0;
   private resets = 0;
@@ -42,7 +80,7 @@ export class Gemini {
               ],
               generationConfig: {
                 responseMimeType: "application/json",
-                responseJsonSchema: z.toJSONSchema(schema),
+                responseJsonSchema: geminiResponseSchema(schema),
                 temperature: 0.3,
                 maxOutputTokens: 8192,
               },
