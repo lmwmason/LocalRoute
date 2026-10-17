@@ -23,7 +23,7 @@ async function action(
 beforeAll(async () => {
   db = new PGlite();
   await db.exec(
-    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key);create function auth.uid()returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema public,auth to anon,authenticated,service_role;grant select on auth.users to service_role;insert into auth.users values('${user}'),('${other}');`,
+    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key,email_confirmed_at timestamptz default now());create function auth.uid()returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema public,auth to anon,authenticated,service_role;grant select on auth.users to service_role;insert into auth.users(id) values('${user}'),('${other}');`,
   );
   for (const file of readdirSync("supabase/migrations")
     .filter((f) => f.endsWith(".sql"))
@@ -118,10 +118,45 @@ describe("atomic LP reservations, save and debit", () => {
     ).toHaveLength(0);
     const result = {
       id: reserved.id,
-      evaluation: { valid: true },
+      evaluation: {
+        valid: true,
+        errors: [],
+        warnings: [],
+        checks: {
+          stopCount: 2,
+          localMeals: 1,
+          preferenceMatches: 1,
+          verifiedHours: 0,
+        },
+      },
       catalog: [{ id: "grounded-1" }, { id: "grounded-2" }],
       provenance: "gemini",
       title: "A validated test plan",
+      schedule: {
+        title: "A validated test plan",
+        summary: "Grounded, validated accounting fixture.",
+        days: [
+          {
+            date: "2026-11-01",
+            stops: [
+              {
+                candidateId: "grounded-1",
+                start: "10:00",
+                end: "11:00",
+                purpose: "visit",
+                explanation: "Grounded test attraction stop.",
+              },
+              {
+                candidateId: "grounded-2",
+                start: "12:00",
+                end: "13:00",
+                purpose: "lunch",
+                explanation: "Grounded test restaurant stop.",
+              },
+            ],
+          },
+        ],
+      },
     };
     const first = await action(user, "finalize", id, { result });
     const second = await action(user, "finalize", id, { result });
