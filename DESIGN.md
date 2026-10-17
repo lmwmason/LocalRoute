@@ -553,3 +553,10 @@ Toss Product Sans was designed with Korean text, numbers, and symbols as one pro
 - **Spacing and radius scale.** The official TDS documentation publishes no spacing scale and no radius tokens (foundation pages checked 2026-10-13). The `spacing` xs–xxl and `rounded` sm/md values are clusters measured on the TDS documentation pages, kept because they are sourced to that capture; they are not TDS tokens. The button radii are the rendered official Button component, whose page states no radius or height.
 - **Button pressed and focus.** The TDS Button page names `--button-pressed-opacity` and `--button-pressed-background-color` without values and states no focus ring. The `pressed` and `focus` values come from the 2026-09-17 computed-style capture of that page, not from the documentation text.
 - **Coverage.** Four of 43 published TDS components are measured; marketing CTA hover states were not captured.
+
+
+## LocalRoute application direction — founder reference
+
+The additional root `image copy.png` specifies the planner wizard: a blue brand header, a four-part progress indicator, white rounded input cards, icon-led region/date rows, pill choices for activities/food/companions, and a full-width bottom Next action. Treat trip example photographs as layout references only; never ship them as actual venue images without provenance and display rights.
+
+The founder-provided root `image.png` is the application-style reference (latest revision should be reopened before visual work). Preserve the original LocalRoute logo and proportions. Use bright white/soft-gray surfaces, rounded preference cards, pale-blue selection chips and blue timeline accents, compact time-based stop rows, and an itinerary-linked map. Use blue for the primary LocalRoute brand/action. The reference is design direction, not permission to copy third-party branding or assert real venue photos, booking availability, hours, or route data. Mobile usability remains a required acceptance criterion. The Toss material above remains background inspiration; explicit founder direction takes priority.

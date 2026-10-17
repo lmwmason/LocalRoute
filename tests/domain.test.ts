@@ -10,12 +10,14 @@ import { demoPlaces } from "../shared/demo";
 import { readConfig } from "../server/config";
 describe("contribution validation", () => {
   const valid = {
+    photoId: '00000000-0000-4000-8000-000000000002',
     requestId: "00000000-0000-4000-8000-000000000001",
     placeId: demoPlaces[0].id,
     text: "직접 먹어 본 들깨 메뉴가 맛있어요.",
     confirmed: true,
   };
   it("requires one exact internal place and an explicit preview confirmation", () => {
+    expect(contributionSchema.safeParse({...valid,photoId:undefined}).success).toBe(false);
     expect(contributionSchema.safeParse(valid).success).toBe(true);
     expect(
       contributionSchema.safeParse({ ...valid, confirmed: false }).success,

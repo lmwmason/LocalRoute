@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "start": "tsx server/index.ts"
+    "start": "tsx server/index.ts",
+    "photos:cleanup": "tsx scripts/cleanup-photos.ts"
   },
   "engines": {
     "node": ">=22.12.0"

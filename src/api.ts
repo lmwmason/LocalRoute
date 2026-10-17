@@ -1,4 +1,7 @@
 import { supabase } from "./supabase";
+import type { BookingProfile, BookingProfileResponse } from "../shared/booking";
+import type { Locality } from "../shared/locality";
+import type { Itinerary, Schedule, TripInput } from "../shared/planner";
 import type { Contribution, Place } from "../shared/domain";
 import type {
   AdminData,
@@ -24,11 +27,77 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body as T;
 }
 export const api = {
+  bookingProfile: () => request<BookingProfileResponse>("/me/booking-profile"),
+  saveBookingProfile: (profile: BookingProfile) =>
+    request("/me/booking-profile", {
+      method: "PUT",
+      body: JSON.stringify({
+        ...profile,
+        consentVersion: "booking-profile-v1",
+      }),
+    }),
+  deleteBookingProfile: () =>
+    request("/me/booking-profile", { method: "DELETE" }),
+  skipBookingProfile: () =>
+    request("/me/booking-profile/skip", { method: "POST" }),
+  quote: () =>
+    request<{
+      enabled: boolean;
+      cost: number;
+      promo: number | null;
+      earned: number | null;
+      held: number;
+      policyVersion: string;
+    }>("/planning/quote"),
+  plans: () =>
+    request<{ id: string; result: Itinerary; revision: number }[]>(
+      "/itineraries",
+    ),
+  generate: (payload: {
+    requestId: string;
+    input: TripInput;
+    expectedCost: number;
+    policyVersion: string;
+    consent: true;
+    sourcePlanId?: string;
+    pinIds?: string[];
+  }) =>
+    request<Itinerary | { status: "generating"; requestId: string }>(
+      "/planning/generate",
+      { method: "POST", body: JSON.stringify(payload) },
+    ),
+  planStatus: (id: string) =>
+    request<{ status: "ready" | "generating" | "failed"; result?: Itinerary }>(
+      `/planning/status/${id}`,
+    ),
+  savePlan: (id: string, revision: number, schedule: Schedule) =>
+    request<Itinerary>(`/itineraries/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ revision, schedule }),
+    }),
   me: () => request<Workspace>("/me"),
-  profile: (displayName: string) =>
+  localityCoverage: () =>
+    request<{
+      coverage: {
+        label: string;
+        widened: boolean;
+        available: number;
+        coverageSource: string;
+      } | null;
+    }>("/me/locality-coverage"),
+  profile: (
+    displayName: string,
+    locality: Locality,
+    publicLocalArea: boolean,
+  ) =>
     request("/me", {
       method: "PUT",
-      body: JSON.stringify({ requestId: crypto.randomUUID(), displayName }),
+      body: JSON.stringify({
+        requestId: crypto.randomUUID(),
+        displayName,
+        ...locality,
+        publicLocalArea,
+      }),
     }),
   edit: (id: string, text: string, requestId: string) =>
     request(`/endorsements/${id}`, {
@@ -58,4 +127,34 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+  uploadPhoto: async (
+    requestId: string,
+    target: unknown,
+    file: File,
+  ): Promise<{ id: string }> => {
+    const token = (await supabase?.auth.getSession())?.data.session
+      ?.access_token;
+    const response = await fetch(`/api/place-photos/${requestId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": file.type,
+        "X-Place-Target": encodeURIComponent(JSON.stringify(target)),
+        "X-Photo-Consent": "real-place-photo-v1",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: file,
+    });
+    const body = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(body?.error || "photos.error.upload");
+    return body;
+  },
+  photoBlob: async (id: string): Promise<Blob> => {
+    const token = (await supabase?.auth.getSession())?.data.session
+      ?.access_token;
+    const response = await fetch(`/api/place-photos/${id}/image`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!response.ok) throw new Error("photos.error.load");
+    return response.blob();
+  },
 };

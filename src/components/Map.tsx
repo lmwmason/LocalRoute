@@ -1,3 +1,4 @@
+import { useI18n } from "../i18n";
 import { useEffect, useRef, useState } from "react";
 import {
   Map as MapLibre,
@@ -17,17 +18,24 @@ export default function Map({
   places,
   selected,
   onSelect,
+  center,
+  caption,
 }: {
   places: Place[];
   selected: string | null;
   onSelect: (place: Place) => void;
+  center?: [number, number];
+  caption?: string;
 }) {
+  const { t } = useI18n();
+
   const container = useRef<HTMLDivElement>(null);
   const map = useRef<MapLibre | null>(null);
   const onSelectRef = useRef(onSelect);
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const initialCenter = useRef(center || [127.053, 37.5455]);
   useEffect(() => {
     onSelectRef.current = onSelect;
   }, [onSelect]);
@@ -39,7 +47,7 @@ export default function Map({
       instance = new MapLibre({
         container: container.current,
         style: config.mapStyle,
-        center: [127.053, 37.5455],
+        center: initialCenter.current as [number, number],
         zoom: 14.6,
         attributionControl: { compact: true },
       });
@@ -93,18 +101,18 @@ export default function Map({
       });
   }, [selected, places]);
   return (
-    <section className="map-panel" aria-label="장소 지도">
+    <section className="map-panel" aria-label={t("장소 지도")}>
       <div ref={container} className="map-canvas" />
       {!loaded && !failed && (
         <div className="map-loading" role="status">
-          동네 지도를 불러오는 중이에요…
+          {t("동네 지도를 불러오는 중이에요…")}
         </div>
       )}
       {failed && (
         <div className="map-error">
           <MapPinned size={28} />
-          <strong>지도를 불러오지 못했어요</strong>
-          <span>장소 목록은 계속 볼 수 있어요.</span>
+          <strong>{t("지도를 불러오지 못했어요")}</strong>
+          <span>{t("장소 목록은 계속 볼 수 있어요.")}</span>
           <button
             className="small-button"
             onClick={() => {
@@ -113,13 +121,13 @@ export default function Map({
               setAttempt((n) => n + 1);
             }}
           >
-            지도 다시 불러오기
+            {t("지도 다시 불러오기")}
           </button>
         </div>
       )}
       <div className="map-caption">
-        <span className="live-dot" /> 성수의 작은 발견{" "}
-        <span>SEOUL, SEONGSU</span>
+        <span className="live-dot" /> {caption || "성수의 작은 발견"}{" "}
+        {!caption && <span>SEOUL, SEONGSU</span>}
       </div>
     </section>
   );

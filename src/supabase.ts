@@ -1,10 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 import { config } from "./config";
-import { isHttpUrl } from "../shared/config";
+import { isLocalRouteSupabase } from "../shared/config";
 
 function initialize() {
   if (
-    !isHttpUrl(config.supabaseUrl) ||
+    !isLocalRouteSupabase(config.supabaseUrl) ||
     !config.supabaseKey ||
     config.supabaseKey.startsWith("sb_secret_")
   )

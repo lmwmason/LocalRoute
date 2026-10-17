@@ -71,10 +71,11 @@ One account may be both traveler and curator. Roles are server-validated.
 6. Traveler can edit stop order, save itinerary, and open navigation.
 
 ### 6.2 Recommend an existing restaurant — primary flow
+The same contribution flow supports locally recommended attractions, cultural venues and experiences. Prefer these endorsements in itinerary candidate selection; label provider-only alternatives explicitly.
 1. Tap `맛집 추천하기`.
 2. Search by business name and select exact map result.
 3. If place exists, do **not** duplicate it. Open endorsement editor directly.
-4. Optionally photograph/upload menu; AI extracts visible menu names and prices for review.
+4. Upload a required real photograph of the selected place. The contributor confirms authorship, place identity and publication rights; no AI-generated or unrelated substitute photos. Menu photography and extraction remain optional and separate.
 5. Enter a one-sentence, first-hand reason or useful tip (required); optional tags.
 6. Preview and submit; show `pending`, `published`, or `needs changes` state.
 7. No LP awarded solely for writing a positive review. Any onboarding incentive must be separately budgeted and fraud-protected.
@@ -82,11 +83,17 @@ One account may be both traveler and curator. Roles are server-validated.
 ### 6.3 Recommend a new restaurant
 1. Search name; show nearby existing-place candidates before allowing creation.
 2. Choose an authoritative map location or manually pin with confirmation if provider coverage is missing.
-3. Enter only required identity data: name and location; category/menu/hours optional.
+3. Enter required identity data: name, exact location and an actual photograph of that place. Restaurant, café, attraction, cultural venue and experience categories are supported. Menu/hours remain optional.
 4. Optionally upload menu photo; extract visible items and prices via Gemini and let contributor correct errors.
 5. Enter required one-line endorsement; submit both place and endorsement.
 6. New place enters moderation/deduplication queue. Endorsement publication waits for canonical place resolution.
 7. If duplicate later found, merge under admin control while preserving attribution and audit history.
+
+Photo acceptance: require a JPEG/PNG/WebP photograph up to 5MB, validate decoded pixels on the server, strip EXIF and store a bounded JPEG in private LocalRoute Storage. Link it atomically to its authenticated author's exact contribution/selected place. Require explicit human photo review before publishing new photographed contributions. Display no substitute photograph if one is missing. Unsubmitted uploads expire after 24 hours; rejected photographs are removed after 30 days by a scheduled server cleanup task. Do not claim a photo's authenticity has been independently verified solely because it passed file validation or the author attested to it.
+
+Account locality: signup collects only a city/district home region, supports international regions, and requires email verification. Private home regions can be edited; publishing a self-declared locality label with recommendations is a separate, optional consent. No street address, GPS history or unearned “verified resident” badge.
+
+Store city and optional district/township separately and allow `auto`, city-wide or local-area scope. Example: 충주시 살미면 defaults to 충주시; 서울특별시 성동구 may default to the district. Widen automatic scope if the actual published candidate count is insufficient for the requested pool and disclose that boundary. Catalog counts must not be described as real-world restaurant density. An explicit user-selected boundary is not silently broadened.
 
 ### 6.4 Evaluate after visiting
 1. Traveler receives an optional feedback prompt after an eligible visit, not automatically for mere map views.
@@ -139,6 +146,7 @@ One-name search + optional photo + one-sentence endorsement; minimal typing. Do 
 - Map browsing, basic place details, and ordinary saving are free.
 - Define exactly what one 100 LP request returns (number of places, itinerary output, reroll/refund rules) before public launch.
 ### Earning
+- Receipt-free visit verification: do not require a receipt for feedback or make receipt scanning the default verification flow. A voluntary arrival check is only supporting evidence; a reservation confirmation, a place photograph, a claimed visit or proximity alone never triggers LP. Verified partner QR/merchant acknowledgement and human review are possible verification channels; label unavailable integrations honestly. Keep feedback available when stronger proof is absent, marked unverified and without an automatic reward.
 - Rewards are tied to **attributable, eligible, independently verified** recommendation outcomes, not mere place creation or exposure.
 - Illustrative payout per eligible endorsement rating: 5→20 LP, 4→15, 3→8, 2→2, 1→0.
 - One eligible reward per traveler/place per rolling 90 days; proposed caps: 300 LP/place/month and 1,000 LP/curator/month. Caps are configurable pilot settings, not finalized economics.
@@ -245,6 +253,7 @@ LP is an in-product, non-transferable utility credit in MVP: **no cash redemptio
 - Define visit verification method, recommendation attribution, and refund/reroll rules.
 - Validate LP unit economics and minimum viable supply in one pilot area.
 ### Phase 1 — core MVP
+- Email ownership verification is mandatory at signup. Email-link signup/sign-in must not create an authenticated app session before the recipient opens the verification link. Protected writes and LP planning require a server-validated, email-confirmed user. Handle resend, expired links and delivery failures. Enable Supabase email confirmations before live launch; do not claim dashboard configuration has been verified from local source alone.
 - Auth, places, map, fast contribution, endorsements, optional Gemini menu extraction, admin review, basic itinerary. Add HeyYumi reservation module behind a feature flag once API contract/access is validated; do not block Phase 1 on booking.
 ### Phase 2 — trusted feedback and LP pilot
 - Separate ratings, attribution events, visit verification, ledger, monthly credits, payout caps, anti-abuse checks; gated rollout.

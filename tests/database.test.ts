@@ -6,7 +6,7 @@ const a = "10000000-0000-4000-8000-000000000001";
 const b = "10000000-0000-4000-8000-000000000002";
 const place = "20000000-0000-4000-8000-000000000001";
 const request = "30000000-0000-4000-8000-000000000001";
-const moderator = '10000000-0000-4000-8000-000000000003';
+const moderator = "10000000-0000-4000-8000-000000000003";
 let db: PGlite;
 beforeAll(async () => {
   db = new PGlite();
@@ -288,38 +288,165 @@ describe("actual Postgres permissions and contribution transactions", () => {
   });
 });
 
-describe('community moderation and version attribution',()=>{
- const action=(actor:string|null,name:string,payload:Record<string,unknown>,requestId=crypto.randomUUID())=>asRole('service_role','',tx=>tx.query<{result:Record<string,unknown>}>('select public.community_action($1,$2,$3,$4) result',[actor,name,requestId,payload]));
- beforeAll(async()=>{await db.query('insert into auth.users values($1)',[moderator]);await db.query("insert into public.user_roles values($1,'moderator')",[moderator]);});
- it('authorizes admin reads and decisions using stored roles, never a client-supplied role',async()=>{
-  await expect(action(a,'queue',{role:'admin'})).rejects.toThrow(/Moderator required/);
-  const result=await action(moderator,'queue',{});expect(result.rows[0].result).toHaveProperty('queue');
- });
- it('accepts honest negative feedback, separates exact-version helpfulness and blocks self-rating',async()=>{
-  const version=(await db.query<{id:string}>("select v.id from public.endorsement_versions v join public.endorsements e on e.id=v.endorsement_id where e.user_id=$1 and e.place_id=$2 and v.status='published'",[a,place])).rows[0].id;
-  const payload={placeId:place,rating:1,text:'솔직하게 남기는 아쉬운 경험입니다.',visitedOn:'2026-01-01',affiliated:false,endorsementVersionId:version,helpfulness:1};
-  await expect(action(a,'feedback',payload)).rejects.toThrow(/Invalid endorsement rating/);
-  const result=await action(b,'feedback',payload);expect(result.rows[0].result).toMatchObject({verification:'unverified',rewardIssued:false});
-  expect((await db.query('select rating from public.place_reviews')).rows).toEqual([{rating:1}]);
-  expect((await db.query('select endorsement_version_id,helpfulness from public.endorsement_ratings')).rows).toEqual([{endorsement_version_id:version,helpfulness:1}]);
- });
- it('creates immutable edited versions and never inherits earlier helpfulness',async()=>{
-  const e=(await db.query<{id:string,published_version_id:string}>('select id,published_version_id from public.endorsements where user_id=$1 and place_id=$2',[a,place])).rows[0];
-  await expect(action(b,'edit_endorsement',{id:e.id,text:'남의 추천을 수정하려고 해요.'})).rejects.toThrow(/Not owner/);
-  const edited=await action(a,'edit_endorsement',{id:e.id,text:'추천 이유를 새롭게 다듬은 두 번째 버전이에요.'});
-  const id=edited.rows[0].result.id;
-  await action(moderator,'decide',{kind:'endorsement',id,decision:'approve',reason:'변경된 추천 내용을 사람이 확인했습니다.'});
-  const ratings=await db.query('select endorsement_version_id from public.endorsement_ratings');expect(ratings.rows[0].endorsement_version_id).toBe(e.published_version_id);
-  expect((await db.query('select * from public.endorsement_ratings where endorsement_version_id=$1',[id])).rows).toHaveLength(0);
-  expect((await asRole('anon','',tx=>tx.query('select id from public.endorsement_versions where id=$1',[e.published_version_id]))).rows).toHaveLength(0);
- });
- it('keeps owner corrections pending until a human approves with a reason',async()=>{
-  const response=await action(null,'owner_correction',{placeId:place,field:'name',value:'정정된 식당 이름',evidence:'직접 확인한 공식 안내문입니다.',contact:'private@example.invalid',consent:true});const id=response.rows[0].result.id;
-  expect((await db.query('select name from public.places where id=$1',[place])).rows[0].name).toBe('테스트 식당');
-  await expect(asRole('anon','',tx=>tx.query('select * from public.owner_correction_requests'))).rejects.toThrow(/permission denied/);
-  await action(moderator,'decide',{kind:'correction',id,decision:'approve',reason:'제출한 정정 근거를 확인했습니다.'});
-  expect((await db.query('select name from public.places where id=$1',[place])).rows[0].name).toBe('정정된 식당 이름');
-  expect((await db.query('select contact from public.owner_correction_requests where id=$1',[id])).rows[0].contact).toBeNull();
-  expect((await db.query("select * from public.moderation_decisions where entity_id=$1",[id])).rows).toHaveLength(1);
- });
+describe("community moderation and version attribution", () => {
+  const action = (
+    actor: string | null,
+    name: string,
+    payload: Record<string, unknown>,
+    requestId = crypto.randomUUID(),
+  ) =>
+    asRole("service_role", "", (tx) =>
+      tx.query<{ result: Record<string, unknown> }>(
+        "select public.community_action($1,$2,$3,$4) result",
+        [actor, name, requestId, payload],
+      ),
+    );
+  beforeAll(async () => {
+    await db.query("insert into auth.users values($1)", [moderator]);
+    await db.query("insert into public.user_roles values($1,'moderator')", [
+      moderator,
+    ]);
+  });
+  it("authorizes admin reads and decisions using stored roles, never a client-supplied role", async () => {
+    await expect(action(a, "queue", { role: "admin" })).rejects.toThrow(
+      /Moderator required/,
+    );
+    const result = await action(moderator, "queue", {});
+    expect(result.rows[0].result).toHaveProperty("queue");
+  });
+  it("accepts honest negative feedback, separates exact-version helpfulness and blocks self-rating", async () => {
+    const version = (
+      await db.query<{ id: string }>(
+        "select v.id from public.endorsement_versions v join public.endorsements e on e.id=v.endorsement_id where e.user_id=$1 and e.place_id=$2 and v.status='published'",
+        [a, place],
+      )
+    ).rows[0].id;
+    const payload = {
+      placeId: place,
+      rating: 1,
+      text: "솔직하게 남기는 아쉬운 경험입니다.",
+      visitedOn: "2026-01-01",
+      affiliated: false,
+      endorsementVersionId: version,
+      helpfulness: 1,
+    };
+    await expect(action(a, "feedback", payload)).rejects.toThrow(
+      /Invalid endorsement rating/,
+    );
+    const result = await action(b, "feedback", payload);
+    expect(result.rows[0].result).toMatchObject({
+      verification: "unverified",
+      rewardIssued: false,
+    });
+    expect(
+      (await db.query("select rating from public.place_reviews")).rows,
+    ).toEqual([{ rating: 1 }]);
+    expect(
+      (
+        await db.query(
+          "select endorsement_version_id,helpfulness from public.endorsement_ratings",
+        )
+      ).rows,
+    ).toEqual([{ endorsement_version_id: version, helpfulness: 1 }]);
+  });
+  it("creates immutable edited versions and never inherits earlier helpfulness", async () => {
+    const e = (
+      await db.query<{ id: string; published_version_id: string }>(
+        "select id,published_version_id from public.endorsements where user_id=$1 and place_id=$2",
+        [a, place],
+      )
+    ).rows[0];
+    await expect(
+      action(b, "edit_endorsement", {
+        id: e.id,
+        text: "남의 추천을 수정하려고 해요.",
+      }),
+    ).rejects.toThrow(/Not owner/);
+    const edited = await action(a, "edit_endorsement", {
+      id: e.id,
+      text: "추천 이유를 새롭게 다듬은 두 번째 버전이에요.",
+    });
+    const id = edited.rows[0].result.id;
+    await action(moderator, "decide", {
+      kind: "endorsement",
+      id,
+      decision: "approve",
+      reason: "변경된 추천 내용을 사람이 확인했습니다.",
+    });
+    const ratings = await db.query<{ endorsement_version_id: string }>(
+      "select endorsement_version_id from public.endorsement_ratings",
+    );
+    expect(ratings.rows[0].endorsement_version_id).toBe(e.published_version_id);
+    expect(
+      (
+        await db.query(
+          "select * from public.endorsement_ratings where endorsement_version_id=$1",
+          [id],
+        )
+      ).rows,
+    ).toHaveLength(0);
+    expect(
+      (
+        await asRole("anon", "", (tx) =>
+          tx.query("select id from public.endorsement_versions where id=$1", [
+            e.published_version_id,
+          ]),
+        )
+      ).rows,
+    ).toHaveLength(0);
+  });
+  it("keeps owner corrections pending until a human approves with a reason", async () => {
+    const response = await action(null, "owner_correction", {
+      placeId: place,
+      field: "name",
+      value: "정정된 식당 이름",
+      evidence: "직접 확인한 공식 안내문입니다.",
+      contact: "private@example.invalid",
+      consent: true,
+    });
+    const id = response.rows[0].result.id;
+    expect(
+      (
+        await db.query<{ name: string }>(
+          "select name from public.places where id=$1",
+          [place],
+        )
+      ).rows[0].name,
+    ).toBe("테스트 식당");
+    await expect(
+      asRole("anon", "", (tx) =>
+        tx.query("select * from public.owner_correction_requests"),
+      ),
+    ).rejects.toThrow(/permission denied/);
+    await action(moderator, "decide", {
+      kind: "correction",
+      id,
+      decision: "approve",
+      reason: "제출한 정정 근거를 확인했습니다.",
+    });
+    expect(
+      (
+        await db.query<{ name: string }>(
+          "select name from public.places where id=$1",
+          [place],
+        )
+      ).rows[0].name,
+    ).toBe("정정된 식당 이름");
+    expect(
+      (
+        await db.query<{ contact: string | null }>(
+          "select contact from public.owner_correction_requests where id=$1",
+          [id],
+        )
+      ).rows[0].contact,
+    ).toBeNull();
+    expect(
+      (
+        await db.query(
+          "select * from public.moderation_decisions where entity_id=$1",
+          [id],
+        )
+      ).rows,
+    ).toHaveLength(1);
+  });
 });

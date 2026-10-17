@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
+import {attachTestPhoto} from './photo-fixture';
 
 test.beforeEach(async ({ page }) => {
   await page.route("https://tiles.openfreemap.org/**", (route) =>
     route.abort(),
   );
-  await page.goto("/");
+  await page.goto("/?view=explore");
 });
 test("mobile-first discovery: no overflow, accessible touch targets, free search and category filter", async ({
   page,
@@ -83,6 +84,7 @@ test("recommendation preview, explicit consent, pending demo receipt and focus-s
   await page.getByRole("button", { name: "소담한 식탁 자세히 보기" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("button", { name: "나도 추천하기" }).click();
+  await attachTestPhoto(page);
   await page
     .getByRole("textbox", { name: "직접 경험한 추천 한마디" })
     .fill("들깨 향이 은은해서 따뜻한 한 끼로 추천해요.");

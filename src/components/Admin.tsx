@@ -4,6 +4,7 @@ import { api } from "../api";
 import { config } from "../config";
 import type { AdminData, QueueItem } from "../../shared/community";
 import { decisionSchema } from "../../shared/community";
+import { PlacePhoto } from "./PlacePhoto";
 
 const sections = [
   ["전체", "/admin"],
@@ -50,7 +51,7 @@ export function Admin() {
   }, []);
   const queue = data.queue.filter((i) =>
     path.endsWith("/places")
-      ? ["place", "submission", "correction"].includes(i.kind)
+      ? ["place", "submission", "correction", "photo"].includes(i.kind)
       : path.endsWith("/endorsements")
         ? i.kind === "endorsement"
         : path.endsWith("/reports")
@@ -176,6 +177,14 @@ export function Admin() {
                 <span className="eyebrow">EVIDENCE FIRST</span>
                 <h2>{selected.title}</h2>
                 <p className="evidence-text">{selected.body}</p>
+                {selected.kind === "photo" && (
+                  <PlacePhoto
+                    id={selected.id}
+                    name="검토할 실제 장소 사진"
+                    privatePreview
+                    className="contribution-photo"
+                  />
+                )}
                 {selected.kind === "submission" && (
                   <>
                     <label>

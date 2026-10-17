@@ -9,6 +9,10 @@ import { demoPlaces } from "../shared/demo";
 const live = readConfig({ VITE_DATA_MODE: "live" });
 function repository(): Repository {
   return {
+    bookingProfile:vi.fn(async()=>({profile:null,onboardingSeen:false})),
+    uploadPhoto:vi.fn(async()=>({id:crypto.randomUUID()})),
+    photo:vi.fn(async()=>Buffer.from('test-image')),
+    planning: vi.fn(async () => ({})),
     community: vi.fn(async () => ({})),
     authenticate: vi.fn(async (token) => {
       if (token !== "valid-token")
@@ -23,10 +27,24 @@ function repository(): Repository {
   };
 }
 describe("HTTP boundary", () => {
-  it('rejects non-moderator queue reads and decisions even with forged client role data',async()=>{
-    const repo=repository();const app=createApp(live,repo);
-    expect((await request(app).get('/api/admin/queue').set('Authorization','Bearer valid-token')).status).toBe(403);
-    expect((await request(app).post('/api/admin/decisions').set('Authorization','Bearer valid-token').send({role:'admin'})).status).toBe(403);
+  it("rejects non-moderator queue reads and decisions even with forged client role data", async () => {
+    const repo = repository();
+    const app = createApp(live, repo);
+    expect(
+      (
+        await request(app)
+          .get("/api/admin/queue")
+          .set("Authorization", "Bearer valid-token")
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await request(app)
+          .post("/api/admin/decisions")
+          .set("Authorization", "Bearer valid-token")
+          .send({ role: "admin" })
+      ).status,
+    ).toBe(403);
     expect(repo.community).not.toHaveBeenCalled();
   });
   it("starts in demo without keys and never writes provider data", async () => {
@@ -63,6 +81,7 @@ describe("HTTP boundary", () => {
     ).toBe(400);
     expect(repo.contribute).not.toHaveBeenCalled();
     const payload = {
+      photoId:crypto.randomUUID(),
       requestId: crypto.randomUUID(),
       placeId: demoPlaces[0].id,
       text: "직접 방문한 추천 한마디입니다.",
@@ -88,6 +107,7 @@ describe("HTTP boundary", () => {
     });
     const app = createApp(live, repo);
     const payload = {
+      photoId:crypto.randomUUID(),
       requestId: crypto.randomUUID(),
       placeId: demoPlaces[0].id,
       text: "맛있는 메뉴를 추천합니다.",

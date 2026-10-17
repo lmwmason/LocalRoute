@@ -30,7 +30,14 @@ export const reportSchema = z.object({
 });
 export const decisionSchema = z.object({
   requestId: z.uuid(),
-  kind: z.enum(["place", "endorsement", "submission", "correction", "report"]),
+  kind: z.enum([
+    "place",
+    "endorsement",
+    "submission",
+    "correction",
+    "report",
+    "photo",
+  ]),
   id: z.uuid(),
   decision: z.enum(["approve", "reject"]),
   reason: z.string().trim().min(5).max(1000),
@@ -41,7 +48,8 @@ export type Feedback = z.infer<typeof feedbackSchema>;
 export type Correction = z.infer<typeof correctionSchema>;
 export type QueueItem = {
   id: string;
-  kind: "place" | "endorsement" | "submission" | "correction" | "report";
+  kind:
+    "place" | "endorsement" | "submission" | "correction" | "report" | "photo";
   title: string;
   body: string;
   status: string;
@@ -51,6 +59,9 @@ export type QueueItem = {
   candidates?: { id: string; name: string; address: string }[];
 };
 export type Workspace = {
+  homeCity?:string|null;homeArea?:string|null;localityScope?:'auto'|'city'|'area';
+  homeRegion?: string | null;
+  publicLocalArea?: boolean;
   id: string;
   role: "traveler" | "moderator" | "admin";
   displayName: string;

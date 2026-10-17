@@ -477,6 +477,45 @@ small {
   align-items: center;
   justify-content: center;
 }
+.actual-place-photo {
+  object-fit: cover;
+  background: #f1f4f8;
+}
+.photo-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7b8798;
+  background: #f1f4f8;
+}
+.contribution-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #f1f4f8;
+}
+.photo-upload {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+}
+.photo-upload input[type="file"] {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px;
+  font-size: 13px;
+}
+.stop-photo {
+  float: left;
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 0 14px 10px 0;
+}
 .art-1 {
   background: #e6ddd1;
 }

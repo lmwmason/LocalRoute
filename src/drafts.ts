@@ -17,6 +17,10 @@ const draftSchema = z.object({
     })
     .optional(),
   manual: z.boolean(),
+  kind: z
+    .enum(["restaurant", "cafe", "attraction", "culture", "experience"])
+    .default("restaurant"),
+  photoId: z.uuid().optional(),
   name: z.string().max(100),
   address: z.string().max(250),
   lat: z.string().max(40),

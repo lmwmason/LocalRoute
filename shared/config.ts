@@ -11,3 +11,12 @@ export function isHttpUrl(value: string): boolean {
     return false;
   }
 }
+export const localRouteProjectRef = "pjdawapasozsrpnrtsfx";
+export const localRouteSupabaseUrl = `https://${localRouteProjectRef}.supabase.co`;
+export function isLocalRouteSupabase(value: string) {
+  try {
+    return new URL(value).origin === localRouteSupabaseUrl;
+  } catch {
+    return false;
+  }
+}

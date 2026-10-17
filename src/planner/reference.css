@@ -1,0 +1,352 @@
+.planner-page {
+  padding: 18px 0 36px;
+}
+.planner-app-home {
+  max-width: 820px;
+  margin: 0 auto;
+}
+.travel-preferences {
+  background: #fff;
+  padding: 16px 18px 20px;
+  border: 1px solid #f0f2f6;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px #1e365309;
+}
+.preference-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.preference-title h1 {
+  font-size: 17px;
+  letter-spacing: -0.035em;
+  line-height: 1.5;
+  font-weight: 750;
+}
+.preference-title .icon-button {
+  color: #a0a9b9;
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: -10px;
+}
+.preference-chips {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+.preference-chips button {
+  min-height: 44px;
+  padding: 9px 7px;
+  border-radius: 24px;
+  background: #f2f4f7;
+  color: #697586;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.preference-chips button[aria-pressed="true"] {
+  color: #1689ef;
+  background: #dcefff;
+}
+.home-itinerary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 28px 0 12px;
+}
+.home-itinerary-heading h2 {
+  font-size: 18px;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+}
+.itinerary-view-toggle {
+  display: flex;
+  border-radius: 24px;
+  padding: 3px;
+  background: #eff2f6;
+}
+.itinerary-view-toggle button {
+  min-width: 56px;
+  min-height: 44px;
+  padding: 8px 13px;
+  border-radius: 22px;
+  color: #6f7887;
+  font-size: 12px;
+  font-weight: 650;
+}
+.itinerary-view-toggle button[aria-pressed="true"] {
+  background: #1599fa;
+  color: white;
+}
+.sample-disclosure {
+  font-size: 11px;
+  line-height: 1.7;
+  color: #788497;
+  margin-bottom: 14px;
+}
+.reference-timeline {
+  display: grid;
+}
+.reference-stop {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 42px 64px minmax(0, 1fr);
+  column-gap: 13px;
+  min-height: 84px;
+  padding: 11px 0;
+  text-align: left;
+  align-items: start;
+}
+.reference-time {
+  position: relative;
+  height: calc(100% + 22px);
+  color: #7c879c;
+  font-size: 12px;
+  line-height: 21px;
+  text-align: center;
+}
+.reference-time:after {
+  content: "";
+  position: absolute;
+  top: 30px;
+  bottom: -3px;
+  left: 50%;
+  width: 1px;
+  background: #d5deea;
+}
+.reference-stop:last-child .reference-time:after {
+  display: none;
+}
+.reference-time i {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #39b5f8;
+  top: 27px;
+  left: calc(50% - 3px);
+  z-index: 1;
+}
+.reference-photo {
+  display: flex;
+  width: 64px;
+  height: 64px;
+  border-radius: 13px;
+  object-fit: cover;
+}
+.reference-stop-copy {
+  min-width: 0;
+  padding: 6px 0;
+}
+.reference-stop-copy strong {
+  display: block;
+  color: #1f293b;
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.5;
+}
+.reference-stop-copy small {
+  display: block;
+  color: #7b879c;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+.reference-map .map-panel {
+  min-height: 440px;
+  height: 55vh;
+  border-radius: 20px;
+}
+.start-itinerary {
+  margin-top: 18px;
+  min-height: 52px;
+}
+.planner-app-home > .fine-print {
+  text-align: center;
+  margin-top: 12px;
+}
+.planner-empty {
+  padding: 70px 20px;
+  text-align: center;
+  color: #8390a2;
+}
+.planner-empty h2 {
+  margin: 14px 0 8px;
+  color: #283449;
+  font-size: 19px;
+}
+.planner-empty p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+.home-region-fields,
+.booking-profile {
+  display: grid;
+  gap: 14px;
+}
+.booking-profile {
+  padding: 22px 0;
+  margin-top: 22px;
+  border-top: 1px solid #e9edf4;
+}
+.booking-profile label {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+}
+.booking-profile .checkbox-label {
+  display: flex;
+}
+.booking-profile h3 {
+  line-height: 1.5;
+}
+.booking-profile > p {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.desktop-tabs {
+  align-items: stretch;
+}
+.result-view-toggle {
+  width: max-content;
+  margin: 0 0 18px auto;
+}
+.schedule-layout[data-view="timeline"] {
+  display: block;
+}
+.schedule-layout[data-view="timeline"] .schedule-map {
+  display: none;
+}
+.schedule-layout[data-view="map"] {
+  display: block;
+}
+.schedule-layout[data-view="map"] .timeline {
+  display: none;
+}
+.schedule-layout[data-view="map"] .schedule-map {
+  position: relative;
+  top: auto;
+}
+.schedule-layout[data-view="map"] .map-panel {
+  height: 65vh;
+  min-height: 440px;
+}
+.stop-edit-details {
+  clear: both;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.stop-edit-details > summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 11px 0;
+  color: #74839a;
+  font-size: 12px;
+}
+.stop-edit-details[open] .stop-editor-fields {
+  margin-top: 14px;
+}
+.stop-edit-details > p {
+  color: #55647a;
+  margin-bottom: 12px;
+}
+.itinerary-editor .stop-content {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 4px 0 0;
+}
+.itinerary-editor .stop-explanation {
+  font-size: 13px;
+  line-height: 1.7;
+  margin-top: 3px;
+  color: #7e8b9f;
+}
+.itinerary-editor .stop-title h3 {
+  font-size: 16px;
+}
+.itinerary-editor .result-topline h1 {
+  font-size: 22px;
+  line-height: 1.5;
+}
+.itinerary-editor .intro-copy {
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 8px;
+}
+@media (max-width: 700px) {
+  .planner-page {
+    padding-top: 12px;
+  }
+  .preference-title h1 {
+    font-size: 15px;
+  }
+  .travel-preferences {
+    padding: 12px 14px 17px;
+  }
+  .preference-chips {
+    gap: 7px;
+  }
+  .preference-chips button {
+    font-size: 12px;
+  }
+  .home-itinerary-heading {
+    margin-top: 24px;
+    gap: 5px;
+  }
+  .home-itinerary-heading h2 {
+    font-size: 16px;
+  }
+  .itinerary-view-toggle button {
+    min-width: 44px;
+    padding-inline: 9px;
+    font-size: 11px;
+  }
+  .reference-stop {
+    column-gap: 10px;
+    grid-template-columns: 38px 58px minmax(0, 1fr);
+    min-height: 82px;
+  }
+  .reference-photo {
+    width: 58px;
+    height: 58px;
+    border-radius: 11px;
+  }
+  .reference-stop-copy strong {
+    font-size: 14px;
+  }
+  .reference-stop-copy small {
+    font-size: 12px;
+  }
+  .reference-time {
+    font-size: 12px;
+  }
+  .sample-disclosure {
+    font-size: 11px;
+  }
+  .itinerary-editor .stop-explanation {
+    font-size: 12px;
+  }
+  .itinerary-editor .stop-title h3 {
+    font-size: 14px;
+  }
+  .itinerary-editor .stop-photo {
+    width: 52px;
+    height: 52px;
+    margin-right: 10px;
+  }
+  .itinerary-editor .result-topline h1 {
+    font-size: 19px;
+  }
+  .itinerary-editor .intro-copy {
+    font-size: 12px;
+  }
+  .itinerary-editor .timeline-time time {
+    font-size: 12px;
+  }
+}

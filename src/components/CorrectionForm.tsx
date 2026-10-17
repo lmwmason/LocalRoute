@@ -1,3 +1,4 @@
+import { useI18n } from "../i18n";
 import { useRef, useState } from "react";
 import type { Place } from "../../shared/domain";
 import { correctionSchema } from "../../shared/community";
@@ -10,6 +11,8 @@ export function CorrectionForm({
   places: Place[];
   initial?: Place;
 }) {
+  const { t } = useI18n();
+
   const [placeId, setPlaceId] = useState(initial?.id || ""),
     [field, setField] = useState("name"),
     [value, setValue] = useState(""),
@@ -24,11 +27,14 @@ export function CorrectionForm({
     return (
       <div className="success-state">
         <h3>
-          {config.demo ? "데모 요청을 확인했어요" : "수정 요청을 접수했어요"}
+          {config.demo
+            ? t("데모 요청을 확인했어요")
+            : t("수정 요청을 접수했어요")}
         </h3>
         <p>
-          운영자가 근거를 확인한 뒤 처리해요. 요청만으로 가게 정보나 평점이
-          바뀌지 않아요.
+          {t(
+            "운영자가 근거를 확인한 뒤 처리해요. 요청만으로 가게 정보나 평점이 바뀌지 않아요.",
+          )}
         </p>
       </div>
     );
@@ -56,7 +62,7 @@ export function CorrectionForm({
           setDone(true);
         } catch (e) {
           setError(
-            e instanceof Error ? e.message : "요청을 접수하지 못했어요.",
+            e instanceof Error ? e.message : t("요청을 접수하지 못했어요."),
           );
         } finally {
           setBusy(false);
@@ -64,16 +70,16 @@ export function CorrectionForm({
       }}
     >
       <p className="muted">
-        사장님과 이용자 모두 잘못된 장소 정보를 알려 주실 수 있어요.
+        {t("사장님과 이용자 모두 잘못된 장소 정보를 알려 주실 수 있어요.")}
       </p>
       <label>
-        가게
+        {t("가게")}
         <select
           value={placeId}
           onChange={(e) => setPlaceId(e.target.value)}
           required
         >
-          <option value="">장소 선택</option>
+          <option value="">{t("장소 선택")}</option>
           {places.map((p) => (
             <option value={p.id} key={p.id}>
               {p.name} · {p.address}
@@ -82,17 +88,17 @@ export function CorrectionForm({
         </select>
       </label>
       <label>
-        수정할 정보
+        {t("수정할 정보")}
         <select value={field} onChange={(e) => setField(e.target.value)}>
-          <option value="name">가게 이름</option>
-          <option value="address">주소</option>
-          <option value="hours">영업시간</option>
-          <option value="menu">메뉴·가격</option>
-          <option value="other">기타</option>
+          <option value="name">{t("가게 이름")}</option>
+          <option value="address">{t("주소")}</option>
+          <option value="hours">{t("영업시간")}</option>
+          <option value="menu">{t("메뉴·가격")}</option>
+          <option value="other">{t("기타")}</option>
         </select>
       </label>
       <label>
-        올바른 내용
+        {t("올바른 내용")}
         <textarea
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -101,17 +107,19 @@ export function CorrectionForm({
         />
       </label>
       <label>
-        확인할 수 있는 근거
+        {t("확인할 수 있는 근거")}
         <textarea
           value={evidence}
           onChange={(e) => setEvidence(e.target.value)}
           maxLength={2000}
-          placeholder="공식 안내 또는 직접 확인한 날짜와 내용을 적어 주세요."
+          placeholder={t(
+            "공식 안내 또는 직접 확인한 날짜와 내용을 적어 주세요.",
+          )}
           required
         />
       </label>
       <label>
-        회신용 연락처 (선택)
+        {t("회신용 연락처 (선택)")}
         <input
           value={contact}
           onChange={(e) => setContact(e.target.value)}
@@ -126,16 +134,17 @@ export function CorrectionForm({
           required
         />
         <span>
-          검토를 위해 내용을 처리하는 데 동의해요. 연락처는 처리 완료 시 또는
-          최대 30일 후 삭제 대상이 돼요.
+          {t(
+            "검토를 위해 내용을 처리하는 데 동의해요. 연락처는 처리 완료 시 또는 최대 30일 후 삭제 대상이 돼요.",
+          )}
         </span>
       </label>
       <button className="primary full" disabled={busy || !consent}>
         {busy
-          ? "접수 중…"
+          ? t("접수 중…")
           : config.demo
-            ? "데모 요청 제출"
-            : "수정 요청 보내기"}
+            ? t("데모 요청 제출")
+            : t("수정 요청 보내기")}
       </button>
       {error && (
         <p className="error-message" role="alert">

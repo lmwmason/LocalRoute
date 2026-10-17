@@ -37,6 +37,7 @@ When requirements conflict or are unspecified, document assumptions and implemen
 - Keep k-skill optional, isolated, disableable, with mocked/tested fallback. Record exact skill and version if installed.
 
 ## Environment and configuration
+- **The only runtime database is the Supabase LocalRoute project `pjdawapasozsrpnrtsfx` (`https://pjdawapasozsrpnrtsfx.supabase.co`).** Never connect application data to another Supabase project or substitute another database. Reject mismatched project URLs at startup. Disposable in-memory databases are test fixtures only and never store real application data.
 - Root `.env` is the only environment configuration file and is LOCAL ONLY and gitignored. It contains blank placeholders for the founder to fill. Do not create or require `.env.example`; keep the key names documented in this file.
 - Validate server/client environment configuration at startup with friendly missing-key errors. Never print secret values, commit live keys, or expose `HEY_YUMI_API_KEY`, `GEMINI_API_KEY`, Supabase secret/service-role credentials, Kakao REST/server keys, or reservation customer data in frontend bundles.
 - `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public-client settings. Only variables explicitly prefixed `VITE_` may go into the browser; treat any `VITE_` variables as public.
@@ -49,10 +50,12 @@ When requirements conflict or are unspecified, document assumptions and implemen
 - Search for existing places before creating one. Deduplicate using provider ID when licensed, normalized name/address, and proximity; uncertain matches require confirmation, not automatic merge.
 - Maintain versioned endorsement text; a substantial edit must not silently inherit ratings of earlier text.
 - Keep objective place facts distinct from subjective recommendations and AI-generated drafts. Track source, observation date, and verification status for facts such as menu prices and hours.
-- New place flow: search/select place -> optional menu photo -> one-line personal recommendation -> preview/confirm -> submit. For an existing place, skip creation and add an endorsement.
+- New place flow: search/select exact location -> required real place photograph -> optional menu photo -> one-line personal recommendation -> preview/confirm -> submit. For an existing place, skip creation and add an endorsement with a real place photograph.
+- Founder update: restaurant and attraction/experience registration requires both an exact location and an actual contributor-taken photograph. Never generate venue images or substitute unrelated photos. Keep unavailable photos visibly empty. Menu photographs remain optional. Strip EXIF, validate image bytes/size, keep unreviewed uploads private, and require human review before public display.
 - Never require menu photo, menu transcription, opening hours, or long descriptions to contribute.
 
 ## Security and privacy (non-negotiable)
+- Signup requires email ownership verification. Use email-link verification, enforce server-side confirmed-email checks before protected writes/LP operations, and verify Supabase Auth email-confirmation settings before enabling live signup. Never claim a confirmation email was sent when provider configuration returns an immediate session instead.
 - Enable and test RLS on every exposed Supabase table. Check ownership, role, and row-level access; `authenticated` alone is not authorization.
 - Keep Gemini keys, Supabase secret/service-role keys, and admin credentials server-side. Only publishable frontend keys may reach the browser.
 - Do not authorize admin actions from client-controlled metadata or UI route visibility. Use server-validated roles and least privilege.
@@ -60,6 +63,8 @@ When requirements conflict or are unspecified, document assumptions and implemen
 - Do not make user bans, fraud findings, or irreversible LP confiscations solely on AI scores. Provide human review and appeals.
 - Redact personal information from uploaded receipts/photos before external AI calls where feasible; minimize retention, apply upload size/type limits, and restrict Storage access.
 - Avoid collecting precise background location histories. Visit verification is optional and must have a clear, privacy-preserving design.
+- Founder update: receipts are not the default or a required visit-verification method. Never exclude honest feedback because a receipt is unavailable. Foreground opt-in arrival checks are supporting signals, not proof of a visit or automatic LP eligibility. Partner QR/merchant acknowledgement and human review may support verification when actually integrated; reservation confirmation and an uploaded place photo alone never prove a visit.
+- Locality scope is adaptive: store a city separately from an optional district/township, suggest district coverage for major-city districts and city-wide coverage for rural 읍/면, and allow explicit overrides. Widen an automatic scope when the published candidate pool is insufficient for the requested result, disclose the new boundary, and never present LocalRoute catalog counts as a census of all venues or self-declared locality as verified residency.
 - Rate-limit submissions, feedback, uploads, and reward-eligible events. Defend against self-reviews, duplicate payouts, and coordinated accounts.
 
 ## Gemini usage
@@ -84,7 +89,7 @@ When requirements conflict or are unspecified, document assumptions and implemen
 - Read `DESIGN.md` as inspiration: clear hierarchy, direct Korean microcopy, restrained blue accent, explicit loading/error/empty/success states, accessible touch targets.
 - Do not claim LocalRoute is affiliated with Toss, import protected Toss assets, or ship Toss Product Sans without a verified license. Default to a licensed font such as Noto Sans KR.
 - Define LocalRoute-owned tokens and responsive layouts in implementation; do not blindly mix TDS mobile and toss.im marketing specifications.
-- Make photo capture optional; support keyboard navigation, screen readers, low bandwidth, and failed AI extraction with manual correction.
+- Offer file upload as well as device photography; a real place photograph is required for registration. Menu-photo extraction remains optional. Support keyboard navigation, screen readers, low bandwidth, and failed AI extraction with manual correction.
 - Admin screens prioritize evidence, review queues, and auditable actions over decorative analytics.
 
 ## MVP scope
@@ -105,6 +110,7 @@ When requirements conflict or are unspecified, document assumptions and implemen
 - States are at least `draft`, `submitting`, `pending`, `confirmed`, `declined`, `cancelled`, `expired`, `failed`, `unknown` (adapt to verified provider schema; do not invent provider values). Display `pending` clearly, and only claim `confirmed` when the provider confirms.
 - Never assume a 5-minute timeout or exact status enum without checking current official docs. After network ambiguity reconcile provider status before retry; do not duplicate bookings. Do not silently cancel or change bookings.
 - Protect phone number, special requests, and customer data with per-user RLS and minimum retention. LP rewards must not follow reservation request/confirmation alone; only eligible verified visits.
+- Founder update: offer an optional private booking profile during verified-account onboarding (reservation name and contact phone). Email verification and browsing do not require booking details. Never place phone numbers in public curator identities, Auth user metadata/JWTs, analytics, Gemini prompts or audit payloads. Reconfirm customer details and provider disclosure before every reservation submission.
 - Test permission failures, duplicate submit, provider timeout, status divergence, cancellation, and unsupported venue fallback.
 
 ## Working procedure

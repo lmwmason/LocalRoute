@@ -1,3 +1,4 @@
+import { useI18n } from "../i18n";
 import { useState } from "react";
 import { api } from "../api";
 import { config } from "../config";
@@ -8,6 +9,8 @@ export function ReportForm({
   id: string;
   kind: "place" | "endorsement" | "appeal";
 }) {
+  const { t } = useI18n();
+
   const [reason, setReason] = useState(""),
     [status, setStatus] = useState(""),
     [busy, setBusy] = useState(false);
@@ -26,8 +29,8 @@ export function ReportForm({
             });
           setStatus(
             config.demo
-              ? "데모 신고를 확인했어요. 실제 접수되지 않습니다."
-              : "신고/이의 신청을 접수했어요. 사람이 근거를 확인합니다.",
+              ? t("데모 신고를 확인했어요. 실제 접수되지 않습니다.")
+              : t("신고/이의 신청을 접수했어요. 사람이 근거를 확인합니다."),
           );
         } catch (e) {
           setStatus((e as Error).message);
@@ -37,11 +40,12 @@ export function ReportForm({
       }}
     >
       <p className="muted">
-        잘못된 정보나 추천의 문제를 알려 주세요. 신고만으로 사용자나 장소가 자동
-        제재되지 않아요.
+        {t(
+          "잘못된 정보나 추천의 문제를 알려 주세요. 신고만으로 사용자나 장소가 자동 제재되지 않아요.",
+        )}
       </p>
       <label>
-        확인할 내용과 근거
+        {t("확인할 내용과 근거")}
         <textarea
           minLength={5}
           maxLength={2000}
@@ -54,7 +58,7 @@ export function ReportForm({
         className="primary full"
         disabled={busy || reason.trim().length < 5}
       >
-        검토 요청
+        {t("검토 요청")}
       </button>
       {status && (
         <p role="status" className="notice-box">

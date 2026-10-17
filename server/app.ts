@@ -1,12 +1,16 @@
 import express, { type ErrorRequestHandler, type Request } from "express";
 import { z } from "zod";
-import { contributionSchema } from "../shared/domain";
+import { contributionSchema, placeTargetSchema } from "../shared/domain";
+import { maxPhotoBytes, preparePlacePhoto, type PhotoTarget } from "./photos";
 import { demoPlaces } from "../shared/demo";
+import { bookingProfileSchema } from "../shared/booking";
 import { AppError } from "./errors";
+import { localitySchema, resolveLocalityCoverage } from "../shared/locality";
 import type { ServerConfig } from "./config";
 import { HeyYumi, providerPlace } from "./heyyumi";
 import type { Actor, Repository } from "./repository";
 import { candidateSigner } from "./candidates";
+import { attachPlanner, type PlannerDependencies } from "./planner/routes";
 import {
   correctionSchema,
   decisionSchema,
@@ -18,9 +22,11 @@ export function createApp(
   config: ServerConfig,
   repository?: Repository,
   provider = new HeyYumi(config.heyyumiKey, config.heyyumiBudget),
+  plannerDependencies?: PlannerDependencies,
 ) {
   const app = express();
   const candidates = candidateSigner();
+  const resUser = new WeakMap<Request, Actor>();
   app.disable("x-powered-by");
   app.use((_req, res, next) => {
     res.set("X-Content-Type-Options", "nosniff");
@@ -28,7 +34,7 @@ export function createApp(
     res.set("Cache-Control", "no-store");
     next();
   });
-  app.use(express.json({ limit: "24kb" }));
+  app.use(express.json({ limit: "256kb" }));
   const buckets = new Map<string, { count: number; expires: number }>();
   function limit(key: string, maximum: number, seconds: number) {
     const now = Date.now();
@@ -111,9 +117,128 @@ export function createApp(
         ),
       );
   });
+  app.post(
+    "/api/place-photos/:requestId",
+    async (req, _res, next) => {
+      try {
+        const user = await actor(req);
+        limit(`photo:${user.id}`, 5, 60);
+        resUser.set(req, user);
+        next();
+      } catch (error) {
+        next(error);
+      }
+    },
+    express.raw({ type: () => true, limit: maxPhotoBytes }),
+    async (req, res) => {
+      const user = resUser.get(req)!;
+      if (req.get("X-Photo-Consent") !== "real-place-photo-v1")
+        throw new AppError(400, "photos.error.consent");
+      let raw: unknown;
+      try {
+        raw = JSON.parse(decodeURIComponent(req.get("X-Place-Target") || ""));
+      } catch {
+        throw new AppError(400, "photos.error.place");
+      }
+      const payload = placeTargetSchema.parse(raw);
+      let target: PhotoTarget;
+      if (payload.candidateToken) {
+        if (!config.heyyumi) throw new AppError(503, "photos.error.place");
+        target = {
+          provider: { id: candidates.verify(payload.candidateToken).id },
+        };
+      } else
+        target = payload.manualPlace
+          ? { manualPlace: payload.manualPlace }
+          : { placeId: payload.placeId! };
+      const photo = await preparePlacePhoto(
+        req.body,
+        req.get("Content-Type")?.split(";")[0] || "",
+      );
+      res
+        .status(201)
+        .json(
+          await repository!.uploadPhoto(
+            user,
+            z.uuid().parse(req.params.requestId),
+            target,
+            photo,
+          ),
+        );
+    },
+  );
+  app.get("/api/place-photos/:id/image", async (req, res) => {
+    limit(`photo-read:${req.ip}`, 120, 60);
+    if (!config.live || !repository)
+      throw new AppError(404, "photos.error.load");
+    const user = req.get("Authorization") ? await actor(req) : null;
+    const bytes = await repository.photo(user, z.uuid().parse(req.params.id));
+    res
+      .type("image/jpeg")
+      .set("Cache-Control", "private, no-store")
+      .send(bytes);
+  });
   app.get("/api/me", async (req, res) => {
     const user = await actor(req);
     res.json(await repository!.community(user, "workspace", null, {}));
+  });
+  app.get("/api/me/booking-profile", async (req, res) => {
+    const user = await actor(req);
+    res.json(await repository!.bookingProfile(user, "get", {}));
+  });
+  app.put("/api/me/booking-profile", async (req, res) => {
+    const user = await actor(req);
+    limit(`booking-profile:${user.id}`, 10, 60);
+    res.json(
+      await repository!.bookingProfile(
+        user,
+        "save",
+        bookingProfileSchema.parse(req.body),
+      ),
+    );
+  });
+  app.delete("/api/me/booking-profile", async (req, res) => {
+    const user = await actor(req);
+    res.json(await repository!.bookingProfile(user, "delete", {}));
+  });
+  app.post("/api/me/booking-profile/skip", async (req, res) => {
+    const user = await actor(req);
+    res.json(await repository!.bookingProfile(user, "skip", {}));
+  });
+  app.get("/api/me/locality-coverage", async (req, res) => {
+    const user = await actor(req);
+    const minimumNeeded = z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(40)
+      .default(1)
+      .parse(req.query.minimumNeeded);
+    const workspace = (await repository!.community(
+      user,
+      "workspace",
+      null,
+      {},
+    )) as Record<string, unknown>;
+    const locality = localitySchema.safeParse(workspace);
+    if (!locality.success) {
+      res.json({ coverage: null });
+      return;
+    }
+    limit(`locality:${user.id}`, 15, 60);
+    const counts = z
+      .object({
+        city: z.number().int().nonnegative(),
+        area: z.number().int().nonnegative(),
+      })
+      .parse(await repository!.community(user, "locality_counts", null, {}));
+    res.json({
+      coverage: {
+        ...resolveLocalityCoverage(locality.data, counts, minimumNeeded),
+        counts,
+        minimumNeeded,
+      },
+    });
   });
   app.put("/api/me", async (req, res) => {
     const user = await actor(req);
@@ -121,7 +246,9 @@ export function createApp(
       .object({
         requestId: z.uuid(),
         displayName: z.string().trim().min(1).max(40),
+        publicLocalArea: z.boolean(),
       })
+      .and(localitySchema)
       .parse(req.body);
     res.json(
       await repository!.community(user, "profile", payload.requestId, payload),
@@ -196,10 +323,15 @@ export function createApp(
       await repository!.community(user, "decide", payload.requestId, payload),
     );
   });
+  attachPlanner(app, config, repository, actor, plannerDependencies);
   app.use("/api", (_req, _res, next) =>
     next(new AppError(404, "요청한 기능을 찾을 수 없어요.")),
   );
   const handler: ErrorRequestHandler = (error, _req, res, _next) => {
+    if (error?.type === "entity.too.large") {
+      res.status(413).json({ error: "photos.error.size" });
+      return;
+    }
     if (error instanceof z.ZodError) {
       res.status(400).json({
         error: error.issues[0]?.message || "입력 내용을 확인해 주세요.",
