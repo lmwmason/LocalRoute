@@ -1,0 +1,66 @@
+.lr-booking {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 16px;
+  background: #f7f9fc;
+  color: #172638;
+  overflow-wrap: anywhere;
+}
+.lr-booking *,
+.lr-booking *::before,
+.lr-booking *::after {
+  box-sizing: border-box;
+}
+.lr-booking form,
+.lr-booking label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.lr-booking form {
+  gap: 16px;
+}
+.lr-booking input,
+.lr-booking button {
+  min-height: 44px;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+  font: inherit;
+  border-radius: 10px;
+  padding: 10px;
+}
+.lr-booking input {
+  background: white;
+  border: 1px solid #8092a8;
+  color: #172638;
+}
+.lr-booking button {
+  background: #175fce;
+  color: white;
+  border: 0;
+  cursor: pointer;
+}
+.lr-booking button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.lr-booking :focus-visible {
+  outline: 3px solid #175fce;
+  outline-offset: 3px;
+}
+.lr-booking .lr-booking-consent {
+  display: flex;
+  align-items: flex-start;
+}
+.lr-booking-consent input {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+}
+.lr-booking-note {
+  overflow-wrap: anywhere;
+}
