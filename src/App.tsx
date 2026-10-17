@@ -32,6 +32,7 @@ import { filterPlaces, moveStop, type Place } from "../shared/domain";
 import { config } from "./config";
 import { api } from "./api";
 import { exchangeAuthCode, supabase } from "./supabase";
+import type { AuthRecoveryReason } from "./supabase";
 import { readSaved, writeSaved } from "./storage";
 import { Modal } from "./components/Modal";
 import { ContributionForm } from "./components/ContributionForm";
@@ -56,6 +57,28 @@ const Planner = lazy(() =>
   import("./planner/Planner").then((module) => ({ default: module.Planner })),
 );
 const categories = ["전체", "한식", "일식", "양식", "카페", "혼밥"];
+const authRecoveryMessages: Record<AuthRecoveryReason, [string, string]> = {
+  expired: [
+    "만료되었거나 이미 사용한 로그인 링크예요. 새 링크를 요청해 주세요.",
+    "This sign-in link has expired or has already been used. Request a new link.",
+  ],
+  verifier: [
+    "인증을 시작한 브라우저 정보가 없거나 일치하지 않아요. 링크를 요청했던 브라우저에서 열거나, 이 브라우저에서 새 로그인 링크를 요청해 주세요.",
+    "The browser verification information is missing or does not match. Open the link in the browser where you requested it, or request a new sign-in link in this browser.",
+  ],
+  network: [
+    "연결 문제로 이메일 인증을 마치지 못했어요. 네트워크를 확인한 뒤 새 로그인 링크를 요청해 주세요.",
+    "A connection problem interrupted email verification. Check your network, then request a new sign-in link.",
+  ],
+  exchange: [
+    "로그인 링크를 확인하지 못했어요. 이 브라우저에서 새 링크를 요청해 주세요.",
+    "We could not verify this sign-in link. Request a new link in this browser.",
+  ],
+  unavailable: [
+    "로그인 연결을 사용할 수 없어요. 잠시 후 다시 시도해 주세요. 작성 중인 내용은 유지돼요.",
+    "Sign-in is unavailable. Try again later. Your draft is preserved.",
+  ],
+};
 function MemberConsent({
   userId,
   children,
@@ -80,6 +103,8 @@ export default function App() {
   );
   const routeRef = useRef(route);
   routeRef.current = route;
+  const routeStateRef = useRef(browserLocation.state);
+  routeStateRef.current = browserLocation.state;
   const { tab, panel, loginOverlay } = route;
   const [places, setPlaces] = useState<Place[]>(config.demo ? demoPlaces : []);
   const placesRef = useRef(places);
@@ -96,6 +121,17 @@ export default function App() {
     : rememberedPlace;
   const [session, setSession] = useState<Session | null>(null);
   const [notice, setNotice] = useState("");
+  const [authRecovery, setAuthRecovery] = useState<AuthRecoveryReason | null>(
+    null,
+  );
+  const [callbackUserId, setCallbackUserId] = useState<string | null>(null);
+  const [loginFocusRequest, setLoginFocusRequest] = useState(0);
+  const callbackAccountRef = useRef<string | null>(null);
+  const authCallbackRef = useRef<{
+    promise: NonNullable<ReturnType<typeof exchangeAuthCode>>;
+    path: string;
+    handled: boolean;
+  } | null>(null);
   const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(!config.demo);
   const [reload, setReload] = useState(0);
@@ -241,11 +277,86 @@ export default function App() {
     return () => controller.abort();
   }, [reload]);
   useEffect(() => {
-    if (!supabase) return;
-    const client = supabase;
     let active = true;
+    const query = new URLSearchParams(window.location.search);
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    const hasCallback = [
+      "code",
+      "error",
+      "error_code",
+      "error_description",
+      "access_token",
+      "refresh_token",
+      "provider_token",
+      "provider_refresh_token",
+    ].some((key) => query.has(key) || hash.has(key));
+    if (!authCallbackRef.current && hasCallback) {
+      const promise = exchangeAuthCode(
+        query.get("code") || hash.get("code") || "",
+      );
+      if (promise)
+        authCallbackRef.current = {
+          promise,
+          handled: false,
+          path:
+            window.location.pathname +
+            window.location.search +
+            window.location.hash,
+        };
+      // The helper scrubs secrets synchronously; also synchronize React Router
+      // while preserving its existing contribution-overlay/back-stack state.
+      navigate(
+        window.location.pathname +
+          window.location.search +
+          window.location.hash,
+        { replace: true, state: routeStateRef.current },
+      );
+    }
+    const callback = authCallbackRef.current;
+    function recover(reason: AuthRecoveryReason) {
+      if (!active) return;
+      setAuthRecovery(reason);
+      setCallbackUserId(null);
+      callbackAccountRef.current = null;
+      const current = routeRef.current;
+      if (current.path === "/login") return;
+      navigate("/login", {
+        replace: true,
+        state: {
+          overlay: false,
+          backgroundPath: readDraft()
+            ? "/contribute"
+            : callback?.path.split("#")[0] || current.path,
+        },
+      });
+    }
+    if (!supabase) {
+      if (callback)
+        void callback.promise
+          .then(({ error }) => {
+            if (
+              !active ||
+              callback.handled ||
+              authCallbackRef.current !== callback
+            )
+              return;
+            callback.handled = true;
+            recover(error?.recoveryReason ?? "unavailable");
+          })
+          .catch(() => {
+            if (active && !callback.handled) {
+              callback.handled = true;
+              recover("network");
+            }
+          });
+      return () => {
+        active = false;
+      };
+    }
+    const client = supabase;
     let authRevision = 0;
     let authEventSeen = false;
+    let latestChange: { userId: string | null } | null = null;
     async function verifySession(next: Session | null, revision: number) {
       if (!active || revision !== authRevision) return;
       if (!next) {
@@ -258,26 +369,19 @@ export default function App() {
         if (!active || revision !== authRevision) return;
         if (error || !data.user || data.user.id !== next.user.id) {
           setSession(null);
+          if (callbackAccountRef.current === next.user.id) recover("exchange");
           await client.auth.signOut({ scope: "local" });
           return;
         }
         setSession({ ...next, user: data.user });
-        setLoginOverlay(false);
+        if (!authCallbackRef.current) setLoginOverlay(false);
       } catch {
         if (!active || revision !== authRevision) return;
         setSession(null);
+        if (callbackAccountRef.current === next.user.id) recover("network");
         await client.auth.signOut({ scope: "local" }).catch(() => {});
       }
     }
-    const code = new URLSearchParams(window.location.search).get("code");
-    if (code)
-      void exchangeAuthCode(code)?.then(({ error }) => {
-        if (active) {
-          if (error)
-            setNotice(t("로그인 링크가 만료되었어요. 다시 요청해 주세요."));
-          navigate(readDraft() ? "/contribute" : "/plan", { replace: true });
-        }
-      });
     void client.auth
       .getSession()
       .then(({ data }) => {
@@ -291,6 +395,8 @@ export default function App() {
       data: { subscription },
     } = client.auth.onAuthStateChange((_event, next) => {
       authEventSeen = true;
+      if (_event !== "INITIAL_SESSION")
+        latestChange = { userId: next?.user.id ?? null };
       const revision = ++authRevision;
       setSession((current) =>
         current?.user.id === next?.user.id ? current : null,
@@ -300,11 +406,84 @@ export default function App() {
         if (active) void verifySession(next, revision);
       }, 0);
     });
+    if (callback)
+      void callback.promise
+        .then(({ error, data }) => {
+          if (
+            !active ||
+            callback.handled ||
+            authCallbackRef.current !== callback
+          )
+            return;
+          callback.handled = true;
+          if (
+            window.location.pathname + window.location.search !==
+            callback.path.split("#")[0]
+          ) {
+            authCallbackRef.current = null;
+            return;
+          }
+          // A callback from an earlier account must not replace a newer sign-in or
+          // undo sign-out. INITIAL_SESSION is not a user account transition.
+          if (
+            latestChange &&
+            (error || latestChange.userId !== data?.session?.user.id)
+          ) {
+            authCallbackRef.current = null;
+            callbackAccountRef.current = null;
+            return;
+          }
+          if (error) {
+            recover(error.recoveryReason);
+            return;
+          }
+          if (!data?.session) {
+            recover("exchange");
+            return;
+          }
+          callbackAccountRef.current = data.session.user.id;
+          setCallbackUserId(data.session.user.id);
+          // Also handle clients that don't emit SIGNED_IN to this subscriber.
+          void verifySession(data.session, authRevision);
+        })
+        .catch(() => {
+          if (
+            active &&
+            !callback.handled &&
+            authCallbackRef.current === callback &&
+            !latestChange
+          ) {
+            callback.handled = true;
+            recover("network");
+          }
+        });
     return () => {
       active = false;
       subscription.unsubscribe();
     };
-  }, [t, navigate, setLoginOverlay]);
+  }, [navigate, setLoginOverlay]);
+  useEffect(() => {
+    // Only getUser-verified state can finish callback navigation. The existing
+    // revision/active guards above still exclude deleted and superseded users.
+    if (!callbackUserId || session?.user.id !== callbackUserId) return;
+    const callback = authCallbackRef.current;
+    authCallbackRef.current = null;
+    callbackAccountRef.current = null;
+    setCallbackUserId(null);
+    setAuthRecovery(null);
+    if (
+      callback &&
+      window.location.pathname + window.location.search ===
+        callback.path.split("#")[0]
+    )
+      navigate(readDraft() ? "/contribute" : "/plan", { replace: true });
+  }, [session, callbackUserId, navigate]);
+  useEffect(() => {
+    if (loginFocusRequest)
+      document
+        .querySelector<HTMLInputElement>('.login-form input[type="email"]')
+        ?.focus();
+  }, [loginFocusRequest]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 4500);
@@ -1083,10 +1262,47 @@ export default function App() {
         <Modal
           title={t("LocalRoute 로그인")}
           onClose={() => {
+            setAuthRecovery(null);
+            setCallbackUserId(null);
+            callbackAccountRef.current = null;
+            authCallbackRef.current = null;
             if (panel === "profile" || panel === "bookingSetup") setPanel(null);
             else setLoginOverlay(false);
           }}
         >
+          {authRecovery && (
+            <section
+              className="notice-box"
+              role="alert"
+              aria-label={
+                language === "ko"
+                  ? "이메일 인증 복구"
+                  : "Email verification recovery"
+              }
+            >
+              <h3>
+                {language === "ko"
+                  ? "이메일 인증을 완료하지 못했어요"
+                  : "Email verification could not be completed"}
+              </h3>
+              <p>
+                {authRecoveryMessages[authRecovery][language === "ko" ? 0 : 1]}
+              </p>
+              <button
+                type="button"
+                className="primary full"
+                onClick={() => {
+                  setAuthRecovery(null);
+                  authCallbackRef.current = null;
+                  setLoginFocusRequest((value) => value + 1);
+                }}
+              >
+                {language === "ko"
+                  ? "로그인 링크 다시 요청"
+                  : "Request a new sign-in link"}
+              </button>
+            </section>
+          )}
           <Login />
         </Modal>
       )}
