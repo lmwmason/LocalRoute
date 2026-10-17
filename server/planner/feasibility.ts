@@ -93,6 +93,15 @@ export function buildFeasibleBlueprint(
   if (pins.some((pin) => !dates.includes(pin.date))) throw impossible();
   const output: FeasibleSlot[] = [];
   const buffer = input.transferBufferMinutes;
+  const matchesActivity = (candidate: Candidate) =>
+    input.activities.some((activity) =>
+      activity === "food"
+        ? candidate.kind === "restaurant"
+        : candidate.tags.includes(activity),
+    );
+  const matchesFood = (candidate: Candidate) =>
+    candidate.kind === "restaurant" &&
+    input.foodTypes.some((food) => candidate.tags.includes(food));
   const distanceLimit =
     input.mobility === "walking"
       ? 1800
@@ -142,7 +151,7 @@ export function buildFeasibleBlueprint(
         to - from < (meal ? 45 : 20) ||
         to - from > 240 ||
         from < open ||
-        to > close ||
+        (meal && from > close) ||
         (meal && !isMealCandidate(candidate)) ||
         !fits(candidate, date, from, to, pin.stop.purpose)
       )
@@ -166,21 +175,63 @@ export function buildFeasibleBlueprint(
       if (count > 1) throw impossible();
       if (meals[purpose] && count === 0) tasks.push(purpose);
     }
+    // A short overlap does not mandate a meal, but can satisfy an available
+    // requested food preference without moving the meal outside its start window.
+    if (
+      input.foodTypes.length &&
+      available.some(
+        (candidate) => isMealCandidate(candidate) && matchesFood(candidate),
+      ) &&
+      !selected.some(
+        (choice) =>
+          ["lunch", "dinner"].includes(choice.purpose) &&
+          matchesFood(choice.candidate),
+      ) &&
+      !tasks.some((purpose) => purpose === "lunch" || purpose === "dinner")
+    ) {
+      const optionalMeal = (["lunch", "dinner"] as const).find((purpose) => {
+        const [open, close] = mealBounds(purpose);
+        return Math.min(end, close) - Math.max(start, open) >= 45;
+      });
+      if (optionalMeal) tasks.push(optionalMeal);
+    }
     if (!selected.some((choice) => nonFood(choice.candidate)))
       tasks.push("visit");
+    // Cafes are a preference stop, not a substitute for the required cultural/
+    // outdoor activity. Reserve their own task when required tasks cannot match.
+    let preferredActivityTask = -1;
+    if (
+      input.activities.length &&
+      !selected.some((choice) => matchesActivity(choice.candidate)) &&
+      available.some(matchesActivity) &&
+      !available.some(
+        (candidate) => nonFood(candidate) && matchesActivity(candidate),
+      ) &&
+      !(
+        input.activities.includes("food") &&
+        tasks.some((purpose) => purpose === "lunch" || purpose === "dinner")
+      )
+    ) {
+      preferredActivityTask = tasks.length;
+      tasks.push("break");
+    }
     while (selected.length + tasks.length < 2) tasks.push("break");
     if (selected.length + tasks.length > 8) throw impossible();
-    function options(purpose: Purpose): Choice[] {
+    function options(
+      purpose: Purpose,
+      preferredActivityOnly = false,
+    ): Choice[] {
       const meal = purpose === "lunch" || purpose === "dinner";
       const [mealStart, mealEnd] = mealBounds(purpose);
       const from = Math.max(start, mealStart),
-        to = Math.min(end, mealEnd);
+        to = end;
       const preferred =
         purpose === "lunch" ? 720 : purpose === "dinner" ? 1080 : start;
       const choices: Choice[] = [];
       for (const candidate of available.filter(
         meal ? isMealCandidate : purpose === "break" ? () => true : nonFood,
       )) {
+        if (preferredActivityOnly && !matchesActivity(candidate)) continue;
         for (const duration of meal ? [45] : [60, 30, 20]) {
           const times = new Set<number>([from, to - duration]);
           for (
@@ -200,6 +251,7 @@ export function buildFeasibleBlueprint(
           for (const time of times)
             if (
               time >= from &&
+              (!meal || time <= mealEnd) &&
               time + duration <= to &&
               fits(candidate, date, time, time + duration, purpose)
             )
@@ -218,8 +270,12 @@ export function buildFeasibleBlueprint(
           input.activities.filter((tag) => choice.candidate.tags.includes(tag))
             .length *
             10000 -
-          input.foodTypes.filter((tag) => choice.candidate.tags.includes(tag))
-            .length *
+          (choice.candidate.kind === "restaurant"
+            ? input.foodTypes.filter((tag) =>
+                choice.candidate.tags.includes(tag),
+              )
+            : []
+          ).length *
             10000;
         return (
           score(a) - score(b) ||
@@ -231,7 +287,10 @@ export function buildFeasibleBlueprint(
     let attempts = 0;
     function place(index: number): boolean {
       if (index === tasks.length) return true;
-      for (const choice of options(tasks[index])) {
+      for (const choice of options(
+        tasks[index],
+        index === preferredActivityTask,
+      )) {
         if (++attempts > 15000) return false;
         if (!compatible(choice, selected)) continue;
         selected.push(choice);

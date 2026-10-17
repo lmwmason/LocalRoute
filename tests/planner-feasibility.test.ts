@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildFeasibleBlueprint } from "../server/planner/feasibility";
-import { minutes, type Candidate } from "../shared/planner";
+import { evaluateSchedule, minutes, type Candidate } from "../shared/planner";
 import { plannerInput } from "./fixtures/planning";
 
 const date = plannerInput.startDate;
@@ -36,6 +36,66 @@ const places = [
   candidate("a4"),
 ];
 describe("deterministic itinerary feasibility before Gemini", () => {
+  it.each([
+    ["09:30", "20:00"],
+    ["11:30", "15:30"],
+    ["13:00", "16:00"],
+  ])(
+    "satisfies coffee and Korean food at %s–%s while retaining a non-food activity",
+    (startTime, endTime) => {
+      const input = {
+        ...plannerInput,
+        startTime,
+        endTime,
+        activities: ["coffee" as const],
+      };
+      const cafe = { ...candidate("coffee-stop", "cafe"), tags: ["coffee"] };
+      const catalog = [...places, cafe];
+      const blueprint = buildFeasibleBlueprint(input, catalog);
+      expect(blueprint.candidateIds).toContain(cafe.id);
+      expect(blueprint.slots.some((slot) => slot.purpose === "lunch")).toBe(
+        true,
+      );
+      const schedule = {
+        title: "Temporal fixture",
+        summary: "Synthetic preference scheduling fixture.",
+        days: [
+          {
+            date,
+            stops: blueprint.slots.map((slot) => ({
+              candidateId: slot.allowedCandidateIds[0],
+              start: slot.start,
+              end: slot.end,
+              purpose: slot.purpose,
+              explanation: "Synthetic scheduling fixture stop.",
+            })),
+          },
+        ],
+      };
+      expect(evaluateSchedule(schedule, input, catalog).errors).toEqual([]);
+    },
+  );
+  it("preserves a pinned meal whose valid start is before the window cutoff and end is later", () => {
+    const plan = buildFeasibleBlueprint(
+      { ...plannerInput, startTime: "11:30", endTime: "15:30" },
+      places,
+      [
+        {
+          date,
+          stop: {
+            candidateId: "r1",
+            start: "13:45",
+            end: "14:30",
+            purpose: "lunch",
+          },
+        },
+      ],
+    );
+    expect(plan.slots.find((slot) => slot.pinned)).toMatchObject({
+      start: "13:45",
+      end: "14:30",
+    });
+  });
   it("constructs ordered non-overlapping slots, real meal windows and the user buffer", () => {
     const plan = buildFeasibleBlueprint(plannerInput, places);
     expect(plan).toEqual(buildFeasibleBlueprint(plannerInput, places));
