@@ -6,6 +6,12 @@ import type { ProviderVenue } from "./heyyumi";
 
 export type Actor = { id: string; role: "traveler" | "moderator" | "admin" };
 export interface Repository {
+  community(
+    actor: Actor | null,
+    action: string,
+    requestId: string | null,
+    payload: Record<string, unknown>,
+  ): Promise<unknown>;
   authenticate(token: string): Promise<Actor>;
   places(): Promise<Place[]>;
   contribute(
@@ -48,7 +54,7 @@ export class SupabaseRepository implements Repository {
     const { data, error } = await this.auth
       .from("places")
       .select(
-        "id,name,category,address,lat,lng,endorsements(id,endorsement_versions(id,text))",
+        "id,name,category,address,lat,lng,place_reviews(rating,verification_state),endorsements!endorsements_place_id_fkey(id,user_id,endorsement_versions!endorsement_versions_endorsement_id_fkey(id,text,endorsement_ratings(helpfulness)))",
       )
       .eq("status", "published")
       .limit(100);
@@ -65,16 +71,57 @@ export class SupabaseRepository implements Repository {
       lat: p.lat,
       lng: p.lng,
       tags: [],
-      rating: null,
-      reviewCount: 0,
+      rating: p.place_reviews.length
+        ? p.place_reviews.reduce((sum, r) => sum + r.rating, 0) /
+          p.place_reviews.length
+        : null,
+      reviewCount: p.place_reviews.length,
       source: "localroute",
       endorsements: (p.endorsements || []).map((e) => ({
         id: e.id,
+        versionId: e.endorsement_versions[0]?.id,
+        userId: e.user_id,
         author: "동네 큐레이터",
         text: e.endorsement_versions.at(-1)?.text || "",
-        helpfulCount: 0,
+        helpfulCount:
+          e.endorsement_versions[0]?.endorsement_ratings.length || 0,
       })),
     }));
+  }
+  async community(
+    actor: Actor | null,
+    action: string,
+    requestId: string | null,
+    payload: Record<string, unknown>,
+  ) {
+    const { data, error } = await this.admin.rpc("community_action", {
+      p_actor: actor?.id || null,
+      p_action: action,
+      p_request_id: requestId,
+      p_payload: payload,
+    });
+    if (error) {
+      if (error.code === "42501" || error.code === "28000")
+        throw new AppError(403, "이 작업을 할 권한이 없어요.");
+      if (error.code === "LR409" || error.code === "23505")
+        throw new AppError(
+          409,
+          "이미 처리되었거나 기존 항목과 겹쳐요. 내용을 새로 확인해 주세요.",
+        );
+      if (error.code === "LR429")
+        throw new AppError(
+          429,
+          "요청이 많아요. 잠시 후 다시 시도해 주세요.",
+          "60",
+        );
+      if (error.code === "22023" || error.code === "23514")
+        throw new AppError(400, "입력 내용과 날짜를 확인해 주세요.");
+      throw new AppError(
+        503,
+        "요청을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.",
+      );
+    }
+    return data;
   }
   async contribute(
     actor: Actor,

@@ -7,6 +7,12 @@ import type { ServerConfig } from "./config";
 import { HeyYumi, providerPlace } from "./heyyumi";
 import type { Actor, Repository } from "./repository";
 import { candidateSigner } from "./candidates";
+import {
+  correctionSchema,
+  decisionSchema,
+  feedbackSchema,
+  reportSchema,
+} from "../shared/community";
 
 export function createApp(
   config: ServerConfig,
@@ -105,16 +111,99 @@ export function createApp(
         ),
       );
   });
+  app.get("/api/me", async (req, res) => {
+    const user = await actor(req);
+    res.json(await repository!.community(user, "workspace", null, {}));
+  });
+  app.put("/api/me", async (req, res) => {
+    const user = await actor(req);
+    const payload = z
+      .object({
+        requestId: z.uuid(),
+        displayName: z.string().trim().min(1).max(40),
+      })
+      .parse(req.body);
+    res.json(
+      await repository!.community(user, "profile", payload.requestId, payload),
+    );
+  });
+  app.put("/api/endorsements/:id", async (req, res) => {
+    const user = await actor(req);
+    const payload = z
+      .object({ requestId: z.uuid(), text: z.string().trim().min(5).max(200) })
+      .parse(req.body);
+    res.json(
+      await repository!.community(user, "edit_endorsement", payload.requestId, {
+        ...payload,
+        id: z.uuid().parse(req.params.id),
+      }),
+    );
+  });
+  app.post("/api/feedback", async (req, res) => {
+    const user = await actor(req);
+    const payload = feedbackSchema.parse(req.body);
+    res
+      .status(201)
+      .json(
+        await repository!.community(
+          user,
+          "feedback",
+          payload.requestId,
+          payload,
+        ),
+      );
+  });
+  app.post("/api/reports", async (req, res) => {
+    const user = await actor(req);
+    const payload = reportSchema.parse(req.body);
+    res
+      .status(201)
+      .json(
+        await repository!.community(user, "report", payload.requestId, payload),
+      );
+  });
+  app.post("/api/corrections", async (req, res) => {
+    limit(`correction:${req.ip}`, 3, 3600);
+    if (!config.live || !repository)
+      throw new AppError(
+        503,
+        "실제 정보 수정 요청은 서비스 연결 후 이용할 수 있어요.",
+      );
+    const payload = correctionSchema.parse(req.body);
+    res
+      .status(201)
+      .json(
+        await repository.community(
+          null,
+          "owner_correction",
+          payload.requestId,
+          payload,
+        ),
+      );
+  });
+  app.get("/api/admin/queue", async (req, res) => {
+    const user = await actor(req);
+    if (!["moderator", "admin"].includes(user.role))
+      throw new AppError(403, "운영자 권한이 필요해요.");
+    res.json(await repository!.community(user, "queue", null, {}));
+  });
+  app.post("/api/admin/decisions", async (req, res) => {
+    const user = await actor(req);
+    if (!["moderator", "admin"].includes(user.role))
+      throw new AppError(403, "운영자 권한이 필요해요.");
+    const payload = decisionSchema.parse(req.body);
+    res.json(
+      await repository!.community(user, "decide", payload.requestId, payload),
+    );
+  });
   app.use("/api", (_req, _res, next) =>
     next(new AppError(404, "요청한 기능을 찾을 수 없어요.")),
   );
   const handler: ErrorRequestHandler = (error, _req, res, _next) => {
     if (error instanceof z.ZodError) {
-      res
-        .status(400)
-        .json({
-          error: error.issues[0]?.message || "입력 내용을 확인해 주세요.",
-        });
+      res.status(400).json({
+        error: error.issues[0]?.message || "입력 내용을 확인해 주세요.",
+      });
       return;
     }
     if (error instanceof AppError) {

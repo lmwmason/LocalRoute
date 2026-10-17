@@ -1,5 +1,11 @@
 import { supabase } from "./supabase";
 import type { Contribution, Place } from "../shared/domain";
+import type {
+  AdminData,
+  Correction,
+  Feedback,
+  Workspace,
+} from "../shared/community";
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = (await supabase?.auth.getSession())?.data.session?.access_token;
   const response = await fetch(`/api${path}`, {
@@ -18,6 +24,29 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body as T;
 }
 export const api = {
+  me: () => request<Workspace>("/me"),
+  profile: (displayName: string) =>
+    request("/me", {
+      method: "PUT",
+      body: JSON.stringify({ requestId: crypto.randomUUID(), displayName }),
+    }),
+  edit: (id: string, text: string, requestId: string) =>
+    request(`/endorsements/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ requestId, text }),
+    }),
+  feedback: (payload: Feedback) =>
+    request("/feedback", { method: "POST", body: JSON.stringify(payload) }),
+  correction: (payload: Correction) =>
+    request("/corrections", { method: "POST", body: JSON.stringify(payload) }),
+  report: (payload: Record<string, unknown>) =>
+    request("/reports", { method: "POST", body: JSON.stringify(payload) }),
+  admin: () => request<AdminData>("/admin/queue"),
+  decide: (payload: Record<string, unknown>) =>
+    request("/admin/decisions", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
   places: (signal?: AbortSignal) =>
     request<{ places: Place[] }>("/places", { signal }),
   search: (query: string, signal?: AbortSignal) =>

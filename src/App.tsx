@@ -28,10 +28,22 @@ import { Modal } from "./components/Modal";
 import { ContributionForm } from "./components/ContributionForm";
 import { Login } from "./components/Login";
 import { readDraft, saveDraft } from "./drafts";
+import { Feedback } from "./components/Feedback";
+import { CorrectionForm } from "./components/CorrectionForm";
+import { Workspace } from "./components/Workspace";
+import { Admin } from "./components/Admin";
+import { ReportForm } from "./components/ReportForm";
 
 const Map = lazy(() => import("./components/Map"));
 const categories = ["전체", "한식", "일식", "양식", "카페", "혼밥"];
-type Panel = "contribute" | "login" | "profile" | null;
+type Panel =
+  | "contribute"
+  | "login"
+  | "profile"
+  | "feedback"
+  | "correction"
+  | "report"
+  | null;
 
 function PlaceArt({
   category,
@@ -150,6 +162,7 @@ export default function App() {
     setContributePlace(place);
     setPanel("contribute");
   }
+  if (window.location.pathname.startsWith("/admin")) return <Admin />;
 
   return (
     <>
@@ -538,7 +551,20 @@ export default function App() {
             LocalRoute <span>© {new Date().getFullYear()}</span>
           </span>
           <p>누군가의 동네가, 당신의 좋은 여행이 되도록.</p>
-          <span>MADE FOR LITTLE DISCOVERIES</span>
+          <button
+            className="text-button"
+            onClick={() => {
+              setContributePlace(undefined);
+              setPanel("correction");
+            }}
+          >
+            장소 정보 수정 요청
+          </button>
+          {config.demo && (
+            <a href="/admin" className="text-button">
+              운영 화면 체험
+            </a>
+          )}
         </footer>
       </div>
       <nav className="bottom-nav" aria-label="모바일 메뉴">
@@ -624,7 +650,7 @@ export default function App() {
                   </div>
                   <p>“{e.text}”</p>
                   <span className="helpful">
-                    이 추천이 도움됐어요 · {e.helpfulCount}명
+                    추천 도움 평가 · {e.helpfulCount}개
                     {selected.source === "demo" ? " (가상)" : ""}
                   </span>
                 </article>
@@ -651,6 +677,38 @@ export default function App() {
                 onClick={() => openContribution(selected)}
               >
                 <Plus size={18} /> 나도 추천하기
+              </button>
+            </div>
+            <button
+              className="secondary full"
+              onClick={() => {
+                setContributePlace(selected);
+                setSelected(null);
+                setPanel("feedback");
+              }}
+            >
+              방문 후기와 추천 도움 평가 남기기
+            </button>
+            <div className="detail-links">
+              <button
+                className="text-button"
+                onClick={() => {
+                  setContributePlace(selected);
+                  setSelected(null);
+                  setPanel("correction");
+                }}
+              >
+                장소 정보 수정 요청
+              </button>
+              <button
+                className="text-button"
+                onClick={() => {
+                  setContributePlace(selected);
+                  setSelected(null);
+                  setPanel("report");
+                }}
+              >
+                신고/검토 요청
               </button>
             </div>
           </div>
@@ -682,6 +740,7 @@ export default function App() {
           <div className="profile-panel">
             <h3>반가워요, 동네 탐험가님</h3>
             <p>{session?.user.email}</p>
+            {!config.demo && <Workspace />}
             <div className="notice-box">
               LP 적립·유료 추천은 정책 검증 후 제공됩니다. 현재 보상이나 차감은
               발생하지 않아요.
@@ -702,6 +761,31 @@ export default function App() {
               로그아웃
             </button>
           </div>
+        </Modal>
+      )}
+      {panel === "feedback" && contributePlace && (
+        <Modal
+          title="방문 후기"
+          onClose={() => {
+            setPanel(null);
+            setReload((n) => n + 1);
+          }}
+        >
+          <Feedback
+            place={contributePlace}
+            userId={session?.user.id}
+            onLogin={() => setLoginOverlay(true)}
+          />
+        </Modal>
+      )}
+      {panel === "correction" && (
+        <Modal title="장소 정보 수정 요청" onClose={() => setPanel(null)}>
+          <CorrectionForm places={places} initial={contributePlace} />
+        </Modal>
+      )}
+      {panel === "report" && contributePlace && (
+        <Modal title="신고/검토 요청" onClose={() => setPanel(null)}>
+          <ReportForm id={contributePlace.id} kind="place" />
         </Modal>
       )}
       {notice && (

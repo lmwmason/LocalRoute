@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export type Endorsement = {
   id: string;
+  versionId?: string;
+  userId?: string;
   author: string;
   text: string;
   helpfulCount: number;
