@@ -1,0 +1,75 @@
+.lr-visits {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  color: #192b40;
+  background: #f7f9fc;
+  padding: 12px;
+  border-radius: 16px;
+}
+.lr-visits * {
+  box-sizing: border-box;
+  min-width: 0;
+}
+.lr-visits article {
+  background: white;
+  padding: 12px;
+  margin: 12px 0;
+  border-radius: 12px;
+  display: grid;
+  gap: 12px;
+}
+.lr-visits form,
+.lr-visits label {
+  display: grid;
+  gap: 8px;
+}
+.lr-visits form {
+  gap: 16px;
+}
+.lr-visits textarea,
+.lr-visits select,
+.lr-visits button {
+  max-width: 100%;
+  width: 100%;
+  font: inherit;
+  min-height: 44px;
+  border-radius: 10px;
+  padding: 10px;
+}
+.lr-visits select {
+  white-space: normal;
+}
+.lr-visits textarea {
+  resize: vertical;
+  min-height: 96px;
+  background: white;
+  color: #192b40;
+  border: 1px solid #8092a8;
+}
+.lr-visits button {
+  background: #175fce;
+  color: white;
+  border: 0;
+  cursor: pointer;
+  margin: 4px 0;
+}
+.lr-visits button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.lr-visits .lr-visit-check {
+  display: flex;
+  align-items: flex-start;
+}
+.lr-visit-check input {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  margin: 0;
+}
+.lr-visits :focus-visible {
+  outline: 3px solid #175fce;
+  outline-offset: 3px;
+}

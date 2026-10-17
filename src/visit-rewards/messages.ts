@@ -1,0 +1,128 @@
+export const visitMessages = {
+  ko: {
+    visitor: "방문자",
+    curator: "추천자",
+    place: "장소",
+    affiliations: "등록된 이해관계",
+    none: "없음",
+    attribution: "후기·추천 버전 연결",
+    title: "방문 인증 검토 요청",
+    empty:
+      "검토를 요청할 추천 후기가 없어요. 방문 후 평가한 추천 하나를 선택해 주세요.",
+    target: "검토할 추천 후기",
+    evidence: "방문 상황과 검토에 도움이 될 설명",
+    affiliated: "이 식당을 소유하거나 제휴·고용·가족 등 이해관계가 있어요",
+    consent: "작성한 내용을 비공개 관리자 검토에 제공하는 데 동의합니다.",
+    send: "검토 요청",
+    refresh: "상태 새로고침",
+    busy: "처리 중…",
+    notice:
+      "영수증은 필요하지 않아요. 예약 확정·사진·위치·본인 주장만으로 자동 인증하지 않습니다. 별점과 관계없이 신청할 수 있으며, 검토 승인이 LP 지급을 보장하지 않아요. 개인정보는 적지 마세요.",
+    pending: "검토 대기",
+    approved: "방문 검토 승인 · 지급은 별도 적격성 확인",
+    rejected: "검토 반려",
+    paid: "추천자에게 지급한 LP",
+    zero: "검토 완료 · 정책상 지급 LP 0",
+    history: "내 신청과 검토 결과",
+    reason: "검토 사유",
+    basis: "확인한 근거와 판단 내용",
+    queue: "방문 인증 관리자 검토",
+    queueEmpty: "대기 중인 신청이 없어요.",
+    approve: "방문 승인",
+    reject: "반려",
+    issue: "정책에 따라 지급",
+    disabled: "LP 지급은 비활성화되어 있어요. 방문 검토만 진행할 수 있어요.",
+    independent:
+      "예약·사진·위치·신청자 주장만에 의존하지 않고 독립적인 근거를 사람이 검토했습니다.",
+    affiliationCheck:
+      "방문자와 추천자의 소유·제휴 관계 및 제 이해충돌을 확인했습니다.",
+    collusion: "중복·담합 위험과 추천 귀속을 확인했습니다.",
+    version: "추천 버전",
+    score: "추천 도움 점수",
+    date: "방문일",
+    evidenceLabel: "신청 근거",
+    noGrant: "아직 LP를 지급하지 않았어요.",
+    "visit.auth": "이메일 인증을 마친 계정으로 로그인해 주세요.",
+    "visit.forbidden":
+      "권한이 없거나 본인·이해관계자의 사건을 검토할 수 없어요.",
+    "visit.notFound": "연결된 후기나 신청을 찾을 수 없어요.",
+    "visit.changed": "후기·정책·검토 결과가 바뀌었어요. 새로고침해 주세요.",
+    "visit.duplicate":
+      "이 방문에 대한 신청이 이미 있어요. 기존 상태를 확인해 주세요.",
+    "visit.limit": "신청·조회 한도에 도달했어요. 잠시 후 시도해 주세요.",
+    "visit.disabled": "지급이 비활성화되어 있어요.",
+    "visit.affiliated":
+      "자기 추천 또는 소유·제휴 관계가 있어 보상 대상이 아니에요.",
+    "visit.window": "동일 방문자·장소에 90일 이내 적격 사건이 있어요.",
+    "visit.placeCap": "이 장소의 월 보상 상한에 도달했어요.",
+    "visit.curatorCap": "추천자의 월 보상 상한에 도달했어요.",
+    "visit.invalid": "입력 내용과 검토 확인 사항을 확인해 주세요.",
+    "visit.unavailable":
+      "처리 결과를 확인하지 못했어요. 같은 요청으로 다시 시도하거나 상태를 새로고침해 주세요.",
+  },
+  en: {
+    visitor: "Visitor",
+    curator: "Curator",
+    place: "Place",
+    affiliations: "Registered affiliations",
+    none: "None",
+    attribution: "Feedback and endorsement version",
+    title: "Request visit verification review",
+    empty:
+      "No endorsement feedback is available for review. Select one endorsement you rated after visiting.",
+    target: "Endorsement feedback to review",
+    evidence: "Describe your visit and information useful for review",
+    affiliated:
+      "I own this business or have an employment, family, partnership or other affiliation",
+    consent: "I agree to provide this information for private human review.",
+    send: "Request review",
+    refresh: "Refresh status",
+    busy: "Processing…",
+    notice:
+      "No receipt is required. A booking confirmation, photo, location or personal claim never verifies a visit automatically. All ratings are welcome. Approval does not guarantee LP rewards. Do not include personal information.",
+    pending: "Awaiting review",
+    approved:
+      "Visit review approved · rewards need separate eligibility checks",
+    rejected: "Review declined",
+    paid: "LP issued to curator",
+    zero: "Processed · policy awards 0 LP",
+    history: "My requests and outcomes",
+    reason: "Review reason",
+    basis: "Checked evidence and assessment",
+    queue: "Admin visit review",
+    queueEmpty: "No requests are awaiting review.",
+    approve: "Approve visit",
+    reject: "Decline",
+    issue: "Issue under current policy",
+    disabled: "LP payouts are disabled. Visit reviews can still proceed.",
+    independent:
+      "I personally reviewed independent evidence beyond a booking, photo, location or the applicant's claim alone.",
+    affiliationCheck:
+      "I checked visitor/curator ownership and affiliations, and my own conflicts of interest.",
+    collusion:
+      "I checked duplicates, collusion risks and endorsement attribution.",
+    version: "Endorsement version",
+    score: "Endorsement helpfulness",
+    date: "Visit date",
+    evidenceLabel: "Applicant evidence",
+    noGrant: "No LP issued yet.",
+    "visit.auth": "Sign in with a verified email account.",
+    "visit.forbidden":
+      "You lack permission or have a conflict of interest in this case.",
+    "visit.notFound": "Feedback or request not found.",
+    "visit.changed": "Feedback, policy or decision changed. Please refresh.",
+    "visit.duplicate":
+      "A request already exists for this visit. Check its status.",
+    "visit.limit": "Request limit reached. Try again later.",
+    "visit.disabled": "Payouts are disabled.",
+    "visit.affiliated":
+      "Self recommendations and owner/affiliate outcomes are ineligible.",
+    "visit.window":
+      "This visitor and place already have an eligible outcome within 90 days.",
+    "visit.placeCap": "This place has reached its monthly reward cap.",
+    "visit.curatorCap": "This curator has reached the monthly reward cap.",
+    "visit.invalid": "Check your inputs and review attestations.",
+    "visit.unavailable":
+      "Unable to verify the outcome. Retry the same request or refresh status.",
+  },
+};
