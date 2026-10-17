@@ -69,7 +69,7 @@ export const api = {
     request("/me/booking-profile", { method: "DELETE" }),
   skipBookingProfile: () =>
     request("/me/booking-profile/skip", { method: "POST" }),
-  quote: () =>
+  quote: (expectedUserId?: string) =>
     request<{
       enabled: boolean;
       starter?: boolean;
@@ -78,7 +78,7 @@ export const api = {
       earned: number | null;
       held: number;
       policyVersion: string;
-    }>("/planning/quote"),
+    }>("/planning/quote", {}, expectedUserId),
   plan: (id: string) =>
     request<Itinerary>(`/itineraries/${encodeURIComponent(id)}`),
   plans: () =>

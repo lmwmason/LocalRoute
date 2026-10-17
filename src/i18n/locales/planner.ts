@@ -1,4 +1,9 @@
 export const ko: Record<string, string> = {
+  "wallet.title": "내 LP",
+  "wallet.loading": "이번 달 혜택과 잔액을 확인하고 있어요.",
+  "wallet.held": "일정 생성 중인 LP",
+  "wallet.refresh": "잔액 다시 확인",
+  "wallet.checkout": "LP 충전 체험 · 실제 결제 없음",
   "common.plan": "일정 만들기",
   "common.discover": "맛집 지도",
   "common.saved": "나의 여행",
@@ -182,6 +187,11 @@ export const ko: Record<string, string> = {
   "quality.PRICES_UNVERIFIED": "메뉴·입장료 미확인. 예산은 보장되지 않아요.",
 };
 export const en: Record<string, string> = {
+  "wallet.title": "My LP",
+  "wallet.loading": "Checking your monthly allowance and balance…",
+  "wallet.held": "LP held for generation",
+  "wallet.refresh": "Refresh balance",
+  "wallet.checkout": "Try LP checkout · no charge",
   "common.plan": "Plan a trip",
   "common.discover": "Local food map",
   "common.saved": "My trips",
@@ -442,6 +452,26 @@ for (const [key, [k, e]] of Object.entries(errors)) {
 ko["quality.PIN_CHANGED"] = "유지한 장소 또는 시간이 바뀌었어요.";
 en["quality.PIN_CHANGED"] = "A pinned place or time was changed.";
 ko["quality.INVALID_FORMAT"] = "날짜와 시간을 올바르게 입력해 주세요.";
+ko["planner.requestMissing"] =
+  "저장된 요청을 찾지 못했어요. 이전으로 돌아가 입력을 수정해 주세요. 상태 확인만으로 AI를 다시 호출하지 않아요.";
+ko["planner.validationRetries"] =
+  "시간·동선·식사를 검증하고 필요하면 최대 3회까지 보완해요.";
+en["planner.validationRetries"] =
+  "We check times, routes and meals, with up to 3 attempts to improve the result.";
+en["planner.requestMissing"] =
+  "The saved request was not found. Go back to edit your trip. Checking status does not call AI again.";
+ko["planner.previousSaved"] =
+  "이전 요청은 이미 완료되어 나의 여행에 보관했어요. 수정한 조건으로 새 일정을 만들 수 있어요.";
+en["planner.previousSaved"] =
+  "The previous itinerary is already saved in My trips. You can create another with your updated choices.";
+ko["planner.editReady"] =
+  "날짜와 조건을 수정할 수 있어요. 이전 요청은 다시 생성하지 않아요.";
+en["planner.editReady"] =
+  "You can edit your dates and preferences. The previous request will not be generated again.";
+ko["planner.editWhilePending"] =
+  "입력은 수정할 수 있어요. 새 생성 전에는 이전 요청 상태를 다시 확인해 주세요.";
+en["planner.editWhilePending"] =
+  "You can edit your choices. Check the previous request before generating again.";
 en["quality.INVALID_FORMAT"] = "Enter valid dates and times.";
 ko["quality.INSUFFICIENT_TRANSFER_BUFFER"] =
   "장소 간 거리보다 이동 여유가 너무 짧아요.";
