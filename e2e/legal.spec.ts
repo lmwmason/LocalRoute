@@ -1,4 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
+test.beforeEach(async ({ page, baseURL }) => {
+  const origin = new URL(baseURL!).origin;
+  await page.routeWebSocket("**", (socket) => socket.close());
+  await page.route("**/*", (route) => {
+    const url = new URL(route.request().url());
+    return url.origin !== origin || url.pathname.startsWith("/api/")
+      ? route.abort()
+      : route.continue();
+  });
+});
 const version = "2026-10-17.1";
 const complete = {
   current: true,
@@ -14,7 +24,7 @@ const incomplete = {
 };
 async function mockClient(page: Page) {
   // Replaces the network boundary, not the component or validation. No Auth or provider call.
-  await page.route("**/src/legal/client.ts", (route) =>
+  await page.route(/\/src\/legal\/client\.ts(?:\?.*)?$/, (route) =>
     route.fulfill({
       contentType: "application/javascript",
       body: `export async function requestLegalConsent(payload) {
@@ -84,9 +94,16 @@ test("verified consent fails closed, retries idempotently and allows optional re
   for (const label of await page.locator(".legal-choice").all()) {
     const box = await label.boundingBox();
     expect(box!.height).toBeGreaterThanOrEqual(44);
+    const input = await label.locator("input").boundingBox();
+    const text = await label.locator("span").boundingBox();
+    expect(input).not.toBeNull();
+    expect(text).not.toBeNull();
+    expect(text!.x - (input!.x + input!.width)).toBeGreaterThanOrEqual(9);
+    expect(Math.abs(text!.y - input!.y)).toBeLessThanOrEqual(2);
+    expect(text!.x + text!.width).toBeLessThanOrEqual(box!.x + box!.width + 1);
   }
   await save.click();
-  await expect(page.getByRole("status")).toContainText(
+  await expect(page.getByRole("alert")).toContainText(
     "동의는 완료되지 않았습니다",
   );
   await expect(page.getByText("MEMBER_CONTENT")).toHaveCount(0);

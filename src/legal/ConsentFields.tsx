@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { useI18n } from "../i18n";
 import { LegalNotices } from "./LegalPage";
 
@@ -31,6 +32,7 @@ export function ConsentFields({
 }) {
   const { language } = useI18n();
   const ko = language === "ko";
+  const groupId = useId();
   const labels: [keyof ConsentChoices, string][] = [
     [
       "adult",
@@ -75,20 +77,68 @@ export function ConsentFields({
           ? "국외 이전: Supabase Pte. Ltd.(싱가포르, privacy@supabase.io), 인도 뭄바이(ap-south-1)의 기본 DB. 가입·로그인·저장 시 HTTPS로 위 항목과 이용 기능의 데이터를 보내 인증·DB·Storage를 운영하고 서비스에 필요한 동안 보관합니다. 미국 운영·지원 및 백업·메일 재위탁의 추가 국가는 출시 전 확인 대상입니다. 거부 시 회원 인증·저장이 불가능하며 철회는 lmw.hpc@gmail.com으로 요청할 수 있어요. Gemini·예약 연락처 제공·위치 추적은 이 동의에 포함되지 않습니다."
           : "Overseas recipient: Supabase Pte. Ltd., Singapore (privacy@supabase.io), primary DB in Mumbai, India (ap-south-1). During signup/login/saving, the data above and feature data are sent over HTTPS for Auth, DB and Storage, retained while needed. Additional US support/operations and backup/email subprocessor locations require prelaunch confirmation. Refusal prevents member authentication/storage. Withdraw at lmw.hpc@gmail.com. This consent excludes Gemini personal-data transfers, booking disclosures and location tracking."}
       </p>
+      <nav
+        className="legal-document-links"
+        aria-label={ko ? "전문 바로 보기 · 새 창" : "Full notices · new tab"}
+      >
+        {(
+          [
+            ["terms", ko ? "이용약관 전문" : "Full terms"],
+            ["privacy", ko ? "개인정보 처리방침 전문" : "Full privacy notice"],
+            [
+              "transfers",
+              ko ? "국외 이전 안내 전문" : "Full overseas transfer notice",
+            ],
+          ] as const
+        ).map(([document, label]) => (
+          <a
+            key={document}
+            href={`/legal/${document}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {label}
+            <span className="legal-new-tab">{ko ? "새 창" : "New tab"}</span>
+          </a>
+        ))}
+      </nav>
       <LegalNotices />
-      {labels.map(([key, label]) => (
-        <label className="legal-choice" key={key}>
-          <input
-            type="checkbox"
-            checked={value[key]}
-            required={key !== "publicLocalArea"}
-            onChange={(event) =>
-              onChange({ ...value, [key]: event.target.checked })
-            }
-          />
-          <span>{label}</span>
-        </label>
-      ))}
+      {([false, true] as const).map(
+        (isOptional) =>
+          (!isOptional || optional) && (
+            <div
+              className={`legal-choice-group ${isOptional ? "legal-choice-optional" : "legal-choice-required"}`}
+              role="group"
+              aria-labelledby={`${groupId}-${isOptional}`}
+              key={String(isOptional)}
+            >
+              <h3 id={`${groupId}-${isOptional}`}>
+                {isOptional
+                  ? ko
+                    ? "선택 동의"
+                    : "Optional consent"
+                  : ko
+                    ? "필수 동의 · 4개"
+                    : "Required consent · 4 choices"}
+              </h3>
+              {labels
+                .filter(([key]) => (key === "publicLocalArea") === isOptional)
+                .map(([key, label]) => (
+                  <label className="legal-choice" key={key}>
+                    <input
+                      type="checkbox"
+                      checked={value[key]}
+                      required={key !== "publicLocalArea"}
+                      onChange={(event) =>
+                        onChange({ ...value, [key]: event.target.checked })
+                      }
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+            </div>
+          ),
+      )}
       {optional && (
         <p>
           {ko
