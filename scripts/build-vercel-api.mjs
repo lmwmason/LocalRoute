@@ -9,6 +9,7 @@ export async function buildVercelRuntime() {
     root,
     configFile: false,
     envDir: false,
+    publicDir: false,
     build: {
       ssr: resolve(root, "server/vercel-runtime.ts"),
       outDir: resolve(root, "server-runtime"),
