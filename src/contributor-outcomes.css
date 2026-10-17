@@ -1,0 +1,106 @@
+.contributor-outcomes {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 880px;
+  min-width: 0;
+  margin-inline: auto;
+  padding: 20px 16px max(24px, env(safe-area-inset-bottom));
+  color: #182b44;
+  font-family: inherit;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.contributor-outcomes * {
+  box-sizing: border-box;
+  min-width: 0;
+}
+.contributor-outcomes h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.3rem, 4.5vw, 1.8rem);
+  line-height: 1.35;
+}
+.contributor-outcomes header p,
+.contributor-outcomes-note {
+  color: #4f6074;
+}
+.contributor-outcomes button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid #a4c3f3;
+  border-radius: 12px;
+  background: #edf4ff;
+  color: #144c9e;
+  cursor: pointer;
+  font: inherit;
+}
+.contributor-outcomes button:focus-visible {
+  outline: 3px solid #165dce;
+  outline-offset: 3px;
+}
+.contributor-outcomes ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.contributor-outcomes article {
+  padding: 20px 16px;
+  border: 1px solid #d9e2ed;
+  border-radius: 18px;
+  background: #fff;
+}
+.contributor-outcomes h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.contributor-outcomes-version {
+  color: #52657b;
+  font-size: 0.875rem;
+  margin: 4px 0 12px;
+}
+.contributor-outcomes-text {
+  white-space: pre-wrap;
+}
+.contributor-outcomes dl {
+  display: grid;
+  gap: 12px;
+  margin-block: 20px;
+}
+.contributor-outcomes dl > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.contributor-outcomes dt {
+  flex: 1;
+  color: #52657b;
+}
+.contributor-outcomes dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: end;
+}
+.contributor-outcomes-review {
+  margin-bottom: 0;
+  color: #345785;
+}
+.contributor-outcomes-note {
+  font-size: 0.875rem;
+}
+@media (min-width: 680px) {
+  .contributor-outcomes {
+    padding: 32px;
+  }
+  .contributor-outcomes dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .contributor-outcomes dl > div {
+    display: block;
+  }
+  .contributor-outcomes dd {
+    text-align: start;
+    margin-top: 6px;
+  }
+}

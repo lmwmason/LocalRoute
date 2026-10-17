@@ -2,6 +2,8 @@ import { createClient } from "@supabase/supabase-js";
 import { isLocalRouteSupabase } from "../../shared/config";
 import type { ServerConfig } from "../config";
 import { AppError } from "../errors";
+import type { ContributorOutcomesResult } from "../../shared/contributor-outcomes";
+import { readContributorOutcomes } from "./contributor-outcomes";
 export type VisitRewardConfig = Pick<
   ServerConfig,
   "live" | "database" | "url" | "secret"
@@ -10,6 +12,7 @@ export function readVisitRewardSettings(env: NodeJS.ProcessEnv) {
   return { payoutsEnabled: env.FEATURE_VISIT_REWARD_PAYOUTS === "true" };
 }
 export interface VisitRewardStore {
+  contributorOutcomes?(actor: string): Promise<ContributorOutcomesResult>;
   action(
     actor: string,
     action: string,
@@ -50,6 +53,7 @@ export function createVisitRewardStore(
     auth: { persistSession: false, autoRefreshToken: false },
   });
   return {
+    contributorOutcomes: (actor) => readContributorOutcomes(client, actor),
     async action(actor, action, payload, issueEnabled) {
       const { data, error } = await client.rpc("visit_reward_action", {
         p_actor: actor,

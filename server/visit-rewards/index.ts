@@ -66,6 +66,14 @@ export function attachVisitRewards(
   app.get("/api/visit-rewards/policy", async (req, res) =>
     res.json(await call(req, "policy")),
   );
+  app.get("/api/visit-rewards/contributor-outcomes", async (req, res) => {
+    const user = await access(req);
+    // There is deliberately no user/curator override, including for administrators.
+    if (Object.keys(req.query).length) throw new AppError(400, "visit.invalid");
+    if (!store?.contributorOutcomes)
+      throw new AppError(503, "visit.unavailable");
+    res.json(await store.contributorOutcomes(user.id));
+  });
   app.get("/api/visit-rewards/targets", async (req, res) =>
     res.json(await call(req, "targets")),
   );
