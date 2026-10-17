@@ -23,7 +23,11 @@ export function createAdminAutomation(options: {
   const now = options.now ?? Date.now;
   const cache = new Map<
     string,
-    { expires: number; promise: Promise<ReviewAssistanceResult> }
+    {
+      expires: number;
+      promise: Promise<ReviewAssistanceResult>;
+      failureRecorded?: boolean;
+    }
   >();
   const rowSchema = assessmentRequestSchema
     .omit({ language: true })
@@ -68,9 +72,11 @@ export function createAdminAutomation(options: {
         }
         if (!cached) continue;
         const assessment = await cached.promise;
-        if (assessment.status === "failed")
+        if (assessment.status === "failed" && !cached.failureRecorded) {
+          cached.failureRecorded = true;
           cached.expires =
             now() + Math.max(60, assessment.retryAfterSeconds ?? 60) * 1000;
+        }
         const priority =
           row.kind === "report" ||
           (assessment.status === "ready" &&
