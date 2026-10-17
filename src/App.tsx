@@ -52,6 +52,7 @@ import { visitRewardsApi } from "./visit-rewards/host-client";
 import { BookingButton } from "./booking/BookingButton";
 import { bookingApi } from "./booking/client";
 import { AccountEntry } from "./components/AccountEntry";
+import { PlanningAccessGate } from "./components/PlanningAccessGate";
 
 const Map = lazy(() => import("./components/Map"));
 const Planner = lazy(() =>
@@ -623,16 +624,24 @@ export default function App() {
               </button>
             </section>
           ) : tab === "plan" ? (
-            <Suspense fallback={<p role="status">{t("planner.checking")}</p>}>
-              <MemberConsent userId={session?.user.id}>
-                <Planner
-                  key={session?.user.id || "guest"}
-                  signedIn={Boolean(session)}
-                  userId={session?.user.id}
-                  onLogin={() => setLoginOverlay(true)}
-                />
-              </MemberConsent>
-            </Suspense>
+            <PlanningAccessGate
+              verified={Boolean(
+                session?.user.email_confirmed_at && !session.user.is_anonymous,
+              )}
+              signedIn={Boolean(session)}
+              onLogin={() => setPanel(session ? "profile" : "login")}
+            >
+              <Suspense fallback={<p role="status">{t("planner.checking")}</p>}>
+                <MemberConsent userId={session?.user.id}>
+                  <Planner
+                    key={session?.user.id || "guest"}
+                    signedIn={Boolean(session)}
+                    userId={session?.user.id}
+                    onLogin={() => setLoginOverlay(true)}
+                  />
+                </MemberConsent>
+              </Suspense>
+            </PlanningAccessGate>
           ) : tab === "explore" ? (
             <>
               <section className="intro">

@@ -51,6 +51,7 @@ describe("launch landing and verified account presentation", () => {
     await server?.close();
   });
   async function setup(width = 390, language = "ko") {
+    const requests: string[] = [];
     const context = await browser.newContext({
       viewport: { width, height: 844 },
       hasTouch: width < 800,
@@ -65,6 +66,8 @@ describe("launch landing and verified account presentation", () => {
     await context.routeWebSocket("**", (socket) => socket.close());
     await context.route("**/*", (route) => {
       const url = new URL(route.request().url());
+      if (url.origin === base && url.pathname.startsWith("/api/"))
+        requests.push(url.pathname);
       if (url.origin !== base || route.request().method() !== "GET")
         return route.abort();
       if (url.pathname.startsWith("/api/"))
@@ -76,7 +79,7 @@ describe("launch landing and verified account presentation", () => {
     });
     const page = await context.newPage();
     page.setDefaultTimeout(7000);
-    return { page, context };
+    return { page, context, requests };
   }
   for (const width of [360, 390, 1280]) {
     it(`supports both languages, 44px targets, keyboard, scrolling and reduced motion at ${width}px`, async () => {
@@ -171,9 +174,12 @@ describe("launch landing and verified account presentation", () => {
     await page
       .getByRole("link", { name: "여행 계획하기", exact: true })
       .click();
-    await page.waitForURL((url) => url.pathname === "/plan");
+    await page.waitForURL((url) => url.pathname === "/login");
+    await ui(page.locator(".login-form")).toBeVisible();
+    await page.goto(`${base}/plan`);
     await page.reload();
     await ui(page.locator(".main-app-shell")).toBeVisible();
+    await ui(page.locator(".planning-access")).toBeVisible();
     await page
       .getByRole("button", { name: "LocalRoute 홈", exact: true })
       .click();
@@ -206,8 +212,64 @@ describe("launch landing and verified account presentation", () => {
     await ui(page.locator(".login-form")).toBeVisible();
     await context.close();
   }, 45000);
+  it("blocks guest planning and direct wizard/itinerary URLs, including demo mode, while allowing place browsing", async () => {
+    for (const language of ["ko", "en"]) {
+      const { page, context, requests } = await setup(360, language);
+      for (const path of [
+        "/plan",
+        "/plan/new/4",
+        "/itineraries/90000000-0000-4000-8000-000000000001",
+      ]) {
+        await page.goto(base + path);
+        await ui(page.locator(".planning-access")).toBeVisible();
+        expect(await page.locator(".planner-page, .wizard-shell").count()).toBe(
+          0,
+        );
+        expect(
+          await page.evaluate(() =>
+            sessionStorage.getItem("localroute.demo.plan"),
+          ),
+        ).toBeNull();
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
+      }
+      expect(
+        requests.filter((path) => /\/api\/(planning|itineraries)/.test(path)),
+      ).toEqual([]);
+      await page
+        .getByRole("link", {
+          name: language === "ko" ? "장소 둘러보기" : "Explore places",
+          exact: true,
+        })
+        .click();
+      await ui(
+        page.getByRole("textbox", {
+          name: language === "ko" ? "장소 검색" : "Search places",
+          exact: true,
+        }),
+      ).toBeVisible();
+      await context.close();
+    }
+  }, 45000);
+  it("allows only email-confirmed, server-verified members into the planner", async () => {
+    for (const scenario of ["member", "unconfirmed", "deleted", "anonymous"]) {
+      const { page, context } = await setup(390, "en");
+      await page.goto(`${base}/plan?landingAuth=${scenario}`);
+      if (scenario === "member") {
+        await ui(page.locator(".planner-page")).toBeVisible();
+        expect(await page.locator(".planning-access").count()).toBe(0);
+      } else {
+        await ui(page.locator(".planning-access")).toBeVisible();
+        expect(await page.locator(".planner-page").count()).toBe(0);
+      }
+      await context.close();
+    }
+  }, 30000);
   it("shows a member only after server verification; cached/deleted/unconfirmed identities do not get member actions", async () => {
-    for (const scenario of ["member", "deleted", "unconfirmed"]) {
+    for (const scenario of ["member", "deleted", "unconfirmed", "anonymous"]) {
       const { page, context } = await setup(390, "en");
       await page.goto(`${base}/?landingAuth=${scenario}`);
       await page.waitForFunction(

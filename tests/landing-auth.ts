@@ -2,6 +2,7 @@
 const scenario =
   new URLSearchParams(location.search).get("landingAuth") || "guest";
 const user = {
+  is_anonymous: scenario === "anonymous",
   id: "90000000-0000-4000-8000-000000000001",
   email: "private-landing@example.invalid",
   email_confirmed_at:
@@ -14,6 +15,7 @@ let session: typeof cached | null = [
   "pending",
   "deleted",
   "unconfirmed",
+  "anonymous",
 ].includes(scenario)
   ? cached
   : null;

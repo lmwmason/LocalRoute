@@ -27,7 +27,12 @@ export function useLandingAccount(): LandingAccount {
       try {
         const { data, error } = await client.auth.getUser(session.access_token);
         if (!active || current !== revision) return;
-        if (error || !data.user || data.user.id !== session.user.id) {
+        if (
+          error ||
+          !data.user ||
+          data.user.is_anonymous ||
+          data.user.id !== session.user.id
+        ) {
           setAccount("guest");
           await client.auth.signOut({ scope: "local" });
           return;

@@ -95,7 +95,16 @@ export default function LandingPage() {
               )}
             </p>
             <div className="landing-hero-cta">
-              <Link className="landing-button landing-primary" to="/plan">
+              <Link
+                className="landing-button landing-primary"
+                to={
+                  member
+                    ? "/plan"
+                    : account === "unconfirmed"
+                      ? "/account"
+                      : "/login"
+                }
+              >
                 {say("여행 계획하기", "Plan a trip")}
                 <ArrowRight size={19} aria-hidden="true" />
               </Link>
@@ -107,8 +116,8 @@ export default function LandingPage() {
             <p className="landing-access-note">
               <Check size={15} aria-hidden="true" />
               {say(
-                "가입 없이 둘러보고, 준비되면 시작하세요.",
-                "Look around without signing up. Start when you’re ready.",
+                "장소는 가입 없이 둘러보기 · 일정 생성은 로그인·이메일 확인 후",
+                "Browse places without signing up. Planning requires sign-in and email verification.",
               )}
             </p>
             <a className="landing-scroll-link" href="#how-it-works">
@@ -407,8 +416,8 @@ export default function LandingPage() {
                     "Continue from your itineraries or visit your account.",
                   )
                 : say(
-                    "장소 둘러보기는 로그인 없이 가능해요. 이 브라우저의 장소 담기와 회원의 일정 저장은 달라요. 계정에 일정 저장·공유는 로그인과 이메일 확인이 필요합니다.",
-                    "Explore without signing in. Places kept in this browser are separate from account itineraries. Saving and sharing account itineraries require sign-in and email verification.",
+                    "비회원은 등록된 장소를 둘러볼 수 있어요. LP를 사용하는 개인화 일정의 생성·저장·공유는 로그인과 이메일 확인을 마친 회원만 이용할 수 있습니다.",
+                    "Guests can browse registered places. Creating, saving and sharing personalized itineraries that use LP require sign-in and email verification.",
                   )}
             </p>
           </div>
