@@ -107,6 +107,12 @@ export const api = {
     request<{ status: "ready" | "generating" | "failed"; result?: Itinerary }>(
       `/planning/status/${id}`,
     ),
+  cancelPlan: (id: string, expectedUserId?: string) =>
+    request<{ status: "failed" | "ready" | "not_found" }>(
+      `/planning/cancel/${encodeURIComponent(id)}`,
+      { method: "POST" },
+      expectedUserId,
+    ),
   savePlan: (id: string, revision: number, schedule: Schedule) =>
     request<Itinerary>(`/itineraries/${id}`, {
       method: "PUT",

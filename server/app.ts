@@ -94,6 +94,7 @@ export function createApp(
     app.post("/api/reports", legal.requireConsent);
     app.use("/api/admin", legal.requireConsent);
     app.post("/api/planning/generate", legal.requireConsent);
+    app.post("/api/planning/cancel/:requestId", legal.requireConsent);
     app.get("/api/planning/quote", legal.requireConsent);
     app.get("/api/planning/status/:requestId", legal.requireConsent);
     app.use("/api/itineraries", legal.requireConsent);

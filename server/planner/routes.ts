@@ -120,7 +120,7 @@ export function attachPlanner(
     });
   app.get("/api/planning/quote", async (req, res) => {
     const user = await actor(req);
-    if (!config.planning) {
+    if (!repository) {
       res.json({
         enabled: false,
         cost: 100,
@@ -141,7 +141,9 @@ export function attachPlanner(
       ...quote,
       starter: config.starterPlanning,
       enabled:
-        quote.enabled === true && (!config.starterPlanning || quote.cost === 0),
+        config.planning &&
+        quote.enabled === true &&
+        (!config.starterPlanning || quote.cost === 0),
     });
   });
   app.get("/api/itineraries", async (req, res) => {
@@ -166,6 +168,34 @@ export function attachPlanner(
         {},
       ),
     );
+  });
+  app.post("/api/planning/cancel/:requestId", async (req, res) => {
+    const user = await actor(req);
+    const requestId = z.uuid().parse(req.params.requestId);
+    try {
+      const prior = (await repository!.planning(
+        user,
+        "status",
+        requestId,
+        {},
+      )) as Reservation;
+      // A retry must not release an already completed request or create another fail event.
+      if (prior.status === "ready" || prior.status === "failed") {
+        res.json({ status: prior.status });
+        return;
+      }
+      const result = await repository!.planning(user, "fail", requestId, {
+        code: "USER_CANCELLED",
+      });
+      // The database lock decides a race against finalize; ready is preserved.
+      res.json(z.object({ status: z.enum(["failed", "ready"]) }).parse(result));
+    } catch (error) {
+      if (error instanceof AppError && error.status === 404) {
+        res.json({ status: "not_found" });
+        return;
+      }
+      throw error;
+    }
   });
   app.post("/api/planning/generate", async (req, res) => {
     const user = await actor(req);
@@ -309,9 +339,11 @@ export function attachPlanner(
           res.json(status.result);
           return;
         }
-        await repository!.planning(user, "fail", payload.requestId, {
-          code: error instanceof AppError ? error.message : "GENERATION_FAILED",
-        });
+        if (status.status !== "failed")
+          await repository!.planning(user, "fail", payload.requestId, {
+            code:
+              error instanceof AppError ? error.message : "GENERATION_FAILED",
+          });
       } catch {
         throw new AppError(503, "REQUEST_STATUS_UNKNOWN");
       }
