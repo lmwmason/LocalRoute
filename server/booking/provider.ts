@@ -13,9 +13,7 @@ const resultSchema = z.object({
 });
 export type ProviderResult = z.infer<typeof resultSchema>["data"];
 export interface BookingProvider {
-  venue(
-    id: string,
-  ): Promise<{
+  venue(id: string): Promise<{
     id: string;
     name: string;
     address: string;
@@ -47,7 +45,7 @@ export class HeyYumiBooking implements BookingProvider {
     if (now < this.blocked || this.count >= this.budget)
       throw new AppError(
         429,
-        "booking.limit",
+        now < this.blocked ? "booking.providerLimit" : "booking.budget",
         String(
           Math.max(
             1,
@@ -77,7 +75,7 @@ export class HeyYumiBooking implements BookingProvider {
         : Math.ceil((Date.parse(raw) - now) / 1000);
       const delay = Number.isFinite(seconds) ? Math.max(1, seconds) : 60;
       this.blocked = now + delay * 1000;
-      throw new AppError(429, "booking.limit", String(delay));
+      throw new AppError(429, "booking.providerLimit", String(delay));
     }
     if (!response.ok)
       throw new AppError(

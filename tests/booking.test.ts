@@ -544,6 +544,35 @@ describe("booking access, consent and durable state", () => {
   });
 });
 describe("official HeyYumi adapter contract (mock network only)", () => {
+  it("distinguishes the local budget from provider throttling and does not retry either automatically", async () => {
+    const fetcher = vi.fn<typeof fetch>(async () =>
+      Response.json({
+        success: true,
+        data: { id: "place", name: "Test", address: {}, yumiReservable: true },
+      }),
+    );
+    const local = new HeyYumiBooking("mock-key", 1, fetcher);
+    await local.venue("place");
+    await expect(local.venue("place")).rejects.toMatchObject({
+      status: 429,
+      message: "booking.budget",
+    });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    const limitedFetch = vi.fn<typeof fetch>(
+      async () =>
+        new Response("{}", { status: 429, headers: { "Retry-After": "90" } }),
+    );
+    const external = new HeyYumiBooking("mock-key", 30, limitedFetch);
+    await expect(external.venue("place")).rejects.toMatchObject({
+      message: "booking.providerLimit",
+      retryAfter: "90",
+    });
+    await expect(external.venue("place")).rejects.toMatchObject({
+      message: "booking.providerLimit",
+    });
+    expect(limitedFetch).toHaveBeenCalledTimes(1);
+  });
+
   it("uses official paths, minimal tiers and stable idempotency key without availability or cancel calls", async () => {
     const fetcher = vi
       .fn<typeof fetch>()

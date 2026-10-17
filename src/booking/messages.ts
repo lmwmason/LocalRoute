@@ -43,6 +43,10 @@ export const messages = {
     "booking.venueChanged": "식당 정보가 바뀌었어요. 다시 열어 확인해 주세요.",
     "booking.future": "미래 일시를 선택해 주세요.",
     "booking.limit": "요청이 많아요. 잠시 후 다시 확인해 주세요.",
+    "booking.budget":
+      "예약 서비스의 이번 시간 조회 한도에 도달했어요. 표시된 대기 시간 후 다시 확인해 주세요.",
+    "booking.providerLimit":
+      "예약 제공자가 요청을 일시 제한했어요. 표시된 대기 시간 후 다시 확인해 주세요.",
     "booking.unavailable": "예약 정보를 처리하지 못했어요.",
     "booking.providerUnavailable": "헤이유미 응답을 확인하지 못했어요.",
     "booking.notFound": "예약 정보를 찾을 수 없어요.",
@@ -97,6 +101,10 @@ export const messages = {
       "Restaurant details changed. Reopen and review them.",
     "booking.future": "Choose a future date and time.",
     "booking.limit": "Too many requests. Please check again later.",
+    "booking.budget":
+      "The booking service hourly request budget has been reached. Retry after the displayed wait.",
+    "booking.providerLimit":
+      "The booking provider is temporarily limiting requests. Retry after the displayed wait.",
     "booking.unavailable": "Unable to process booking details.",
     "booking.providerUnavailable": "Unable to verify HeyYumi's response.",
     "booking.notFound": "Booking not found.",
