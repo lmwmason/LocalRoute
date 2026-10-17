@@ -1,6 +1,5 @@
 import { createBookingApi } from "./api";
 import { supabase } from "../supabase";
-export const bookingApi = createBookingApi(async () => {
-  if (!supabase) return undefined;
-  return (await supabase.auth.getSession()).data.session?.access_token;
-});
+import { createBookingTokenSource } from "./session-token";
+const source = supabase ? createBookingTokenSource(supabase.auth) : undefined;
+export const bookingApi = createBookingApi(async () => source?.token());
