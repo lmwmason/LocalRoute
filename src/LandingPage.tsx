@@ -112,6 +112,13 @@ export default function LandingPage() {
                 {say("장소 둘러보기", "Explore places")}
                 <Compass size={18} aria-hidden="true" />
               </Link>
+              <Link
+                className="landing-button landing-secondary"
+                to="/examples/euljiro"
+              >
+                {say("을지로 예시 일정", "Euljiro sample itinerary")}
+                <ListOrdered size={18} aria-hidden="true" />
+              </Link>
             </div>
             <p className="landing-access-note">
               <Check size={15} aria-hidden="true" />

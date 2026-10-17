@@ -14,6 +14,9 @@ const SharedItineraryPage = React.lazy(
 );
 const LegalSitePage = React.lazy(() => import("./LegalSitePage"));
 const TestCheckout = React.lazy(() => import("./checkout/TestCheckout"));
+const EuljiroExamplePage = React.lazy(
+  () => import("./examples/EuljiroExamplePage"),
+);
 function SiteRouter() {
   const location = useLocation();
   // Keep the existing App mounted while it scrubs a root callback URL and
@@ -34,6 +37,12 @@ function SiteRouter() {
     return (
       <React.Suspense fallback={<p role="status">LocalRoute…</p>}>
         <LandingPage />
+      </React.Suspense>
+    );
+  if (location.pathname === "/examples/euljiro")
+    return (
+      <React.Suspense fallback={<p role="status">LocalRoute…</p>}>
+        <EuljiroExamplePage />
       </React.Suspense>
     );
   if (location.pathname === "/checkout/test")
