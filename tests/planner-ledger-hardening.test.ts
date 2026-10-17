@@ -464,3 +464,156 @@ describe("original intent replay across policy changes", () => {
     expect(currentMonth.rows[0].count).toBe(0);
   });
 });
+
+describe("explicit free itinerary policy", () => {
+  const freeIntent = {
+    ...intent,
+    expectedCost: 0,
+    policyVersion: "operator-free-v1",
+  };
+  async function freePolicy() {
+    // Deliberately retain a nonzero promotional setting: free planning must not mint it.
+    await db.exec(
+      "update public.lp_policy set plan_cost=0,version='operator-free-v1',monthly_promo=300",
+    );
+  }
+
+  it("saves a validated free result with no balance, allowance, debit or duplicate charge", async () => {
+    await freePolicy();
+    expect(await action(user, "balance", null)).toMatchObject({
+      cost: 0,
+      promo: 0,
+      earned: 0,
+      held: 0,
+    });
+    const requestId = crypto.randomUUID();
+    expect(await action(user, "reserve", requestId, freeIntent)).toMatchObject({
+      status: "generating",
+      cost: 0,
+      replay: false,
+    });
+    const saved = await action(user, "finalize", requestId, {
+      result: resultFixture(),
+    });
+    expect(saved).toMatchObject({ cost: 0 });
+    expect(
+      await action(user, "finalize", requestId, { result: resultFixture() }),
+    ).toEqual(saved);
+    expect(await action(user, "reserve", requestId, freeIntent)).toMatchObject({
+      status: "ready",
+      result: saved,
+    });
+    expect(await action(user, "balance", null)).toMatchObject({
+      cost: 0,
+      promo: 0,
+      earned: 0,
+      held: 0,
+    });
+    expect(await counters()).toEqual({
+      requests: 1,
+      plans: 1,
+      debits: 0,
+      charged: 0,
+      grants: 0,
+    });
+    expect(
+      (
+        await db.query("select * from public.lp_ledger where user_id=$1", [
+          user,
+        ])
+      ).rows,
+    ).toHaveLength(0);
+    expect(
+      (
+        await db.query(
+          "select cost,promo_reserved,earned_reserved from public.planning_requests where user_id=$1",
+          [user],
+        )
+      ).rows,
+    ).toEqual([{ cost: 0, promo_reserved: 0, earned_reserved: 0 }]);
+  });
+
+  it("replays the original free request after moving to a priced disabled policy", async () => {
+    await freePolicy();
+    const requestId = crypto.randomUUID();
+    await action(user, "reserve", requestId, freeIntent);
+    const saved = await action(user, "finalize", requestId, {
+      result: resultFixture(),
+    });
+    await db.exec(
+      "update public.lp_policy set plan_cost=120,version='priced-v2',planning_enabled=false",
+    );
+    expect(await action(user, "reserve", requestId, freeIntent)).toMatchObject({
+      status: "ready",
+      result: saved,
+    });
+    await expect(
+      action(user, "reserve", requestId, {
+        ...freeIntent,
+        expectedCost: 120,
+        policyVersion: "priced-v2",
+      }),
+    ).rejects.toThrow(/Idempotency conflict/);
+    expect(await counters()).toEqual({
+      requests: 1,
+      plans: 1,
+      debits: 0,
+      charged: 0,
+      grants: 0,
+    });
+  });
+
+  it("still rejects invalid free schedules and releases without any ledger mutation", async () => {
+    await freePolicy();
+    const requestId = crypto.randomUUID();
+    await action(user, "reserve", requestId, freeIntent);
+    await expect(
+      action(user, "finalize", requestId, {
+        result: { evaluation: { valid: true } },
+      }),
+    ).rejects.toThrow(/Invalid generated plan/);
+    await action(user, "fail", requestId, { code: "INVALID_RESULT" });
+    expect(await action(user, "balance", null)).toMatchObject({
+      cost: 0,
+      held: 0,
+      promo: 0,
+      earned: 0,
+    });
+    expect(await counters()).toEqual({
+      requests: 1,
+      plans: 0,
+      debits: 0,
+      charged: 0,
+      grants: 0,
+    });
+  });
+
+  it("does not interpret absent, null, string or negative prices as free confirmation", async () => {
+    await freePolicy();
+    const missing = {
+      input: freeIntent.input,
+      consent: true,
+      policyVersion: freeIntent.policyVersion,
+    };
+    for (const payload of [
+      missing,
+      { ...freeIntent, expectedCost: null },
+      { ...freeIntent, expectedCost: "0" },
+      { ...freeIntent, expectedCost: -1 },
+    ]) {
+      await expect(
+        action(user, "reserve", crypto.randomUUID(), payload),
+      ).rejects.toThrow(/Price confirmation required/);
+    }
+    expect(await counters()).toEqual({
+      requests: 0,
+      plans: 0,
+      debits: 0,
+      charged: 0,
+      grants: 0,
+    });
+    await expect(
+      db.exec("update public.lp_policy set plan_cost=-1"),
+    ).rejects.toThrow(/check constraint/);
+  });
+});
