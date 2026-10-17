@@ -6,6 +6,7 @@ import { demoPlaces } from "../shared/demo";
 import { bookingProfileSchema } from "../shared/booking";
 import { AppError } from "./errors";
 import { attachShares } from "./sharing";
+import { attachTestCheckout } from "./testcheckout";
 import { attachVisitRewards, readVisitRewardSettings } from "./visit-rewards";
 import {
   createAiAssistance,
@@ -127,6 +128,11 @@ export function createApp(
     }),
   );
   attachBooking(app, bookingConfig, actor);
+  attachTestCheckout(app, {
+    config: { ...config, live: config.live && config.database },
+    actor,
+    limit,
+  });
   app.get("/api/places/:id", async (req, res) => {
     const id = z.uuid().parse(req.params.id);
     const place = config.live
