@@ -26,6 +26,8 @@ import { PlacePhoto } from "../components/PlacePhoto";
 import { PlaceOrigin } from "../components/PlaceOrigin";
 import { ShareItinerary } from "./ShareItinerary";
 import { TransportLeg } from "./TransportLeg";
+import { BookingButton } from "../booking/BookingButton";
+import { bookingApi } from "../booking/client";
 const PlaceMap = lazy(() => import("../components/Map"));
 export function ItineraryEditor({
   itinerary,
@@ -161,6 +163,13 @@ export function ItineraryEditor({
       </div>
       {itinerary.provenance === "demo" && (
         <p className="demo-banner">{t("planner.demoNotice")}</p>
+      )}
+      {itinerary.provenance === "operator_example" && (
+        <p className="demo-banner" role="note">
+          {language === "ko"
+            ? "운영자 예약 시연 일정 · 0 LP · 예약 확정 아님. 날짜별 영업시간과 예약 가능 시간은 미확인입니다. 지원 매장은 별도 정보 확인·동의 후 직접 예약 요청해야 해요."
+            : "Operator reservation example · 0 LP · No booking confirmed. Opening hours and booking availability for these dates are unverified. Supported venues require a separate review, consent and reservation submission."}
+        </p>
       )}
       <div className="quality-strip">
         <span>
@@ -300,6 +309,11 @@ export function ItineraryEditor({
                       </button>
                     </div>
                     <p className="stop-explanation">{stop.explanation}</p>
+                    {candidate.externalIds?.some(
+                      (external) => external.provider === "heyyumi" && !external.possiblyClosed,
+                    ) && (
+                      <BookingButton api={bookingApi} placeId={candidate.id} language={language} />
+                    )}
                     <details className="stop-edit-details">
                       <summary>{t("planner.editStop")}</summary>
                       <p>{stop.explanation}</p>
