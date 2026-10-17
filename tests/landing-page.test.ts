@@ -81,7 +81,7 @@ describe("launch landing and verified account presentation", () => {
     page.setDefaultTimeout(7000);
     return { page, context, requests };
   }
-  for (const width of [360, 390, 1280]) {
+  for (const width of [360, 390, 768, 1024, 1280, 1440]) {
     it(`supports both languages, 44px targets, keyboard, scrolling and reduced motion at ${width}px`, async () => {
       for (const language of ["ko", "en"]) {
         const ko = language === "ko",
@@ -90,7 +90,7 @@ describe("launch landing and verified account presentation", () => {
         page.on("pageerror", (error) => errors.push(error.message));
         await page.goto(base);
         await ui(page.getByRole("heading", { level: 1 })).toContainText(
-          ko ? "현지인의 발견" : "Local discoveries",
+          ko ? "검색은 짧게" : "Less searching",
         );
         await ui(
           page.getByText(
@@ -98,7 +98,35 @@ describe("launch landing and verified account presentation", () => {
             { exact: true },
           ),
         ).toBeVisible();
-        expect(await page.locator(".landing img").count()).toBe(1);
+        const planAction = page.locator(".landing-hero .landing-primary");
+        expect(await planAction.getAttribute("href")).toBe("/login");
+        const actionBox = await planAction.boundingBox();
+        expect(actionBox!.y + actionBox!.height).toBeLessThanOrEqual(844);
+        expect(
+          await planAction.evaluate(
+            (node) => getComputedStyle(node).backgroundColor,
+          ),
+        ).toBe("rgb(255, 255, 255)");
+        expect(
+          await page
+            .locator("#landing-title > span")
+            .evaluate((node) => getComputedStyle(node).color),
+        ).toBe("rgb(186, 221, 255)");
+        expect(await page.locator(".landing img").count()).toBe(4);
+        await page
+          .locator(".landing-brand-illustration")
+          .scrollIntoViewIfNeeded();
+        await page
+          .locator(".landing-brand-illustration img")
+          .evaluate((image) => (image as HTMLImageElement).decode());
+        await ui(
+          page.locator(".landing-brand-illustration figcaption"),
+        ).toContainText(ko ? "AI로 만든" : "AI-generated");
+        await page.locator(".landing-screen-phones").scrollIntoViewIfNeeded();
+        for (const image of await page
+          .locator(".landing-screen-phone img")
+          .all())
+          await image.evaluate((image) => (image as HTMLImageElement).decode());
         expect(await page.locator(".landing-source-grid a").count()).toBe(3);
         await page
           .getByRole("button", {
@@ -123,14 +151,7 @@ describe("launch landing and verified account presentation", () => {
           () => document.activeElement?.tagName,
         );
         expect(["A", "BUTTON"]).toContain(focus);
-        await page
-          .getByRole("link", {
-            name: ko
-              ? "어떻게 만드는지 볼까요?"
-              : "See how your day comes together",
-            exact: true,
-          })
-          .click();
+        await page.locator("#how-it-works").scrollIntoViewIfNeeded();
         expect(await page.evaluate(() => scrollY)).toBeGreaterThan(0);
         for (const target of await page
           .locator(".landing a, .landing button")
