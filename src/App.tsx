@@ -45,6 +45,7 @@ import { Admin } from "./components/Admin";
 import { ReportForm } from "./components/ReportForm";
 import { BookingProfile } from "./components/BookingProfile";
 import { PlacePhoto } from "./components/PlacePhoto";
+import { PlaceOrigin } from "./components/PlaceOrigin";
 import { LanguageSwitch, useI18n } from "./i18n";
 import { LegalConsentGate } from "./legal";
 import { VisitRewardRequestPanel } from "./visit-rewards/VisitRewards";
@@ -731,7 +732,7 @@ export default function App() {
                       <p>
                         {loading
                           ? t("장소를 불러오는 중이에요")
-                          : `${filtered.length}곳의 발견 · ${config.demo ? t("성수 데모 컬렉션") : t("LocalRoute 추천")}`}
+                          : `${filtered.length}${language === "ko" ? "곳의 발견" : " places"} · ${config.demo ? t("성수 데모 컬렉션") : t("LocalRoute 추천")}`}
                       </p>
                     </div>
                     <span className="list-label">
@@ -802,13 +803,21 @@ export default function App() {
                         >
                           <PlacePhoto
                             id={p.photo?.id}
+                            sourcePhoto={p.sourcePhoto}
                             name={p.name}
                             className="place-art actual-place-photo"
                           />
                           <div className="place-info">
                             <div className="place-meta">
                               <span>{p.category}</span>
-                              <span>{t("성수동")}</span>
+                              <span>
+                                {config.demo
+                                  ? t("성수동")
+                                  : p.address
+                                      .split(/\s+/)
+                                      .slice(0, 2)
+                                      .join(" ")}
+                              </span>
                             </div>
                             <h3>{p.name}</h3>
                             <div className="rating">
@@ -823,7 +832,9 @@ export default function App() {
                             <p className="place-quote">
                               “
                               {p.endorsements[0]?.text ||
-                                "이곳의 첫 추천을 기다려요."}
+                                t(
+                                  "아직 공개된 추천이 없어요. 첫 경험을 나눠 주세요.",
+                                )}
                               ”
                             </p>
                             <div className="place-tags">
@@ -833,6 +844,7 @@ export default function App() {
                             </div>
                           </div>
                         </button>
+                        <PlaceOrigin place={p} />
                         <button
                           className={`save-button ${saved.includes(p.id) ? "saved" : ""}`}
                           aria-label={`${p.name} ${saved.includes(p.id) ? t("저장 해제") : t("저장")}`}
@@ -1077,6 +1089,7 @@ export default function App() {
           <div className="place-detail">
             <PlacePhoto
               id={selected.photo?.id}
+              sourcePhoto={selected.sourcePhoto}
               name={selected.name}
               className="place-art actual-place-photo"
             />
@@ -1094,6 +1107,7 @@ export default function App() {
                 {selected.address}
               </p>
             </div>
+            <PlaceOrigin place={selected} linked />
             <div className="rating-summary">
               <div>
                 <Star size={20} />
