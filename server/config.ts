@@ -42,6 +42,7 @@ export function readConfig(env: NodeJS.ProcessEnv) {
       env.KAKAO_TERMS_VERIFIED === "true" &&
       Boolean(env.GEMINI_API_KEY && env.KAKAO_REST_API_KEY),
     kakaoKey: env.KAKAO_REST_API_KEY || "",
+    kakaoMobilityKey: env.KAKAO_MOBILITY_API_KEY || "",
     routing:
       env.FEATURE_KAKAO_ROUTING === "true" &&
       env.KAKAO_ROUTING_TERMS_VERIFIED === "true",

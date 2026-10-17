@@ -65,7 +65,7 @@ export function attachPlanner(
     deps.routing ||
     createKakaoRouting({
       enabled: config.routing,
-      carKey: config.kakaoKey,
+      carKey: config.kakaoMobilityKey,
       transitKey: config.kakaoKey,
       maxCalls: config.routingBudget,
     });
