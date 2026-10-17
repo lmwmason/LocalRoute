@@ -1,0 +1,2928 @@
+{
+  "schemaVersion": 1,
+  "datasetType": "real_place_desk_research",
+  "generatedAt": "2026-10-17T04:55:15.281Z",
+  "language": "ko-KR",
+  "purpose": "충주시 테스트 중심 및 서울 성수동 시연을 위한 실제 장소의 출처 기반 조사 자료",
+  "scope": {
+    "chungju": {
+      "restaurants": 8,
+      "attractions": 12
+    },
+    "seongsu": {
+      "restaurants": 3,
+      "attractions": 3
+    }
+  },
+  "usage": {
+    "automaticImport": false,
+    "remoteDatabaseChanged": false,
+    "paidApiUsed": false,
+    "accountsCreated": false,
+    "liveApplicationConnected": false,
+    "providerReuseRights": "not_confirmed_for_production",
+    "photosDownloaded": false,
+    "personalRecommendationsCollected": false
+  },
+  "verificationPolicy": {
+    "checkedAtMeaning": "원격 공개 자료를 읽은 시각(UTC ISO 8601). 현장 관찰일이나 원문 갱신일이 아니다.",
+    "coordinatesMeaning": "Kakao 장소 HTML에서 WGS84로 명시한 대표 핀을 추출했다. 실제 출입구·측량 정확도·현재 개방은 확인하지 않았다.",
+    "unknownValues": "미확인 값은 null 또는 빈 배열. openingHours=null은 24시간 영업을 뜻하지 않는다.",
+    "classificationMeaning": "공식 설명을 식당/관광 및 세부 유형으로 정규화했다. 품질 추천이나 현지인 평가가 아니다.",
+    "identityMeaning": "Kakao 장소명·주소와 공식 근거의 대상 이름·주소를 수동 대조했다. 지번-도로명 법적 대응 및 상이한 주소는 미확인으로 보존했다.",
+    "sourcesMeaning": "public_detail_json은 공식 페이지가 쓰는 비인증 조회 요청이다. search_index는 공식 도메인의 검색 색인이며 직접 본문 열람과 구분한다.",
+    "photoMeaning": "공식 기관이나 Kakao 페이지에서 볼 수 있다는 이유만으로 사진 재사용 권리를 부여하지 않는다."
+  },
+  "places": [
+    {
+      "researchId": "real-place-001",
+      "region": {
+        "collectionArea": "서울 성수동",
+        "country": "KR",
+        "city": "서울특별시",
+        "district": "성동구",
+        "locality": "성수동1가",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "대성갈비",
+      "kind": "restaurant",
+      "placeType": "돼지갈비·한식",
+      "address": {
+        "value": "서울 성동구 상원1길 26 서울숲A타워 1층 101~103호",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "서울특별시 성동구 상원1길 26 (성수동1가) 서울숲 A타워 101호~103호",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.54619597199362,
+        "longitude": 127.04843220943702,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 0,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "12055448"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:09.380Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/12055448",
+          "checkedAt": "2026-10-17T04:51:09.380Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "0317f6783397dbe4aaed2c04a5eaaf94606cc40d775e12f52d9cd7e119629d5f",
+          "observed": {
+            "name": "대성갈비",
+            "address": "서울 성동구 상원1길 26 서울숲A타워 1층 101~103호",
+            "coordinates": {
+              "longitude": 127.04843220943702,
+              "latitude": 37.54619597199362,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=48a0552a-2b19-4373-8793-0f119c3ff86a",
+          "checkedAt": "2026-10-17T04:51:36.020Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "대성갈비",
+            "address": "서울특별시 성동구 상원1길 26 (성수동1가) 서울숲 A타워 101호~103호",
+            "coordinates": {
+              "longitude": 127.04843236710661,
+              "latitude": 37.546194354247156
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "48a0552a-2b19-4373-8793-0f119c3ff86a",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 최신 상세와 Kakao는 상원1길 26을 안내한다. 이전 서울숲길 주소를 가져오지 않았다."
+      ]
+    },
+    {
+      "researchId": "real-place-002",
+      "region": {
+        "collectionArea": "서울 성수동",
+        "country": "KR",
+        "city": "서울특별시",
+        "district": "성동구",
+        "locality": "성수동2가",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "성수족발",
+      "kind": "restaurant",
+      "placeType": "족발·한식",
+      "address": {
+        "value": "서울 성동구 아차산로7길 7 1층",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "서울특별시 성동구 아차산로7길 7 (성수동2가)",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.54602762815355,
+        "longitude": 127.05431637398702,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 6,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "8416853"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:09.412Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/8416853",
+          "checkedAt": "2026-10-17T04:51:09.412Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "6d6e693ac454632fa7eeab998cde4b74a539ac991aa93fb7e750fc5c18bf604f",
+          "observed": {
+            "name": "성수족발",
+            "address": "서울 성동구 아차산로7길 7 1층",
+            "coordinates": {
+              "longitude": 127.05431637398702,
+              "latitude": 37.54602762815355,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc0fe900-cf60-4ff5-8acc-418025c625ea",
+          "checkedAt": "2026-10-17T04:51:35.989Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "성수족발",
+            "address": "서울특별시 성동구 아차산로7길 7 (성수동2가)",
+            "coordinates": {
+              "longitude": 127.05427073959858,
+              "latitude": 37.54598715041313
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "bc0fe900-cf60-4ff5-8acc-418025c625ea",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    },
+    {
+      "researchId": "real-place-003",
+      "region": {
+        "collectionArea": "서울 성수동",
+        "country": "KR",
+        "city": "서울특별시",
+        "district": "성동구",
+        "locality": "성수동2가",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "성수부두",
+      "kind": "restaurant",
+      "placeType": "해산물·한식",
+      "address": {
+        "value": "서울 성동구 연무장길 41-26 지하 1층",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "서울특별시 성동구 연무장길 41-26 (성수동2가) 지하1층",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.543421951881434,
+        "longitude": 127.05428732628826,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 1,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "1282309711"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:09.413Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/1282309711",
+          "checkedAt": "2026-10-17T04:51:09.413Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "87c076d6379031558a210785e9d85cdefbafca9dbd49ab6c1fd33e244655d0fd",
+          "observed": {
+            "name": "성수부두",
+            "address": "서울 성동구 연무장길 41-26 지하 1층",
+            "coordinates": {
+              "longitude": 127.05428732628826,
+              "latitude": 37.543421951881434,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=5b34b854-c575-44d5-8df3-ec8676274390",
+          "checkedAt": "2026-10-17T04:51:36.020Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "성수부두",
+            "address": "서울특별시 성동구 연무장길 41-26 (성수동2가) 지하1층",
+            "coordinates": {
+              "longitude": 127.05427256148846,
+              "latitude": 37.54341722604326
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "5b34b854-c575-44d5-8df3-ec8676274390",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    },
+    {
+      "researchId": "real-place-004",
+      "region": {
+        "collectionArea": "서울 성수동",
+        "country": "KR",
+        "city": "서울특별시",
+        "district": "성동구",
+        "locality": "성수동1가",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "서울숲",
+      "kind": "attraction",
+      "placeType": "도시공원",
+      "address": {
+        "value": "서울 성동구 성수동1가 678-1",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "서울특별시 성동구 뚝섬로 273",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.544322230151316,
+        "longitude": 127.03761775916502,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 394,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "11331488"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.064Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/11331488",
+          "checkedAt": "2026-10-17T04:51:10.064Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "e2c57e0884239c3334e8c067e44fe67b74afdecc2bd9da914dc6ff81cd5fef47",
+          "observed": {
+            "name": "서울숲",
+            "address": "서울 성동구 성수동1가 678-1",
+            "coordinates": {
+              "longitude": 127.03761775916502,
+              "latitude": 37.544322230151316,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=02f56ab2-5e53-470f-8ec3-95cf8fb88aa4",
+          "checkedAt": "2026-10-17T04:53:07.389Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "서울숲",
+            "address": "서울특별시 성동구 뚝섬로 273",
+            "coordinates": {
+              "longitude": 127.04179844597822,
+              "latitude": 37.543071581483325
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "02f56ab2-5e53-470f-8ec3-95cf8fb88aa4",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공원 전체 대표 핀이다. 공식 도로명 주소는 뚝섬로 273, Kakao 표기는 성수동1가 678-1이다. 필지/입구 대응은 미확인이다.",
+        "공식 관광기관 핀과 Kakao 핀이 50m 이상 다르다. 좌표를 평균하거나 입구 위치로 확정하지 않았다."
+      ]
+    },
+    {
+      "researchId": "real-place-005",
+      "region": {
+        "collectionArea": "서울 성수동",
+        "country": "KR",
+        "city": "서울특별시",
+        "district": "성동구",
+        "locality": "성수동1가",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "수도박물관",
+      "kind": "attraction",
+      "placeType": "박물관",
+      "address": {
+        "value": "서울 성동구 성수동1가 642-1 1층",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "서울시 성동구 왕십리로 27",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.5384603660401,
+        "longitude": 127.04279245170706,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "10376369"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.065Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/10376369",
+          "checkedAt": "2026-10-17T04:51:10.065Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "7474fd00c1a4b763e64293b8b5b279c8cd01f38da269f65375cb785d649aa937",
+          "observed": {
+            "name": "수도박물관",
+            "address": "서울 성동구 성수동1가 642-1 1층",
+            "coordinates": {
+              "longitude": 127.04279245170706,
+              "latitude": 37.5384603660401,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "서울아리수본부",
+          "url": "https://arisu.seoul.go.kr/home/sub?menukey=7510",
+          "checkedAt": "2026-10-17T04:52:43.447Z",
+          "accessMethod": "direct_html",
+          "observed": {
+            "name": null,
+            "address": "서울시 성동구 왕십리로 27"
+          },
+          "latestDirectFetch": "success"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "운영기관 도로명 주소와 Kakao 지번 표기를 각각 보존했다. 도로명-지번 법적 대응 및 방문객 출입구는 미확인이다."
+      ]
+    },
+    {
+      "researchId": "real-place-006",
+      "region": {
+        "collectionArea": "서울 성수동",
+        "country": "KR",
+        "city": "서울특별시",
+        "district": "성동구",
+        "locality": "성수동2가",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "성수연방",
+      "kind": "attraction",
+      "placeType": "복합문화공간",
+      "address": {
+        "value": "서울 성동구 성수이로14길 14",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "서울특별시 성동구 성수이로14길 14",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.54139884962453,
+        "longitude": 127.05696077520759,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "1819728691"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:09.675Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/1819728691",
+          "checkedAt": "2026-10-17T04:51:09.675Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "32708a731492a0c4cc466df8f2be770336ac29459dc848050d8cc5b4d11de223",
+          "observed": {
+            "name": "성수연방",
+            "address": "서울 성동구 성수이로14길 14",
+            "coordinates": {
+              "longitude": 127.05696077520759,
+              "latitude": 37.54139884962453,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=78ac1b66-81f8-45d8-b987-dd4a217db34d",
+          "checkedAt": "2026-10-17T04:55:01.853Z",
+          "accessMethod": "direct_html",
+          "observed": {
+            "name": null,
+            "address": "서울특별시 성동구 성수이로14길 14"
+          },
+          "latestDirectFetch": "success"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 여행기사는 과거 공간 소개다. 현재 입점 매장·전시·프로그램 제공 여부는 미확인이다."
+      ]
+    },
+    {
+      "researchId": "real-place-007",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "중앙탑면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "메밀마당 충주중앙탑본점",
+      "kind": "restaurant",
+      "placeType": "막국수·메밀요리",
+      "address": {
+        "value": "충북 충주시 중앙탑면 중앙탑길 103",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 중앙탑면 중앙탑길 103",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.01758671105797,
+        "longitude": 127.86432386602299,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 1,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "8291326"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.237Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/8291326",
+          "checkedAt": "2026-10-17T04:51:10.237Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "59132b6932a172aa891a202f0033b2880d3488cadc853129ceef0ce05be982f2",
+          "observed": {
+            "name": "메밀마당 충주중앙탑본점",
+            "address": "충북 충주시 중앙탑면 중앙탑길 103",
+            "coordinates": {
+              "longitude": 127.86432386602299,
+              "latitude": 37.01758671105797,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=9d34d695-3e4a-4555-885a-c328c9baa851",
+          "checkedAt": "2026-10-17T04:53:34.185Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "메밀마당 충주 중앙탑본점",
+            "address": "충청북도 충주시 중앙탑면 중앙탑길 103",
+            "coordinates": {
+              "longitude": 127.864321447212,
+              "latitude": 37.0175914141272
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "9d34d695-3e4a-4555-885a-c328c9baa851",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 자료의 메밀마당 충주 중앙탑본점/중앙탑메밀마당과 Kakao의 메밀마당 충주중앙탑본점은 중앙탑길 103으로 대조했다."
+      ]
+    },
+    {
+      "researchId": "real-place-008",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "문화동",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "운정식당",
+      "kind": "restaurant",
+      "placeType": "올갱이해장국·한식",
+      "address": {
+        "value": "충북 충주시 중원대로 3432-1 1층",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 중원대로 3432-1 (문화동)",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.97282387398439,
+        "longitude": 127.92208367443112,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 5,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "10698086"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.296Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/10698086",
+          "checkedAt": "2026-10-17T04:51:10.296Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "8f80bb5ec11989561fdd5b0c17c32337640c59285a9aee0b5c87f615177af51b",
+          "observed": {
+            "name": "운정식당",
+            "address": "충북 충주시 중원대로 3432-1 1층",
+            "coordinates": {
+              "longitude": 127.92208367443112,
+              "latitude": 36.97282387398439,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=ff7fb6b9-f8e4-47b1-9f6b-f1d92c838e82",
+          "checkedAt": "2026-10-17T04:53:34.730Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "운정식당",
+            "address": "충청북도 충주시 중원대로 3432-1 (문화동)",
+            "coordinates": {
+              "longitude": 127.92213319629,
+              "latitude": 36.9728390535064
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "ff7fb6b9-f8e4-47b1-9f6b-f1d92c838e82",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    },
+    {
+      "researchId": "real-place-009",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "수안보면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "대장군",
+      "kind": "restaurant",
+      "placeType": "꿩요리·한식",
+      "address": {
+        "value": "충북 충주시 수안보면 미륵송계로 105 1층",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충주시 수안보면 미륵송계로 105",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.841698118172985,
+        "longitude": 128.0161755650381,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "11891870"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.257Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/11891870",
+          "checkedAt": "2026-10-17T04:51:10.257Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "239ab598ba1ca31b48129427cef7bd4c6673be9079acde567e4294e0ef91d031",
+          "observed": {
+            "name": "대장군",
+            "address": "충북 충주시 수안보면 미륵송계로 105 1층",
+            "coordinates": {
+              "longitude": 128.0161755650381,
+              "latitude": 36.841698118172985,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=1f390d1d-6f63-4c6b-8b53-737dc3e1a0b2",
+          "checkedAt": "2026-10-17T04:55:01.887Z",
+          "accessMethod": "direct_html",
+          "observed": {
+            "name": null,
+            "address": "충주시 수안보면 미륵송계로 105"
+          },
+          "latestDirectFetch": "success"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 기사 명칭은 대장군식당, Kakao 표기는 대장군이다. 미륵송계로 105로 대조했다. 예약 가능·확정 상태를 수집하지 않았다."
+      ]
+    },
+    {
+      "researchId": "real-place-010",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "수안보면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "상록수식당",
+      "kind": "restaurant",
+      "placeType": "버섯전골·한식",
+      "address": {
+        "value": "충북 충주시 수안보면 주정산로 19 1층",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충주시 수안보면 주정산로 19",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.84749611464185,
+        "longitude": 127.98984215263224,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "12800097"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.518Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/12800097",
+          "checkedAt": "2026-10-17T04:51:10.518Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "c973ad3e91444a9d501b29b68dd9c9254e3ee850f6aca21031d600ad3fa3e86b",
+          "observed": {
+            "name": "상록수식당",
+            "address": "충북 충주시 수안보면 주정산로 19 1층",
+            "coordinates": {
+              "longitude": 127.98984215263224,
+              "latitude": 36.84749611464185,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=1f390d1d-6f63-4c6b-8b53-737dc3e1a0b2",
+          "checkedAt": "2026-10-17T04:55:01.887Z",
+          "accessMethod": "direct_html",
+          "observed": {
+            "name": null,
+            "address": "충주시 수안보면 주정산로 19"
+          },
+          "latestDirectFetch": "success"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    },
+    {
+      "researchId": "real-place-011",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "수안보면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "영화식당",
+      "kind": "restaurant",
+      "placeType": "산채정식·한식",
+      "address": {
+        "value": "충북 충주시 수안보면 물탕1길 11 1층",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 수안보면 물탕1길 11",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.84739417827116,
+        "longitude": 127.99039693579994,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 2,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "10641816"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.465Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/10641816",
+          "checkedAt": "2026-10-17T04:51:10.465Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "04f7cf043ff443bb906dfaa01e5d4c7bab47471cd624fa2f1184afdea83a2ba0",
+          "observed": {
+            "name": "영화식당",
+            "address": "충북 충주시 수안보면 물탕1길 11 1층",
+            "coordinates": {
+              "longitude": 127.99039693579994,
+              "latitude": 36.84739417827116,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=3a074b6f-56e3-4bf3-a504-ac65b9230f1f",
+          "checkedAt": "2026-10-17T04:51:36.563Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "영화식당",
+            "address": "충청북도 충주시 수안보면 물탕1길 11",
+            "coordinates": {
+              "longitude": 127.99040525529,
+              "latitude": 36.8474082346647
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "3a074b6f-56e3-4bf3-a504-ac65b9230f1f",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    },
+    {
+      "researchId": "real-place-012",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "금릉동",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "숲속장수촌 본점",
+      "kind": "restaurant",
+      "placeType": "백숙·한식",
+      "address": {
+        "value": "충북 충주시 쇠저울1길 36",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 쇠저울1길 36 (금릉동)",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.989639767856474,
+        "longitude": 127.92318523739172,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 1,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "23840178"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.500Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/23840178",
+          "checkedAt": "2026-10-17T04:51:10.500Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "76afae41c3c5dce500696bed668e70a21f58816bc60c8f9084c04dd664d60a1f",
+          "observed": {
+            "name": "숲속장수촌 본점",
+            "address": "충북 충주시 쇠저울1길 36",
+            "coordinates": {
+              "longitude": 127.92318523739172,
+              "latitude": 36.989639767856474,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc4ad83e-e9a2-4b56-b1e8-d9b03feaabbe",
+          "checkedAt": "2026-10-17T04:51:36.563Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "숲속장수촌",
+            "address": "충청북도 충주시 쇠저울1길 36 (금릉동)",
+            "coordinates": {
+              "longitude": 127.92317881179689,
+              "latitude": 36.98965018439137
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "bc4ad83e-e9a2-4b56-b1e8-d9b03feaabbe",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "오래된 공식 코스 기사에는 금제로 28이 있으나 이번 공식 최신 상세와 Kakao는 쇠저울1길 36으로 일치한다. 이전 이력 자체는 미확인이다."
+      ]
+    },
+    {
+      "researchId": "real-place-013",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "앙성면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "메밀면묵밥리 앙성온천점",
+      "kind": "restaurant",
+      "placeType": "막국수·묵밥",
+      "address": {
+        "value": "충북 충주시 앙성면 가곡로 1509 1층 2호",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충북 충주시 앙성면 가곡로 1509 1층 2호",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.09024218315855,
+        "longitude": 127.80084883699055,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "61123582"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.797Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/61123582",
+          "checkedAt": "2026-10-17T04:51:10.797Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "35e42783606001408398e5ecc43985c33198f721cfa03d41839af3f30b164f55",
+          "observed": {
+            "name": "메밀면묵밥리 앙성온천점",
+            "address": "충북 충주시 앙성면 가곡로 1509 1층 2호",
+            "coordinates": {
+              "longitude": 127.80084883699055,
+              "latitude": 37.09024218315855,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=19c80a5e-fb70-45af-8ffa-f3669746f690",
+          "checkedAt": "2026-10-17T04:55:01.887Z",
+          "accessMethod": "direct_html",
+          "observed": {
+            "name": null,
+            "address": "충북 충주시 앙성면 가곡로 1509 1층 2호"
+          },
+          "latestDirectFetch": "success"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 기사의 메밀면묵밥리와 Kakao의 앙성온천점을 가곡로 1509 1층 2호로 대조했다. 공식 기사는 2020년 자료다."
+      ]
+    },
+    {
+      "researchId": "real-place-014",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "성내동",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "복서울해장국",
+      "kind": "restaurant",
+      "placeType": "해장국·한식",
+      "address": {
+        "value": "충북 충주시 관아1길 16 1층",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 관아1길 16",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.97026033914198,
+        "longitude": 127.93510614925388,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 2,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "21347061"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.709Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/21347061",
+          "checkedAt": "2026-10-17T04:51:10.709Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "bf01060e8d932a15c0c8a044cc688258e1a4631bf55b959a5f88bbc52bd5c0a5",
+          "observed": {
+            "name": "복서울해장국",
+            "address": "충북 충주시 관아1길 16 1층",
+            "coordinates": {
+              "longitude": 127.93510614925388,
+              "latitude": 36.97026033914198,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=c7199f1f-e721-4d2e-a84c-e040efe0471b",
+          "checkedAt": "2026-10-17T04:51:36.563Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "복서울해장국",
+            "address": "충청북도 충주시 관아1길 16",
+            "coordinates": {
+              "longitude": 127.9350792392,
+              "latitude": 36.9702600299
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "c7199f1f-e721-4d2e-a84c-e040efe0471b",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    },
+    {
+      "researchId": "real-place-015",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "중앙탑면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "중앙탑사적공원",
+      "kind": "attraction",
+      "placeType": "역사공원",
+      "address": {
+        "value": "충북 충주시 중앙탑면 탑정안길 6",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 탑정안길 6",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.017117700946805,
+        "longitude": 127.86685803536334,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "17697891"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:10.696Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/17697891",
+          "checkedAt": "2026-10-17T04:51:10.696Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "c718d0c3c40e2c11128443a6ebcb5c36c71622e2d31958296a4046e7a3e21082",
+          "observed": {
+            "name": "중앙탑사적공원",
+            "address": "충북 충주시 중앙탑면 탑정안길 6",
+            "coordinates": {
+              "longitude": 127.86685803536334,
+              "latitude": 37.017117700946805,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://access.visitkorea.or.kr/opentour/detail.do?cotId=1ec0a252-dd64-4f6d-84c0-f4bea990c3e5",
+          "checkedAt": "2026-10-17T04:52:59.408Z",
+          "accessMethod": "direct_html",
+          "observed": {
+            "name": null,
+            "address": "충청북도 충주시 탑정안길 6"
+          },
+          "latestDirectFetch": "success"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    },
+    {
+      "researchId": "real-place-016",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "중앙탑면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "충주박물관",
+      "kind": "attraction",
+      "placeType": "역사박물관",
+      "address": {
+        "value": "충북 충주시 중앙탑면 중앙탑길 112-28",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충북 충주시 중앙탑면 중앙탑길 112-28",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.01616221952152,
+        "longitude": 127.86542688719354,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "8585447"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:11.284Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/8585447",
+          "checkedAt": "2026-10-17T04:51:11.284Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "492a8053996da31e7581a8901c950ca972de866197aeb8fb99eca5c303554377",
+          "observed": {
+            "name": "충주박물관",
+            "address": "충북 충주시 중앙탑면 중앙탑길 112-28",
+            "coordinates": {
+              "longitude": 127.86542688719354,
+              "latitude": 37.01616221952152,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "충청북도 충북나드리",
+          "url": "https://tour.chungbuk.go.kr/www/selectTourCntnts.do?key=60&searchMainSe=ATTR&tourNo=464",
+          "checkedAt": "2026-10-17T04:52:50.233Z",
+          "accessMethod": "search_index",
+          "observed": {
+            "name": null,
+            "address": "충북 충주시 중앙탑면 중앙탑길 112-28"
+          },
+          "latestDirectFetch": "timeout"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 페이지 본문 직접 조회는 시간 초과였다. 공식 도메인의 검색 색인에 노출된 주소/종류를 보조 근거로 사용했으며 현재 본문 재확인이 필요하다."
+      ]
+    },
+    {
+      "researchId": "real-place-017",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "목벌동",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "활옥동굴",
+      "kind": "attraction",
+      "placeType": "관광동굴·체험시설",
+      "address": {
+        "value": "충북 충주시 목벌동 319-16",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충북 충주시 목벌안길 26 활옥동굴",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.96114794786167,
+        "longitude": 128.00662688793955,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "531411391"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:11.356Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/531411391",
+          "checkedAt": "2026-10-17T04:51:11.356Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "08de563388d4744abf9dd1afebf8518628722de07762bc5dd175d05f1e394496",
+          "observed": {
+            "name": "활옥동굴",
+            "address": "충북 충주시 목벌동 319-16",
+            "coordinates": {
+              "longitude": 128.00662688793955,
+              "latitude": 36.96114794786167,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "충청북도 충북나드리",
+          "url": "https://tour.chungbuk.go.kr/www/selectTourCntnts.do?key=60&searchMainSe=ATTR&tourNo=2562",
+          "checkedAt": "2026-10-17T04:52:58.236Z",
+          "accessMethod": "search_index",
+          "observed": {
+            "name": null,
+            "address": "충북 충주시 목벌안길 26 활옥동굴"
+          },
+          "latestDirectFetch": "timeout"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 관광기관은 목벌안길 26, Kakao는 목벌동 319-16을 표기한다. 필지/입구 대응은 미확인이다. 카약 운영·이용 가능 여부는 미확인이다.",
+        "공식 페이지 본문 직접 조회는 시간 초과였다. 공식 도메인의 검색 색인에 노출된 주소/종류를 보조 근거로 사용했으며 현재 본문 재확인이 필요하다."
+      ]
+    },
+    {
+      "researchId": "real-place-018",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "중앙탑면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "충주고구려비전시관",
+      "kind": "attraction",
+      "placeType": "역사전시관",
+      "address": {
+        "value": "충북 충주시 중앙탑면 감노로 2319",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 중앙탑면 감노로 2319",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.028132005442856,
+        "longitude": 127.84842655445881,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 27,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "8077640"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:11.356Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/8077640",
+          "checkedAt": "2026-10-17T04:51:11.356Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "76ff4b8779d6d72cf00b5e14f119f3bca8fa19b715890e6e47cce25e3c2d7832",
+          "observed": {
+            "name": "충주고구려비전시관",
+            "address": "충북 충주시 중앙탑면 감노로 2319",
+            "coordinates": {
+              "longitude": 127.84842655445881,
+              "latitude": 37.028132005442856,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=83305ab8-af95-41a8-b129-389de4bddb9a",
+          "checkedAt": "2026-10-17T04:53:34.386Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "충주고구려비전시관",
+            "address": "충청북도 충주시 중앙탑면 감노로 2319",
+            "coordinates": {
+              "longitude": 127.848185933541,
+              "latitude": 37.0282782042354
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "83305ab8-af95-41a8-b129-389de4bddb9a",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    },
+    {
+      "researchId": "real-place-019",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "중앙탑면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "충주고구려천문과학관",
+      "kind": "attraction",
+      "placeType": "천문과학관",
+      "address": {
+        "value": "충북 충주시 중앙탑면 묘곡내동길 100",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충북 충주시 중앙탑면 묘곡내동길 100",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.04031773370562,
+        "longitude": 127.84843624779725,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "10025826"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:11.786Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/10025826",
+          "checkedAt": "2026-10-17T04:51:11.786Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "3e5b5992df5ba593aa3501fd1f9766c10c81d328878a84c456c97cdf0ac4e7aa",
+          "observed": {
+            "name": "충주고구려천문과학관",
+            "address": "충북 충주시 중앙탑면 묘곡내동길 100",
+            "coordinates": {
+              "longitude": 127.84843624779725,
+              "latitude": 37.04031773370562,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "충청북도 충북나드리",
+          "url": "https://tour.chungbuk.go.kr/www/selectTourCntnts.do?key=60&searchMainSe=ATTR&tourNo=586",
+          "checkedAt": "2026-10-17T04:52:58.234Z",
+          "accessMethod": "search_index",
+          "observed": {
+            "name": null,
+            "address": "충북 충주시 중앙탑면 묘곡내동길 100"
+          },
+          "latestDirectFetch": "timeout"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 페이지 본문 직접 조회는 시간 초과였다. 공식 도메인의 검색 색인에 노출된 주소/종류를 보조 근거로 사용했으며 현재 본문 재확인이 필요하다."
+      ]
+    },
+    {
+      "researchId": "real-place-020",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "동량면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "충주자연생태체험관",
+      "kind": "attraction",
+      "placeType": "생태체험관",
+      "address": {
+        "value": "충북 충주시 동량면 지등로 260",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 동량면 지등로 260",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.025275820243465,
+        "longitude": 127.95175124290891,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 5,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "9972481"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:11.718Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/9972481",
+          "checkedAt": "2026-10-17T04:51:11.718Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "ce4f19f471e11a7f7bb04fbff6a392021c5c677a007f176a300327ff959b84a4",
+          "observed": {
+            "name": "충주자연생태체험관",
+            "address": "충북 충주시 동량면 지등로 260",
+            "coordinates": {
+              "longitude": 127.95175124290891,
+              "latitude": 37.025275820243465,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=8a6e7ebc-e526-47a3-954c-d35844a21cd7",
+          "checkedAt": "2026-10-17T04:51:37.235Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "충주자연생태체험관",
+            "address": "충청북도 충주시 동량면 지등로 260",
+            "coordinates": {
+              "longitude": 127.951703834122,
+              "latitude": 37.0252554957259
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "8a6e7ebc-e526-47a3-954c-d35844a21cd7",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    },
+    {
+      "researchId": "real-place-021",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": null,
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "충주세계무술박물관",
+      "kind": "attraction",
+      "placeType": "무술문화박물관",
+      "address": {
+        "value": "충북 충주시 남한강로 26",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충북 충주시 남한강로24",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.98844323168408,
+        "longitude": 127.90775545469533,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "14508671"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:11.688Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/14508671",
+          "checkedAt": "2026-10-17T04:51:11.688Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "f12d9632c88915047c8f00f878bc011db6574d91d61bcd070023034354a211fa",
+          "observed": {
+            "name": "충주세계무술박물관",
+            "address": "충북 충주시 남한강로 26",
+            "coordinates": {
+              "longitude": 127.90775545469533,
+              "latitude": 36.98844323168408,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "충청북도 네바퀴로떠나는 충북여행",
+          "url": "https://freetour.chungbuk.go.kr/www/selectTourCntntsWebView.do?ctgry=4&key=4&pageIndex=7&pageUnit=6&searchCnd=all&searchShowAt=Y&sortTy=RECOMEND&tourNo=625",
+          "checkedAt": "2026-10-17T04:53:06.236Z",
+          "accessMethod": "search_index",
+          "observed": {
+            "name": null,
+            "address": "충북 충주시 남한강로24"
+          },
+          "latestDirectFetch": "timeout"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 충북 무장애 관광 자료는 남한강로24, Kakao는 남한강로 26이다. 주소 차이를 해결하지 않았으므로 정확한 입구 안내에 사용하지 않는다.",
+        "공식 페이지 본문 직접 조회는 시간 초과였다. 공식 도메인의 검색 색인에 노출된 주소/종류를 보조 근거로 사용했으며 현재 본문 재확인이 필요하다."
+      ]
+    },
+    {
+      "researchId": "real-place-022",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "앙성면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "오대호아트팩토리",
+      "kind": "attraction",
+      "placeType": "미술관·예술체험시설",
+      "address": {
+        "value": "충북 충주시 앙성면 가곡로 1434 1층",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 앙성면 가곡로 1434",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.09391140638567,
+        "longitude": 127.79385518250172,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 78,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "1247062613"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:11.987Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/1247062613",
+          "checkedAt": "2026-10-17T04:51:11.987Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "c8b01e3a4f32c966882733a3c8e5180131edff015c13cc157500af24a0212b2f",
+          "observed": {
+            "name": "오대호아트팩토리",
+            "address": "충북 충주시 앙성면 가곡로 1434 1층",
+            "coordinates": {
+              "longitude": 127.79385518250172,
+              "latitude": 37.09391140638567,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=44ab3132-75a4-4179-b1e7-262db516c677",
+          "checkedAt": "2026-10-17T04:51:37.235Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "오대호아트팩토리",
+            "address": "충청북도 충주시 앙성면 가곡로 1434",
+            "coordinates": {
+              "longitude": 127.79449787068826,
+              "latitude": 37.094394296878185
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "44ab3132-75a4-4179-b1e7-262db516c677",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 관광기관 핀과 Kakao 핀이 50m 이상 다르다. 좌표를 평균하거나 입구 위치로 확정하지 않았다."
+      ]
+    },
+    {
+      "researchId": "real-place-023",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "소태면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "비내섬",
+      "kind": "attraction",
+      "placeType": "하천섬·자연탐방",
+      "address": {
+        "value": "충북 충주시 소태면 복탄리 908",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": null,
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 37.107632444677655,
+        "longitude": 127.81772698713424,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "11495420"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:12.024Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/11495420",
+          "checkedAt": "2026-10-17T04:51:12.024Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "9429f2038af761a290c24c37676facf2741763f87f9a028df8fdf28991a83577",
+          "observed": {
+            "name": "비내섬",
+            "address": "충북 충주시 소태면 복탄리 908",
+            "coordinates": {
+              "longitude": 127.81772698713424,
+              "latitude": 37.107632444677655,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=19c80a5e-fb70-45af-8ffa-f3669746f690",
+          "checkedAt": "2026-10-17T04:55:01.887Z",
+          "accessMethod": "direct_html",
+          "observed": {
+            "name": null,
+            "address": null
+          },
+          "latestDirectFetch": "success"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "Kakao의 소태면 복탄리 908을 그대로 기록했다. 관광 안내의 앙성면 조천리 접근 경로와 동일 필지로 합치지 않았다. 하천섬 대표 핀이며 출입 허용·수위·입구는 미확인이다."
+      ]
+    },
+    {
+      "researchId": "real-place-024",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "칠금동",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "탄금대",
+      "kind": "attraction",
+      "placeType": "역사유적·자연탐방",
+      "address": {
+        "value": "충북 충주시 칠금동 산 1-1",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 탄금대안길 105 (칠금동)",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.989366077753886,
+        "longitude": 127.90063601310686,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 242,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "11235478"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:12.426Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/11235478",
+          "checkedAt": "2026-10-17T04:51:12.426Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "a335b78b776f43543a563fc9fc7b346b7df521cea392321048db06886a944d8f",
+          "observed": {
+            "name": "탄금대",
+            "address": "충북 충주시 칠금동 산 1-1",
+            "coordinates": {
+              "longitude": 127.90063601310686,
+              "latitude": 36.989366077753886,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=cfda5364-2ef5-48cb-90b7-2b55fed9bab7",
+          "checkedAt": "2026-10-17T04:51:37.166Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "충주 탄금대",
+            "address": "충청북도 충주시 탄금대안길 105 (칠금동)",
+            "coordinates": {
+              "longitude": 127.89829116086217,
+              "latitude": 36.98825035024837
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "cfda5364-2ef5-48cb-90b7-2b55fed9bab7",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 상세는 탄금대안길 105, Kakao는 칠금동 산 1-1이다. 유적 영역의 대표 핀을 출입구 좌표로 간주하지 않는다.",
+        "공식 관광기관 핀과 Kakao 핀이 50m 이상 다르다. 좌표를 평균하거나 입구 위치로 확정하지 않았다."
+      ]
+    },
+    {
+      "researchId": "real-place-025",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "수안보면",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "수안보물탕공원",
+      "kind": "attraction",
+      "placeType": "온천문화공원",
+      "address": {
+        "value": "충북 충주시 수안보면 주정산로 12",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충청북도 충주시 수안보면 주정산로 12",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.84839465593112,
+        "longitude": 127.98927969351165,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": {
+        "sourceRef": "official",
+        "distanceMeters": 26,
+        "method": "haversine_between_provider_representative_pins",
+        "entranceEquivalenceVerified": false
+      },
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "17344256"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:52:42.140Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/17344256",
+          "checkedAt": "2026-10-17T04:52:42.140Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "1985c9a395e9c8d7e6f2354697ef57394004c0417fbb5c7a97528a6783d41c6c",
+          "observed": {
+            "name": "수안보물탕공원",
+            "address": "충북 충주시 수안보면 주정산로 12",
+            "coordinates": {
+              "longitude": 127.98927969351165,
+              "latitude": 36.84839465593112,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "한국관광공사",
+          "url": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=b5650a0c-3f97-4f3b-89cd-e5f0a36cc36c",
+          "checkedAt": "2026-10-17T04:51:37.625Z",
+          "accessMethod": "public_detail_json",
+          "observed": {
+            "name": "수안보온천 관광특구",
+            "address": "충청북도 충주시 수안보면 주정산로 12",
+            "coordinates": {
+              "longitude": 127.989010918672,
+              "latitude": 36.8483108776871
+            }
+          },
+          "latestDirectFetch": null,
+          "readRequest": {
+            "url": "https://korean.visitkorea.or.kr/call",
+            "method": "POST",
+            "form": {
+              "cmd": "TOUR_CONTENT_BODY_DETAIL",
+              "cotId": "b5650a0c-3f97-4f3b-89cd-e5f0a36cc36c",
+              "locationx": "",
+              "locationy": "",
+              "stampId": ""
+            }
+          }
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": [
+        "공식 상세의 대상은 수안보온천 관광특구이며 본 공원과 같은 주정산로 12를 대표 주소로 사용한다. 별도 시설인 수안보온천 관광협의회 핀은 제외했다. 족욕 운영 여부는 미확인이다."
+      ]
+    },
+    {
+      "researchId": "real-place-026",
+      "region": {
+        "collectionArea": "충주시",
+        "country": "KR",
+        "city": "충주시",
+        "district": null,
+        "locality": "연수동",
+        "localityBasis": "source_address_or_official_site"
+      },
+      "name": "국립충주 기상과학관",
+      "kind": "attraction",
+      "placeType": "기상과학관",
+      "address": {
+        "value": "충북 충주시 번영대로 270-10",
+        "sourceRef": "kakao",
+        "status": "source_observed",
+        "officialValue": "충북 충주시 번영대로 270-10 국립충주기상과학관",
+        "roadParcelEquivalenceVerified": false
+      },
+      "coordinates": {
+        "latitude": 36.985672081138254,
+        "longitude": 127.9487146993508,
+        "crs": "EPSG:4326",
+        "sourceRef": "kakao",
+        "sourceLocation": "HTML meta[name=\"twitter:image\"] URL: srs=wgs84, m=longitude,latitude",
+        "status": "provider_representative_pin_observed",
+        "surveyedAccuracyMeters": null
+      },
+      "navigationEntranceCoordinates": null,
+      "coordinateComparison": null,
+      "externalIds": [
+        {
+          "provider": "kakao",
+          "id": "793335766"
+        }
+      ],
+      "checkedAt": "2026-10-17T04:51:12.732Z",
+      "openingHours": null,
+      "operatingStatus": "unverified",
+      "photos": [],
+      "photoRights": {
+        "status": "unverified",
+        "sourceUrl": null,
+        "license": null,
+        "permissionEvidenceUrl": null
+      },
+      "endorsements": [],
+      "reviews": [],
+      "publication": {
+        "ready": false,
+        "reasons": [
+          "실제 기여자 촬영 사진 없음",
+          "인적 검토 및 제공자 표시/저장 이용조건 확인 필요",
+          "현재 영업/개방 및 방문객 입구 미확인"
+        ]
+      },
+      "sources": [
+        {
+          "id": "kakao",
+          "publisher": "Kakao Map",
+          "url": "https://place.map.kakao.com/793335766",
+          "checkedAt": "2026-10-17T04:51:12.732Z",
+          "accessMethod": "public_html_get_no_api_key",
+          "httpStatus": 200,
+          "htmlSha256": "3c47c3d45dfe4b7d5ae8ce5daa29a5fcd5d540d6676d0ec7042756479b2670c7",
+          "observed": {
+            "name": "국립충주 기상과학관",
+            "address": "충북 충주시 번영대로 270-10",
+            "coordinates": {
+              "longitude": 127.9487146993508,
+              "latitude": 36.985672081138254,
+              "crsLabel": "wgs84"
+            }
+          },
+          "fields": ["name", "address", "coordinates"]
+        },
+        {
+          "id": "official",
+          "publisher": "기상청 국립충주기상과학관",
+          "url": "https://science.kma.go.kr/chungju/company/location",
+          "checkedAt": "2026-10-17T04:52:50.231Z",
+          "accessMethod": "web_document",
+          "observed": {
+            "name": null,
+            "address": "충북 충주시 번영대로 270-10 국립충주기상과학관"
+          },
+          "latestDirectFetch": "timeout"
+        }
+      ],
+      "unverified": [
+        "현재 영업시간·휴무·임시휴관",
+        "입장/식사 요금",
+        "방문객 입구와 접근 가능 경로",
+        "사진 재사용 권리",
+        "방문/현지인 추천/예약 가능 여부"
+      ],
+      "notes": []
+    }
+  ]
+}
