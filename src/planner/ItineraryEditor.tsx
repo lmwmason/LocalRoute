@@ -310,9 +310,17 @@ export function ItineraryEditor({
                     </div>
                     <p className="stop-explanation">{stop.explanation}</p>
                     {candidate.externalIds?.some(
-                      (external) => external.provider === "heyyumi" && !external.possiblyClosed,
+                      (external) =>
+                        external.provider === "heyyumi" &&
+                        !external.possiblyClosed,
                     ) && (
-                      <BookingButton api={bookingApi} placeId={candidate.id} language={language} />
+                      <BookingButton
+                        api={bookingApi}
+                        placeId={candidate.id}
+                        language={language}
+                        initialDate={day.date}
+                        initialTime={stop.start}
+                      />
                     )}
                     <details className="stop-edit-details">
                       <summary>{t("planner.editStop")}</summary>

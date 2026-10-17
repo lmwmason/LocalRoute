@@ -8,12 +8,16 @@ import {
 } from "../../shared/reservations";
 import { BookingApiError, type BookingApi } from "./api";
 import { messages } from "./messages";
+import { initialBookingDateTime } from "./initial-date-time";
 import "./booking.css";
 
 type Props = {
   api: BookingApi;
   placeId: string;
   language?: "ko" | "en";
+  /** Planned visit date (YYYY-MM-DD) and start time (HH:mm), both in Korea. */
+  initialDate?: string;
+  initialTime?: string;
   onReservation?: (reservation: Reservation) => void;
 };
 export function BookingButton(props: Props) {
@@ -60,17 +64,35 @@ export function BookingButton(props: Props) {
     </div>
   );
 }
-export function BookingForm({
+export function BookingForm(props: Props) {
+  // Changing the itinerary context discards old lookups, errors, review and
+  // consent. Cleanup guards prevent an earlier lookup from filling this form.
+  // The place-scoped opaque recovery ID is deliberately retained: changing
+  // dates must not bypass reconciliation of an ambiguous provider submission.
+  return (
+    <BookingRequestForm
+      key={JSON.stringify([
+        props.placeId,
+        props.initialDate,
+        props.initialTime,
+      ])}
+      {...props}
+    />
+  );
+}
+function BookingRequestForm({
   api,
   placeId,
   language = "ko",
   onReservation,
+  initialDate,
+  initialTime,
 }: Props) {
   const t = messages[language];
   const uid = useId();
   const [venue, setVenue] = useState<BookingVenue>();
   const [details, setDetails] = useState({
-    time: "",
+    time: initialBookingDateTime(initialDate, initialTime),
     count: "2",
     name: "",
     phone: "",
@@ -231,7 +253,11 @@ export function BookingForm({
     setReview(false);
     setConsent(false);
     setError("");
-    setDetails((d) => ({ ...d, time: "", note: "" }));
+    setDetails((d) => ({
+      ...d,
+      time: initialBookingDateTime(initialDate, initialTime),
+      note: "",
+    }));
   }
   if (!venue)
     return (
@@ -326,7 +352,9 @@ export function BookingForm({
                 }
                 onChange={(e) => {
                   setDetails((d) => ({ ...d, [key]: e.target.value }));
+                  setReview(false);
                   setConsent(false);
+                  setError("");
                 }}
               />
             </label>
