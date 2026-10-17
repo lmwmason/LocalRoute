@@ -1,0 +1,89 @@
+.legal-page,
+.legal-gate,
+.legal-consent-fields,
+.legal-notices {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.legal-page {
+  line-height: 1.75;
+  padding: 8px 0;
+}
+.legal-page p {
+  white-space: pre-line;
+}
+.legal-page h3 {
+  font-size: 1rem;
+  margin-top: 24px;
+}
+.legal-page a {
+  color: #1758b6;
+  text-decoration: underline;
+}
+.legal-page ul {
+  padding-inline-start: 20px;
+}
+.legal-consent-fields {
+  border: 1px solid #cdd5df;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 16px 0;
+  text-align: start;
+}
+.legal-consent-fields legend {
+  font-weight: 700;
+}
+.legal-summary {
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+.legal-notices details {
+  border-bottom: 1px solid #dfe5ec;
+}
+.legal-notices summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 12px 0;
+  font-weight: 600;
+}
+.legal-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px 0;
+  line-height: 1.6;
+}
+.legal-choice input[type="checkbox"] {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  margin: 2px 0;
+  accent-color: #1758b6;
+}
+.legal-choice span {
+  flex: 1;
+  min-width: 0;
+}
+.legal-gate {
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+.legal-gate button {
+  min-height: 44px;
+  min-width: 44px;
+}
+.legal-notices summary:focus-visible,
+.legal-choice input:focus-visible,
+.legal-gate button:focus-visible {
+  outline: 3px solid #1758b6;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .legal-gate *,
+  .legal-notices * {
+    scroll-behavior: auto;
+    animation: none;
+    transition: none;
+  }
+}

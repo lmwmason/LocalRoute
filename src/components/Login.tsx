@@ -4,18 +4,24 @@ import { Mail } from "lucide-react";
 import { supabase } from "../supabase";
 import { localitySchema, type Locality } from "../../shared/locality";
 import { HomeRegionFields } from "./HomeRegionFields";
+import {
+  ConsentFields,
+  emptyChoices,
+  requiredAccepted,
+} from "../legal/ConsentFields";
+import { LegalNotices } from "../legal/LegalPage";
 
 export function Login() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const [choices, setChoices] = useState(emptyChoices);
 
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [locality, setLocality] = useState<Locality>({
-      homeCity: "",
-      homeArea: "",
-      localityScope: "auto",
-    }),
-    [publicLocalArea, setPublicLocalArea] = useState(false);
+    homeCity: "",
+    homeArea: "",
+    localityScope: "auto",
+  });
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   return (
@@ -24,6 +30,14 @@ export function Login() {
       onSubmit={async (e) => {
         e.preventDefault();
         if (!supabase || busy) return;
+        if (mode === "signup" && !requiredAccepted(choices)) {
+          setStatus(
+            language === "ko"
+              ? "필수 동의를 모두 확인해 주세요."
+              : "Please confirm all required choices.",
+          );
+          return;
+        }
         if (mode === "signup" && !localitySchema.safeParse(locality).success) {
           setStatus(t("profile.regionRequired"));
           return;
@@ -42,7 +56,8 @@ export function Login() {
                       home_city: locality.homeCity.trim(),
                       home_area: locality.homeArea.trim(),
                       locality_scope: locality.localityScope,
-                      public_local_area: publicLocalArea,
+                      // Publication consent is recorded only after email verification.
+                      public_local_area: false,
                     },
                   }
                 : {}),
@@ -121,18 +136,28 @@ export function Login() {
           <p id="signup-region-help" className="fine-print">
             {t("profile.regionHelp")}
           </p>
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={publicLocalArea}
-              onChange={(e) => setPublicLocalArea(e.target.checked)}
-            />
-            <span>{t("profile.regionPublic")}</span>
-          </label>
+          <ConsentFields
+            value={choices}
+            onChange={setChoices}
+            optional={false}
+            disabled={busy}
+          />
+          <p className="fine-print">
+            {language === "ko"
+              ? "이메일 확인 후 동의를 다시 확인하고 서버에 기록해야 가입 절차가 완료됩니다. 지역 공개는 그때 선택할 수 있어요. 예약자명·전화번호는 가입에 필요하지 않습니다."
+              : "After email verification, reconfirm consent for server recording to complete membership. Area publication is optional at that step. Booking names and phone numbers are not required to sign up."}
+          </p>
         </>
       )}
-      {mode==='signup'&&<p className="fine-print">{t('booking.signupHint')}</p>}
-      <button className="primary full" disabled={!supabase || busy}>
+      {mode === "signup" && (
+        <p className="fine-print">{t("booking.signupHint")}</p>
+      )}
+      <button
+        className="primary full"
+        disabled={
+          !supabase || busy || (mode === "signup" && !requiredAccepted(choices))
+        }
+      >
         {busy ? t("보내는 중…") : t("로그인 링크 받기")}
       </button>
       {!supabase && (
@@ -143,6 +168,7 @@ export function Login() {
         </p>
       )}
       {status && <p role="status">{status}</p>}
+      {mode === "login" && <LegalNotices />}
     </form>
   );
 }

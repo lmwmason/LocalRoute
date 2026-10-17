@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { readdirSync, readFileSync } from "node:fs";
+import { LEGAL_VERSION } from "../shared/legal";
 const a = "60000000-0000-4000-8000-000000000001",
   b = "60000000-0000-4000-8000-000000000002",
   mod = "60000000-0000-4000-8000-000000000003";
@@ -24,6 +25,12 @@ const community = (
     requestId,
     payload,
   ]);
+// Public locality now requires versioned evidence, independently of profile metadata.
+const acceptLocality = (actor: string, publicLocalArea: boolean) =>
+  service("select public.legal_consent_action($1,'record',$2)value", [actor, {
+    requestId: crypto.randomUUID(), version: LEGAL_VERSION, language: "ko",
+    terms: true, privacy: true, supabaseTransfer: true, adult: true, publicLocalArea,
+  }]);
 const target = {
   manualPlace: {
     kind: "culture",
@@ -69,6 +76,8 @@ beforeAll(async () => {
   db = new PGlite();
   await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key);create function auth.uid()returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema public,auth to anon,authenticated,service_role;grant select on auth.users to service_role;insert into auth.users values('${a}'),('${b}'),('${mod}');
  create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);alter table storage.objects enable row level security;grant usage on schema storage to anon,authenticated;grant all on storage.objects to anon,authenticated;create policy broad_other_app_policy on storage.objects for all to anon,authenticated using(true)with check(true);`);
+  await db.exec(`alter table auth.users add column email text, add column email_confirmed_at timestamptz, add column is_anonymous boolean default false;
+    update auth.users set email=id::text||'@test.invalid', email_confirmed_at=now();`);
   for (const file of readdirSync("supabase/migrations")
     .filter((f) => f.endsWith(".sql"))
     .sort())
@@ -124,6 +133,7 @@ describe("private home area and required, attributed place photos", () => {
     expect(await call(a, "get")).toMatchObject({ profile: null });
   });
   it("stores a rural home area privately while exposing only the chosen city recommendation scope", async () => {
+    await acceptLocality(a, true);
     await community(
       a,
       "onboard_profile",
@@ -149,6 +159,7 @@ describe("private home area and required, attributed place photos", () => {
         )
       ).rows[0].local_area_label,
     ).toBe("충주시");
+    await acceptLocality(a, false);
     await community(a, "profile", {
       displayName: "City contributor",
       homeCity: "서울특별시",
@@ -158,6 +169,7 @@ describe("private home area and required, attributed place photos", () => {
     });
   });
   it("keeps home areas private by default and only publishes explicit opt-in labels", async () => {
+    await acceptLocality(b, true);
     await community(
       a,
       "onboard_profile",
@@ -194,6 +206,7 @@ describe("private home area and required, attributed place photos", () => {
         await tx.query("select home_region from public.profiles");
       }),
     ).rejects.toThrow(/permission denied/);
+    await acceptLocality(a, true);
     await community(a, "profile", {
       displayName: "Curator A",
       homeRegion: "서울 성동구",
