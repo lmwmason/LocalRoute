@@ -3,11 +3,11 @@
 **Status:** Draft for MVP implementation  
 **Date:** 2026-10-17  
 **Product:** LocalRoute — local restaurant recommendations and map-based travel planning  
-**Language:** Korean-first; internationalization-ready  
+**Language:** Korean and English for primary traveler flows, itinerary inputs/results and uncertainty notices  
 **Owner:** Founder / product team
 
 ## 1. Product summary
-LocalRoute helps travelers discover restaurants recommended by people familiar with the area, evaluate the *specific reasons* behind those recommendations, and organize places into practical map-based itineraries. Local contributors can add restaurants quickly and earn platform points (LP) when their useful recommendations lead to eligible, verified visits and helpfulness ratings.
+LocalRoute is a travel itinerary scheduler built around a map of independently recommended local restaurants. It helps Korean and international travelers combine local food with enjoyable regional activities and places, using Gemini to propose a practical timed schedule. Local contributors can add restaurants quickly and earn platform points (LP) when their useful recommendations lead to eligible, verified visits and helpfulness ratings.
 
 **Product promise:** Find local places, understand why someone recommends them, and turn them into a trip without tedious research.
 
@@ -55,6 +55,14 @@ One account may be both traveler and curator. Roles are server-validated.
 
 ## 6. Core user journeys
 ### 6.1 Discover restaurants and plan trip
+#### Scheduler requirements (founder clarification, 2026-10-17)
+- Collect region, date, local start/end time, party/travel context, purpose, preferred activities and food, food restrictions, travel mode and preferred pace before planning. Keep common choices easy and optional details skippable.
+- Use Gemini on the server to propose a schedule mixing independently recommended restaurants with verified regional attractions/activities. Select exact places only from supplied provider/canonical candidates; never invent a business, attraction, URL, hours or live availability.
+- Give meals explicit time windows and leave dwell/transport buffers. Validate all selected IDs, time bounds, overlap, meal coverage, and plausible transfer time before accepting the model output. Explain unknown hours and estimated travel times. A technically valid draft is not a guarantee that venues are open or bookable.
+- Korean/English selection applies to the form, result descriptions, timings and uncertainty notices; keep proper place names and provide verified addresses for navigation.
+- Enhanced planning uses LP. Display price and separate expiring promotional/earned balances before consent. Reserve entitlement atomically; charge exactly once only after a validated result is durably saved. Failure/invalid output releases the reservation without a debit. Concurrent retries must not duplicate charges or results. Keep launch controls disabled until the published deliverable/refund policy is reviewed.
+- Quality is a release criterion: grounded places, preferences reflected, sensible geography/order, meals at sensible times, an editable schedule, and honest uncertainty. Missing enough reliable candidates must produce an actionable failure rather than a paid fabricated itinerary.
+
 1. Traveler opens free map and searches a city/area/category.
 2. Place cards show verified facts, local endorsement summaries, place satisfaction and recommendation helpfulness **separately**.
 3. Traveler saves restaurants to an itinerary.
