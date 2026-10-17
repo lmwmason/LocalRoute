@@ -1,0 +1,105 @@
+import type { Place } from "./domain";
+
+// Fictional fixtures, never a fallback for a failed provider request.
+export const demoPlaces: Place[] = [
+  {
+    id: "00000000-0000-4000-8000-000000000001",
+    name: "소담한 식탁",
+    category: "한식",
+    address: "서울 성동구 성수동 · 가상 장소",
+    lat: 37.5459,
+    lng: 127.0537,
+    tags: ["혼밥", "든든한 한 끼"],
+    rating: 4.8,
+    reviewCount: 24,
+    source: "demo",
+    endorsements: [
+      {
+        id: "demo-e1",
+        author: "성수 산책자",
+        text: "점심엔 따뜻한 한 그릇. 들깨 향이 은은해서 마지막 한 숟갈까지 편안해요.",
+        helpfulCount: 18,
+      },
+    ],
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000002",
+    name: "오후의 모퉁이",
+    category: "카페",
+    address: "서울 성동구 성수동 · 가상 장소",
+    lat: 37.5442,
+    lng: 127.0495,
+    tags: ["조용한", "커피 한 잔"],
+    rating: 4.7,
+    reviewCount: 16,
+    source: "demo",
+    endorsements: [
+      {
+        id: "demo-e2",
+        author: "동네기록",
+        text: "산책하다 잠깐 쉬어 가기 좋은 창가 자리. 고소한 라테와 작은 책 한 권이면 충분해요.",
+        helpfulCount: 12,
+      },
+    ],
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000003",
+    name: "골목의 면",
+    category: "일식",
+    address: "서울 성동구 성수동 · 가상 장소",
+    lat: 37.5473,
+    lng: 127.057,
+    tags: ["혼밥", "작은 가게"],
+    rating: 4.6,
+    reviewCount: 31,
+    source: "demo",
+    endorsements: [
+      {
+        id: "demo-e3",
+        author: "면을 좋아해",
+        text: "쫄깃한 면을 천천히 즐기기 좋은 곳. 혼자 와도 편한 카운터 자리가 있어요.",
+        helpfulCount: 21,
+      },
+    ],
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000004",
+    name: "초록 접시",
+    category: "양식",
+    address: "서울 성동구 성수동 · 가상 장소",
+    lat: 37.5418,
+    lng: 127.0558,
+    tags: ["함께 가기", "가벼운 식사"],
+    rating: 4.9,
+    reviewCount: 9,
+    source: "demo",
+    endorsements: [
+      {
+        id: "demo-e4",
+        author: "한입의 발견",
+        text: "계절 채소가 주인공인 작은 식탁. 친구와 두 접시를 나눠 먹는 걸 추천해요.",
+        helpfulCount: 7,
+      },
+    ],
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000005",
+    name: "하루 굽는 집",
+    category: "카페",
+    address: "서울 성동구 성수동 · 가상 장소",
+    lat: 37.549,
+    lng: 127.0505,
+    tags: ["포장", "빵과 커피"],
+    rating: 4.7,
+    reviewCount: 19,
+    source: "demo",
+    endorsements: [
+      {
+        id: "demo-e5",
+        author: "빵 산책",
+        text: "담백한 빵을 좋아한다면 들러 보세요. 공원에 가져가 먹으면 더 좋아요.",
+        helpfulCount: 15,
+      },
+    ],
+  },
+];
