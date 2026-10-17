@@ -1,0 +1,459 @@
+{
+  "version": 1,
+  "verifiedAt": "2026-10-17T05:12:02.806Z",
+  "summary": {
+    "registeredPlaces": 26,
+    "approvedPhotos": 6,
+    "skippedPlaces": 20,
+    "approvedRestaurantPhotos": 0
+  },
+  "usage": "Only photos entries are approved for import. Keep attribution, source and license links visible. These are operator-sourced licensed photographs, not contributor visit photos or endorsements. Preserve captured dates and subject descriptions.",
+  "photos": [
+    {
+      "placeName": "서울숲",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=02f56ab2-5e53-470f-8ec3-95cf8fb88aa4",
+      "assetPath": "/place-source-photos/seoul-forest-christian-bolz.jpg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Seoul_Forest_%EC%84%9C%EC%9A%B8%EC%88%B2.jpg",
+      "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/7/79/Seoul_Forest_%EC%84%9C%EC%9A%B8%EC%88%B2.jpg",
+      "title": "Seoul Forest 서울숲.jpg",
+      "author": "Christian Bolz",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "sha256": "ab28573a08cdfe13c746c808d64838937106caaf362031d1b9b7f5f36365317d",
+      "sha1": "a45eecbd0cfec6ea80bda8b2bc06849ae6f88e49",
+      "width": 4288,
+      "height": 2416,
+      "bytes": 2593830,
+      "capturedAt": "2013-06-15 14:06:24",
+      "alt": "서울숲 입구의 서울숲 표지",
+      "subjectEvidence": "Commons 원문 설명이 Seoul Forest를 특정하며, 직접 열어 확인한 사진에 서울숲 / SEOUL FOREST 표지가 보인다.",
+      "visualReview": {
+        "status": "verified",
+        "method": "view_image",
+        "checkedAt": "2026-10-17T05:12:02.806Z"
+      },
+      "attribution": "Christian Bolz · CC BY-SA 4.0 · Wikimedia Commons",
+      "changes": "No changes by LocalRoute; original downloaded bytes preserved."
+    },
+    {
+      "placeName": "충주세계무술박물관",
+      "placeSourceUrl": "https://place.map.kakao.com/14508671",
+      "assetPath": "/place-source-photos/chungju-world-martial-arts-museum-naturehead.jpg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Chungju_World_Martial_Arts_Museum_1.jpg",
+      "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/6/62/Chungju_World_Martial_Arts_Museum_1.jpg",
+      "title": "Chungju World Martial Arts Museum 1.jpg",
+      "author": "Naturehead",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "sha256": "9bc5621fccf3b70f0da5f4409e9006dd27e4946c2fbb62684b2cdaa836c44913",
+      "sha1": "7ceebf6bc8041a9ff249f96299ffab4059d48e5f",
+      "width": 4032,
+      "height": 3024,
+      "bytes": 3095279,
+      "capturedAt": "2022-08-03 16:17:15",
+      "alt": "충주세계무술박물관 건물 외관과 간판",
+      "subjectEvidence": "Commons 파일 설명·촬영좌표가 충주 세계무술박물관을 특정한다. 직접 확인한 건물에 충주세계무술박물관 / Chungju World Martial Arts Museum 간판이 보인다.",
+      "visualReview": {
+        "status": "verified",
+        "method": "view_image",
+        "checkedAt": "2026-10-17T05:12:02.806Z"
+      },
+      "attribution": "Naturehead · CC BY-SA 3.0 · Wikimedia Commons",
+      "changes": "No changes by LocalRoute; original downloaded bytes preserved."
+    },
+    {
+      "placeName": "충주고구려비전시관",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=83305ab8-af95-41a8-b129-389de4bddb9a",
+      "assetPath": "/place-source-photos/chungju-goguryeo-monument-koreabook.jpg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Chungju_Goguryeo_Monument_2025.jpg",
+      "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/9/92/Chungju_Goguryeo_Monument_2025.jpg",
+      "title": "Chungju Goguryeo Monument 2025.jpg",
+      "author": "Koreabook",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "sha256": "76ca7929c3f84e31be080f4442ecb69a4829805e36dc83f28a3bf8716e97cecf",
+      "sha1": "1743db2581661c85eb4a336de8648e2509ddb879",
+      "width": 3024,
+      "height": 4032,
+      "bytes": 2156069,
+      "capturedAt": "2025-02-23 16:59:50",
+      "alt": "충주고구려비전시관 내부 충주 고구려비",
+      "subjectEvidence": "Commons 설명·촬영좌표는 충주 고구려비를 특정한다. 직접 확인한 사진에서 국보 제205호 충주 고구려비 안내판과 실내 전시 비석을 확인했다. 건물 외관 사진으로 표시하면 안 된다.",
+      "visualReview": {
+        "status": "verified",
+        "method": "view_image",
+        "checkedAt": "2026-10-17T05:12:02.806Z"
+      },
+      "attribution": "Koreabook · CC BY 4.0 · Wikimedia Commons",
+      "changes": "No changes by LocalRoute; original downloaded bytes preserved."
+    },
+    {
+      "placeName": "활옥동굴",
+      "placeSourceUrl": "https://place.map.kakao.com/531411391",
+      "assetPath": "/place-source-photos/hwalok-cave-dittwjfsdgkvkdjg-0234.jpg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:CH-JC0234.jpg",
+      "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/5/59/CH-JC0234.jpg",
+      "title": "CH-JC0234.jpg",
+      "author": "Dittwjfsdgkvkdjg",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "sha256": "389887c0d68f9291b8026eb3285157c9554056f7380e069ac3de89a0ee750782",
+      "sha1": "6906070b9ca0c41ce4f481ff95602d52b4a50a8b",
+      "width": 4624,
+      "height": 2600,
+      "bytes": 2526440,
+      "capturedAt": "2024-04-25 13:02:34",
+      "alt": "활옥동굴 내부 산책 통로와 암석 안내판",
+      "subjectEvidence": "Commons 설명은 Chungju Jade/Hwalok Cave를 특정한다. 직접 확인한 사진에 동굴 내부 통로와 활옥 관련 암석 안내판이 보인다.",
+      "visualReview": {
+        "status": "verified",
+        "method": "view_image",
+        "checkedAt": "2026-10-17T05:12:02.806Z"
+      },
+      "attribution": "Dittwjfsdgkvkdjg · CC BY-SA 3.0 · Wikimedia Commons",
+      "changes": "No changes by LocalRoute; original downloaded bytes preserved."
+    },
+    {
+      "placeName": "수안보온천 관광특구",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=b5650a0c-3f97-4f3b-89cd-e5f0a36cc36c",
+      "assetPath": "/place-source-photos/suanbo-banner-jpatokal.jpg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:Suanbo_Banner.JPG",
+      "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Suanbo_Banner.JPG",
+      "title": "Suanbo Banner.JPG",
+      "author": "Jpatokal; banner adaptation by Asretired",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "sha256": "d695efbc807e5fc760eb6ba6bb6fe6a0d7b553b0d3c7767ae3266e455b06a5b0",
+      "sha1": "56f9094d1b3e9b46fbfacc4b51d7b1e7e1d5fefe",
+      "width": 2940,
+      "height": 420,
+      "bytes": 368704,
+      "capturedAt": "2006-06-26",
+      "alt": "2006년 촬영된 수안보 지역의 언덕과 마을 풍경",
+      "subjectEvidence": "Commons 파일명·설명과 원본 Suanbo Hills 링크가 수안보를 특정한다. 직접 확인한 사진은 언덕과 온천 마을의 넓은 풍경이다. 특정 식당이나 현재 시설의 사진으로 재사용하면 안 된다.",
+      "visualReview": {
+        "status": "verified",
+        "method": "view_image",
+        "checkedAt": "2026-10-17T05:12:02.806Z"
+      },
+      "attribution": "Jpatokal; banner adaptation by Asretired · CC BY-SA 4.0 · Wikimedia Commons",
+      "changes": "No changes by LocalRoute; original downloaded bytes preserved.",
+      "priorChanges": "Commons의 배너 파일은 2015년 Asretired가 만든 원본 사진의 배너용 편집본이다. LocalRoute에서는 파일을 변경하지 않았다."
+    },
+    {
+      "placeName": "중앙탑사적공원",
+      "placeSourceUrl": "https://place.map.kakao.com/17697891",
+      "assetPath": "/place-source-photos/jungangtap-pagoda-cultural-heritage.jpg",
+      "sourcePageUrl": "https://commons.wikimedia.org/wiki/File:%EC%A4%91%EC%9B%90_%ED%83%91%ED%8F%89%EB%A6%AC_%EC%B9%A0%EC%B8%B5%EC%84%9D%ED%83%91_%EA%B8%B0%EB%8B%A8%EB%B6%80.jpg",
+      "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/6/69/%EC%A4%91%EC%9B%90_%ED%83%91%ED%8F%89%EB%A6%AC_%EC%B9%A0%EC%B8%B5%EC%84%9D%ED%83%91_%EA%B8%B0%EB%8B%A8%EB%B6%80.jpg",
+      "title": "중원 탑평리 칠층석탑 기단부.jpg",
+      "author": "문화재청",
+      "license": "KOGL Type 1",
+      "licenseUrl": "https://www.kogl.or.kr/info/licenseType1.do",
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "sha256": "a5a2fed6bca13af9878c461094ea0ad8edc922a2cbdce952222c0e5bbfa73e3d",
+      "sha1": "d2d4c0ae8cf614fa09aa96abe749a8d2c4583d71",
+      "width": 900,
+      "height": 715,
+      "bytes": 215296,
+      "capturedAt": null,
+      "alt": "중앙탑사적공원의 탑평리 칠층석탑 기단부",
+      "subjectEvidence": "Commons 파일명·설명이 충주 탑평리 칠층석탑 기단부를 특정한다. 직접 확인한 사진은 공원 내 중앙탑의 기단 부분이다. 공원 전체 전경 사진으로 표시하면 안 된다.",
+      "visualReview": {
+        "status": "verified",
+        "method": "view_image",
+        "checkedAt": "2026-10-17T05:12:02.806Z"
+      },
+      "attribution": "문화재청 · KOGL Type 1 · Wikimedia Commons",
+      "changes": "No changes by LocalRoute; original downloaded bytes preserved."
+    }
+  ],
+  "skipped": [
+    {
+      "placeName": "대성갈비",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=48a0552a-2b19-4373-8793-0f119c3ff86a",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "공식 상세 사진 목록을 확인했지만 각 사진의 재사용 라이선스와 촬영자 귀속을 확인하지 못했다. Public 표시는 이용 허락으로 간주하지 않았다.",
+      "officialImageCheck": {
+        "status": 200,
+        "listedImages": 5,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "성수족발",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc0fe900-cf60-4ff5-8acc-418025c625ea",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "공식 상세 사진 목록을 확인했지만 각 사진의 재사용 라이선스와 촬영자 귀속을 확인하지 못했다. Public 표시는 이용 허락으로 간주하지 않았다.",
+      "officialImageCheck": {
+        "status": 200,
+        "listedImages": 5,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "성수부두",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=5b34b854-c575-44d5-8df3-ec8676274390",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "공식 상세 사진 목록을 확인했지만 각 사진의 재사용 라이선스와 촬영자 귀속을 확인하지 못했다. Public 표시는 이용 허락으로 간주하지 않았다.",
+      "officialImageCheck": {
+        "status": 200,
+        "listedImages": 5,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "수도박물관",
+      "placeSourceUrl": "https://place.map.kakao.com/10376369",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "이번 제한된 조사에서 동일 장소 사진의 재사용 권리를 확인한 파일을 확보하지 못했다. 다른 장소나 스톡 사진으로 대체하지 않는다."
+    },
+    {
+      "placeName": "성수연방",
+      "placeSourceUrl": "https://place.map.kakao.com/1819728691",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "이번 제한된 조사에서 동일 장소 사진의 재사용 권리를 확인한 파일을 확보하지 못했다. 다른 장소나 스톡 사진으로 대체하지 않는다."
+    },
+    {
+      "placeName": "메밀마당 충주 중앙탑본점",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=9d34d695-3e4a-4555-885a-c328c9baa851",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "공식 상세 사진 목록을 확인했지만 각 사진의 재사용 라이선스와 촬영자 귀속을 확인하지 못했다. Public 표시는 이용 허락으로 간주하지 않았다.",
+      "officialImageCheck": {
+        "status": 200,
+        "listedImages": 15,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "운정식당",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=ff7fb6b9-f8e4-47b1-9f6b-f1d92c838e82",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "공식 상세 사진 목록을 확인했지만 각 사진의 재사용 라이선스와 촬영자 귀속을 확인하지 못했다. Public 표시는 이용 허락으로 간주하지 않았다.",
+      "officialImageCheck": {
+        "status": 200,
+        "listedImages": 5,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "대장군",
+      "placeSourceUrl": "https://place.map.kakao.com/11891870",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "Kakao 장소·사용자 사진의 별도 재사용 권리를 확인하지 못했다.",
+      "officialImageCheck": {
+        "status": "not_licensed",
+        "listedImages": 0,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "상록수식당",
+      "placeSourceUrl": "https://place.map.kakao.com/12800097",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "Kakao 장소·사용자 사진의 별도 재사용 권리를 확인하지 못했다.",
+      "officialImageCheck": {
+        "status": "not_licensed",
+        "listedImages": 0,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "영화식당",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=3a074b6f-56e3-4bf3-a504-ac65b9230f1f",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "공식 상세 사진 목록을 확인했지만 각 사진의 재사용 라이선스와 촬영자 귀속을 확인하지 못했다. Public 표시는 이용 허락으로 간주하지 않았다.",
+      "officialImageCheck": {
+        "status": 200,
+        "listedImages": 7,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "숲속장수촌",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc4ad83e-e9a2-4b56-b1e8-d9b03feaabbe",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "공식 상세 사진 목록을 확인했지만 각 사진의 재사용 라이선스와 촬영자 귀속을 확인하지 못했다. Public 표시는 이용 허락으로 간주하지 않았다.",
+      "officialImageCheck": {
+        "status": 200,
+        "listedImages": 5,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "메밀면묵밥리 앙성온천점",
+      "placeSourceUrl": "https://place.map.kakao.com/61123582",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "Kakao 장소·사용자 사진의 별도 재사용 권리를 확인하지 못했다.",
+      "officialImageCheck": {
+        "status": "not_licensed",
+        "listedImages": 0,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "복서울해장국",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=c7199f1f-e721-4d2e-a84c-e040efe0471b",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "공식 상세 사진 목록을 확인했지만 각 사진의 재사용 라이선스와 촬영자 귀속을 확인하지 못했다. Public 표시는 이용 허락으로 간주하지 않았다.",
+      "officialImageCheck": {
+        "status": 200,
+        "listedImages": 4,
+        "perImageLicenseProvided": false
+      }
+    },
+    {
+      "placeName": "충주박물관",
+      "placeSourceUrl": "https://place.map.kakao.com/8585447",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "이번 제한된 조사에서 동일 장소 사진의 재사용 권리를 확인한 파일을 확보하지 못했다. 다른 장소나 스톡 사진으로 대체하지 않는다."
+    },
+    {
+      "placeName": "충주고구려천문과학관",
+      "placeSourceUrl": "https://place.map.kakao.com/10025826",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "이번 제한된 조사에서 동일 장소 사진의 재사용 권리를 확인한 파일을 확보하지 못했다. 다른 장소나 스톡 사진으로 대체하지 않는다."
+    },
+    {
+      "placeName": "충주자연생태체험관",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=8a6e7ebc-e526-47a3-954c-d35844a21cd7",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "이번 제한된 조사에서 동일 장소 사진의 재사용 권리를 확인한 파일을 확보하지 못했다. 다른 장소나 스톡 사진으로 대체하지 않는다."
+    },
+    {
+      "placeName": "오대호아트팩토리",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=44ab3132-75a4-4179-b1e7-262db516c677",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "이번 제한된 조사에서 동일 장소 사진의 재사용 권리를 확인한 파일을 확보하지 못했다. 다른 장소나 스톡 사진으로 대체하지 않는다."
+    },
+    {
+      "placeName": "비내섬",
+      "placeSourceUrl": "https://place.map.kakao.com/11495420",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "이번 제한된 조사에서 동일 장소 사진의 재사용 권리를 확인한 파일을 확보하지 못했다. 다른 장소나 스톡 사진으로 대체하지 않는다."
+    },
+    {
+      "placeName": "충주 탄금대",
+      "placeSourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=cfda5364-2ef5-48cb-90b7-2b55fed9bab7",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "이번 제한된 조사에서 동일 장소 사진의 재사용 권리를 확인한 파일을 확보하지 못했다. 다른 장소나 스톡 사진으로 대체하지 않는다."
+    },
+    {
+      "placeName": "국립충주 기상과학관",
+      "placeSourceUrl": "https://place.map.kakao.com/793335766",
+      "status": "skipped",
+      "photoUrl": null,
+      "author": null,
+      "license": null,
+      "licenseUrl": null,
+      "verifiedAt": "2026-10-17T05:12:02.806Z",
+      "reason": "이번 제한된 조사에서 동일 장소 사진의 재사용 권리를 확인한 파일을 확보하지 못했다. 다른 장소나 스톡 사진으로 대체하지 않는다."
+    }
+  ],
+  "researchNotes": [
+    "No generated, stock-food, unrelated-branch, Google or Naver images were used.",
+    "All approved files were opened with view_image and their unmodified SHA-1 matched Wikimedia Commons metadata.",
+    "429 responses were not bypassed; the supplied Retry-After interval was respected before retry.",
+    "No HeyYumi media, paid API, remote DB write or account action occurred."
+  ]
+}
