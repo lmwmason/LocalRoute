@@ -1,0 +1,586 @@
+{
+  "schemaVersion": 1,
+  "datasetType": "restaurant_source_photo_rights_research",
+  "checkedAt": "2026-10-17T05:14:50.560419Z",
+  "input": "scripts/data/operator-places.json",
+  "scope": {
+    "kind": "restaurant",
+    "placeCount": 11,
+    "tourismAndCultureIncluded": false
+  },
+  "handoff": {
+    "readyPhotoCount": 0,
+    "readyLocalFiles": [],
+    "unavailablePlaceCount": 11,
+    "visuallyMatchedRestrictedCandidateCount": 1,
+    "instructions": "photos만 배포용 확정 목록이다. 현재 전부 비어 있다. candidates와 searches는 조사 근거이며 자동 다운로드·앱 표시·DB/Storage 업로드 대상이 아니다. 빠르게 넘길 수 있는 배포용 확정 사진은 이번 조사에서 확보하지 못했다."
+  },
+  "policy": {
+    "noGeneratedOrStockImages": true,
+    "unverifiedBlogImagesExcluded": true,
+    "remoteDatabaseChanged": false,
+    "storageChanged": false,
+    "paidApiCalled": false,
+    "originalImagesModified": false,
+    "retainedRepositoryImageFiles": [],
+    "checkedAtMeaning": "공개 자료를 조회·대조한 시각. 촬영일·현재 영업·현장 방문 확인을 의미하지 않음.",
+    "licensePolicy": "공식 게재 또는 Public 메타데이터만으로 사진 사용권을 확정하지 않는다. 포토코리아 이용권과 TourAPI 이용권을 서로 대체하지 않는다. LocalRoute의 상업적 서비스 활용이 가능하다고 확인하지 못한 사진은 photos에 넣지 않는다.",
+    "unknownValues": "확인하지 못한 촬영자·권리자·개별 라이선스·출처표시 문구·보관 경로는 null. 빈 photos는 사진이 존재하지 않는다는 뜻이 아니라 채택 가능한 사진을 확보하지 못했다는 뜻."
+  },
+  "generalRightsReferences": [
+    {
+      "url": "https://www.data.go.kr/data/15101578/openapi.do",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "finding": "국문 관광정보 OpenAPI는 공공누리 1·3유형 이미지를 제공한다고 명시한다. 그러나 이번에 조회한 구석구석 공개 상세 사진 각각의 TourAPI 제공 여부·개별 유형은 확인하지 못했으므로 이를 일괄 허가 근거로 삼지 않았다."
+    },
+    {
+      "url": "https://phoko.visitkorea.or.kr/main/index.kto",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "finding": "개별 사진의 공공누리 조건과 신청 용도를 확인해야 하며 다운로드 사진의 제3자 제공 제한을 안내한다. 회원가입·사진 신청·다운로드를 하지 않았다."
+    },
+    {
+      "url": "https://www.kogl.or.kr/info/licenseType4.do",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "finding": "제4유형은 출처표시·비상업적 이용·변경금지 조건. 상업적 이용은 별도 허락이 필요하다."
+    }
+  ],
+  "places": [
+    {
+      "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=48a0552a-2b19-4373-8793-0f119c3ff86a",
+      "name": "대성갈비",
+      "address": "서울특별시 성동구 상원1길 26 (성수동1가) 서울숲 A타워 101호~103호",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "공식 상세의 Public 사진 후보는 찾았으나, 개별 사진의 재사용 라이선스·권리자·출처표시 조건을 확인하지 못했다. Public은 자유이용 허락 표시로 해석하지 않았다. 권리 확인 전 다운로드와 채택을 보류했다. 대성갈비는 서울숲4길 27에서 상원1길 26으로 이전한 것으로 공식 설명되어, 과거 주소 사진을 현 지점 사진으로 대체하지 않았다.",
+      "candidates": [
+        {
+          "photoUrl": "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=ccb50bfa-78fe-4bae-acc3-4807a2ebc737",
+          "originalSourcePage": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=48a0552a-2b19-4373-8793-0f119c3ff86a",
+          "sourcePublisher": "한국관광공사 대한민국 구석구석",
+          "photographer": null,
+          "rightsHolder": null,
+          "licenseName": null,
+          "licenseUrl": null,
+          "attributionText": null,
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "unverified_do_not_download_or_publish",
+          "identityEvidence": {
+            "status": "metadata_only_not_visually_verified",
+            "sourceTitle": "대성갈비",
+            "sourceAddress": "서울특별시 성동구 상원1길 26 (성수동1가)",
+            "sourceImageCaption": "대성갈비 1",
+            "basis": "공식 상세 조회의 publicImage 첫 항목이 이 장소 상세에 연결됨. 사진 원본·간판·현 주소의 일치는 미확인이다.",
+            "readRequest": {
+              "url": "https://korean.visitkorea.or.kr/call",
+              "method": "POST",
+              "form": {
+                "cmd": "TOUR_CONTENT_BODY_DETAIL",
+                "cotId": "48a0552a-2b19-4373-8793-0f119c3ff86a",
+                "locationx": "",
+                "locationy": "",
+                "stampId": ""
+              }
+            }
+          },
+          "viewImageReviewed": false
+        }
+      ],
+      "searches": [
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EB%8C%80%EC%84%B1%EA%B0%88%EB%B9%84&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc0fe900-cf60-4ff5-8acc-418025c625ea",
+      "name": "성수족발",
+      "address": "서울특별시 성동구 아차산로7길 7 (성수동2가)",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "서울시 기사 원본의 지점 일치를 view_image로 확인했으나 제4유형의 상업적 이용금지 조건으로 LocalRoute 앱용 채택·저장·배포는 보류했다. 별도 허락이 필요하다. 한국관광공사 후보의 개별 권리도 미확인이다.",
+      "candidates": [
+        {
+          "photoUrl": "https://mediahub.seoul.go.kr/uploads/mediahub/2026/10/ARmogSpmXYTjtPgzZRyhhRpARaHCgQOx.jpg",
+          "originalSourcePage": "https://mediahub.seoul.go.kr/archives/2019626",
+          "sourcePublisher": "서울특별시 내 손안에 서울",
+          "photographer": "조수봉",
+          "rightsHolder": "조수봉 (사진 캡션 ©조수봉)",
+          "licenseName": "공공누리 제4유형: 출처표시 + 상업적 이용금지 + 변경금지",
+          "licenseUrl": "https://www.kogl.or.kr/info/licenseType4.do",
+          "licenseEvidenceUrl": "https://mediahub.seoul.go.kr/archives/2019626",
+          "licenseEvidence": "기사 하단에 제4유형과 상업적 이용금지·변경금지를 명시하고 위 라이선스 안내로 연결함.",
+          "attributionText": "사진: 조수봉 / 서울특별시 내 손안에 서울, 「30년 넘게 사랑받은 맛! 오래가게로 떠나는 동북권 미식 산책」(2026.10.14), 공공누리 제4유형(출처표시·상업적 이용금지·변경금지). 원문: https://mediahub.seoul.go.kr/archives/2019626",
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "noncommercial_only_not_approved_for_localroute_app",
+          "commercialUseAllowed": false,
+          "modificationAllowed": false,
+          "viewImageReviewed": true,
+          "identityEvidence": {
+            "status": "visually_matched_to_source_address",
+            "basis": "원본을 view_image로 열어 성수족발 간판, 464-0425 전화번호 및 옆 아차산로7길 도로 표지판을 확인했다. 같은 기사 음식점 주소 목록의 아차산로7길 7이 operator-places.json과 일치한다. 사진만으로 번지 7이 판독되는 것은 아니며 기사 주소와 함께 대조했다.",
+            "sourceAddress": "서울시 성동구 아차산로7길 7",
+            "sourceImageCaption": "지하철 2호선 성수역 인근에 위치한 성수족발 ©조수봉"
+          },
+          "originalReview": {
+            "temporaryPath": "/tmp/localroute-restaurant-photo-review/seongsu-jokbal-original.jpg",
+            "bytes": 146105,
+            "sha256": "9d7304c4fc59d3d8b21b25e4d9bb7f2664d196a8389f71c77ee28964d2974992",
+            "modified": false,
+            "committed": false,
+            "purpose": "라이선스가 허용하는 비상업적 권리·장소 일치 확인만 수행. 앱용 파일로 복사하거나 배포하지 않음."
+          }
+        },
+        {
+          "photoUrl": "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=6e2f1dc7-60ad-4418-b783-9885cf59ec63",
+          "originalSourcePage": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc0fe900-cf60-4ff5-8acc-418025c625ea",
+          "sourcePublisher": "한국관광공사 대한민국 구석구석",
+          "photographer": null,
+          "rightsHolder": null,
+          "licenseName": null,
+          "licenseUrl": null,
+          "attributionText": null,
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "unverified_do_not_download_or_publish",
+          "identityEvidence": {
+            "status": "metadata_only_not_visually_verified",
+            "sourceTitle": "성수족발",
+            "sourceAddress": "서울특별시 성동구 아차산로7길 7 (성수동2가)",
+            "sourceImageCaption": "성수족발 1",
+            "basis": "공식 상세 조회의 publicImage 첫 항목이 이 장소 상세에 연결됨. 사진 원본·간판·현 주소의 일치는 미확인이다.",
+            "readRequest": {
+              "url": "https://korean.visitkorea.or.kr/call",
+              "method": "POST",
+              "form": {
+                "cmd": "TOUR_CONTENT_BODY_DETAIL",
+                "cotId": "bc0fe900-cf60-4ff5-8acc-418025c625ea",
+                "locationx": "",
+                "locationy": "",
+                "stampId": ""
+              }
+            }
+          },
+          "viewImageReviewed": false
+        }
+      ],
+      "searches": [
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EC%84%B1%EC%88%98%EC%A1%B1%EB%B0%9C&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=5b34b854-c575-44d5-8df3-ec8676274390",
+      "name": "성수부두",
+      "address": "서울특별시 성동구 연무장길 41-26 (성수동2가) 지하1층",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "공식 상세의 Public 사진 후보는 찾았으나, 개별 사진의 재사용 라이선스·권리자·출처표시 조건을 확인하지 못했다. Public은 자유이용 허락 표시로 해석하지 않았다. 권리 확인 전 다운로드와 채택을 보류했다.",
+      "candidates": [
+        {
+          "photoUrl": "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=7fd1b85e-76a1-495c-9293-bbdc938a54c6",
+          "originalSourcePage": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=5b34b854-c575-44d5-8df3-ec8676274390",
+          "sourcePublisher": "한국관광공사 대한민국 구석구석",
+          "photographer": null,
+          "rightsHolder": null,
+          "licenseName": null,
+          "licenseUrl": null,
+          "attributionText": null,
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "unverified_do_not_download_or_publish",
+          "identityEvidence": {
+            "status": "metadata_only_not_visually_verified",
+            "sourceTitle": "성수부두",
+            "sourceAddress": "서울특별시 성동구 연무장길 41-26 (성수동2가)",
+            "sourceImageCaption": "성수부두 1",
+            "basis": "공식 상세 조회의 publicImage 첫 항목이 이 장소 상세에 연결됨. 사진 원본·간판·현 주소의 일치는 미확인이다.",
+            "readRequest": {
+              "url": "https://korean.visitkorea.or.kr/call",
+              "method": "POST",
+              "form": {
+                "cmd": "TOUR_CONTENT_BODY_DETAIL",
+                "cotId": "5b34b854-c575-44d5-8df3-ec8676274390",
+                "locationx": "",
+                "locationy": "",
+                "stampId": ""
+              }
+            }
+          },
+          "viewImageReviewed": false
+        }
+      ],
+      "searches": [
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EC%84%B1%EC%88%98%EB%B6%80%EB%91%90&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=9d34d695-3e4a-4555-885a-c328c9baa851",
+      "name": "메밀마당 충주 중앙탑본점",
+      "address": "충청북도 충주시 중앙탑면 중앙탑길 103",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "공식 상세의 Public 사진 후보는 찾았으나, 개별 사진의 재사용 라이선스·권리자·출처표시 조건을 확인하지 못했다. Public은 자유이용 허락 표시로 해석하지 않았다. 권리 확인 전 다운로드와 채택을 보류했다.",
+      "candidates": [
+        {
+          "photoUrl": "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=257ab22f-b89f-4ca5-b205-f69bb64c01ae",
+          "originalSourcePage": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=9d34d695-3e4a-4555-885a-c328c9baa851",
+          "sourcePublisher": "한국관광공사 대한민국 구석구석",
+          "photographer": null,
+          "rightsHolder": null,
+          "licenseName": null,
+          "licenseUrl": null,
+          "attributionText": null,
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "unverified_do_not_download_or_publish",
+          "identityEvidence": {
+            "status": "metadata_only_not_visually_verified",
+            "sourceTitle": "메밀마당 충주 중앙탑본점",
+            "sourceAddress": "충청북도 충주시 중앙탑면 중앙탑길 103",
+            "sourceImageCaption": "메밀마당 충주 중앙탑본점 1",
+            "basis": "공식 상세 조회의 publicImage 첫 항목이 이 장소 상세에 연결됨. 사진 원본·간판·현 주소의 일치는 미확인이다.",
+            "readRequest": {
+              "url": "https://korean.visitkorea.or.kr/call",
+              "method": "POST",
+              "form": {
+                "cmd": "TOUR_CONTENT_BODY_DETAIL",
+                "cotId": "9d34d695-3e4a-4555-885a-c328c9baa851",
+                "locationx": "",
+                "locationy": "",
+                "stampId": ""
+              }
+            }
+          },
+          "viewImageReviewed": false
+        }
+      ],
+      "searches": [
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EB%A9%94%EB%B0%80%EB%A7%88%EB%8B%B9&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=ff7fb6b9-f8e4-47b1-9f6b-f1d92c838e82",
+      "name": "운정식당",
+      "address": "충청북도 충주시 중원대로 3432-1 (문화동)",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "공식 상세의 Public 사진 후보는 찾았으나, 개별 사진의 재사용 라이선스·권리자·출처표시 조건을 확인하지 못했다. Public은 자유이용 허락 표시로 해석하지 않았다. 권리 확인 전 다운로드와 채택을 보류했다.",
+      "candidates": [
+        {
+          "photoUrl": "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=c7519e70-0a33-4c96-b8a7-eeebeaf5c771",
+          "originalSourcePage": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=ff7fb6b9-f8e4-47b1-9f6b-f1d92c838e82",
+          "sourcePublisher": "한국관광공사 대한민국 구석구석",
+          "photographer": null,
+          "rightsHolder": null,
+          "licenseName": null,
+          "licenseUrl": null,
+          "attributionText": null,
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "unverified_do_not_download_or_publish",
+          "identityEvidence": {
+            "status": "metadata_only_not_visually_verified",
+            "sourceTitle": "운정식당",
+            "sourceAddress": "충청북도 충주시 중원대로 3432-1",
+            "sourceImageCaption": "운정식당 1",
+            "basis": "공식 상세 조회의 publicImage 첫 항목이 이 장소 상세에 연결됨. 사진 원본·간판·현 주소의 일치는 미확인이다.",
+            "readRequest": {
+              "url": "https://korean.visitkorea.or.kr/call",
+              "method": "POST",
+              "form": {
+                "cmd": "TOUR_CONTENT_BODY_DETAIL",
+                "cotId": "ff7fb6b9-f8e4-47b1-9f6b-f1d92c838e82",
+                "locationx": "",
+                "locationy": "",
+                "stampId": ""
+              }
+            }
+          },
+          "viewImageReviewed": false
+        }
+      ],
+      "searches": [
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EC%9A%B4%EC%A0%95%EC%8B%9D%EB%8B%B9&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://place.map.kakao.com/11891870",
+      "name": "대장군",
+      "address": "충북 충주시 수안보면 미륵송계로 105 1층",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "공식 상세의 Public 사진 후보는 찾았으나, 개별 사진의 재사용 라이선스·권리자·출처표시 조건을 확인하지 못했다. Public은 자유이용 허락 표시로 해석하지 않았다. 권리 확인 전 다운로드와 채택을 보류했다.",
+      "candidates": [
+        {
+          "photoUrl": "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=1a50ca15-845f-4839-b795-89f0532a3f13",
+          "originalSourcePage": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=1bae9197-dc9b-4562-8906-6f4c0f1f23e0",
+          "sourcePublisher": "한국관광공사 대한민국 구석구석",
+          "photographer": null,
+          "rightsHolder": null,
+          "licenseName": null,
+          "licenseUrl": null,
+          "attributionText": null,
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "unverified_do_not_download_or_publish",
+          "identityEvidence": {
+            "status": "metadata_only_not_visually_verified",
+            "sourceTitle": "대장군식당",
+            "sourceAddress": "충청북도 충주시 수안보면 미륵송계로 105",
+            "sourceImageCaption": "대장군식당  0",
+            "basis": "공식 상세 조회의 publicImage 첫 항목이 이 장소 상세에 연결됨. 사진 원본·간판·현 주소의 일치는 미확인이다.",
+            "readRequest": {
+              "url": "https://korean.visitkorea.or.kr/call",
+              "method": "POST",
+              "form": {
+                "cmd": "TOUR_CONTENT_BODY_DETAIL",
+                "cotId": "1bae9197-dc9b-4562-8906-6f4c0f1f23e0",
+                "locationx": "",
+                "locationy": "",
+                "stampId": ""
+              }
+            }
+          },
+          "viewImageReviewed": false
+        }
+      ],
+      "searches": [
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EB%8C%80%EC%9E%A5%EA%B5%B0+%EC%88%98%EC%95%88%EB%B3%B4&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://place.map.kakao.com/12800097",
+      "name": "상록수식당",
+      "address": "충북 충주시 수안보면 주정산로 19 1층",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "주정산로 19의 상록수식당을 언급한 공식 여행기사는 찾았으나 해당 식당의 재사용 가능한 개별 사진을 확인하지 못했다. 여수·평택 등 동명 식당 사진과 권리 미확인 블로그 사진은 제외했다.",
+      "candidates": [],
+      "searches": [
+        {
+          "url": "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=1f390d1d-6f63-4c6b-8b53-737dc3e1a0b2",
+          "result": "음식점 정보에 상록수식당과 주정산로 19를 명시. 기사 표시는 출처표시·상업용금지·변경금지이며, 해당 식당 사진의 식별·사용권은 확보하지 못함.",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        },
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EC%83%81%EB%A1%9D%EC%88%98%EC%8B%9D%EB%8B%B9&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=3a074b6f-56e3-4bf3-a504-ac65b9230f1f",
+      "name": "영화식당",
+      "address": "충청북도 충주시 수안보면 물탕1길 11",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "공식 상세의 Public 사진 후보는 찾았으나, 개별 사진의 재사용 라이선스·권리자·출처표시 조건을 확인하지 못했다. Public은 자유이용 허락 표시로 해석하지 않았다. 권리 확인 전 다운로드와 채택을 보류했다.",
+      "candidates": [
+        {
+          "photoUrl": "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=72b005ce-d869-4fbf-ad4e-d2587193e2dd",
+          "originalSourcePage": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=3a074b6f-56e3-4bf3-a504-ac65b9230f1f",
+          "sourcePublisher": "한국관광공사 대한민국 구석구석",
+          "photographer": null,
+          "rightsHolder": null,
+          "licenseName": null,
+          "licenseUrl": null,
+          "attributionText": null,
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "unverified_do_not_download_or_publish",
+          "identityEvidence": {
+            "status": "metadata_only_not_visually_verified",
+            "sourceTitle": "영화식당",
+            "sourceAddress": "충청북도 충주시 수안보면 물탕1길 11",
+            "sourceImageCaption": "영화식당 1",
+            "basis": "공식 상세 조회의 publicImage 첫 항목이 이 장소 상세에 연결됨. 사진 원본·간판·현 주소의 일치는 미확인이다.",
+            "readRequest": {
+              "url": "https://korean.visitkorea.or.kr/call",
+              "method": "POST",
+              "form": {
+                "cmd": "TOUR_CONTENT_BODY_DETAIL",
+                "cotId": "3a074b6f-56e3-4bf3-a504-ac65b9230f1f",
+                "locationx": "",
+                "locationy": "",
+                "stampId": ""
+              }
+            }
+          },
+          "viewImageReviewed": false
+        }
+      ],
+      "searches": [
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EC%98%81%ED%99%94%EC%8B%9D%EB%8B%B9+%EC%B6%A9%EC%A3%BC&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc4ad83e-e9a2-4b56-b1e8-d9b03feaabbe",
+      "name": "숲속장수촌",
+      "address": "충청북도 충주시 쇠저울1길 36 (금릉동)",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "공식 상세의 Public 사진 후보는 찾았으나, 개별 사진의 재사용 라이선스·권리자·출처표시 조건을 확인하지 못했다. Public은 자유이용 허락 표시로 해석하지 않았다. 권리 확인 전 다운로드와 채택을 보류했다. 과거 여행기사의 금제로 28 사진을 현재 쇠저울1길 36 사진으로 간주하지 않았다.",
+      "candidates": [
+        {
+          "photoUrl": "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=0b4a299a-12ec-4b4b-8e96-815f920d8c00",
+          "originalSourcePage": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc4ad83e-e9a2-4b56-b1e8-d9b03feaabbe",
+          "sourcePublisher": "한국관광공사 대한민국 구석구석",
+          "photographer": null,
+          "rightsHolder": null,
+          "licenseName": null,
+          "licenseUrl": null,
+          "attributionText": null,
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "unverified_do_not_download_or_publish",
+          "identityEvidence": {
+            "status": "metadata_only_not_visually_verified",
+            "sourceTitle": "숲속장수촌",
+            "sourceAddress": "충청북도 충주시 쇠저울1길 36 (금릉동)",
+            "sourceImageCaption": "숲속장수촌 1",
+            "basis": "공식 상세 조회의 publicImage 첫 항목이 이 장소 상세에 연결됨. 사진 원본·간판·현 주소의 일치는 미확인이다.",
+            "readRequest": {
+              "url": "https://korean.visitkorea.or.kr/call",
+              "method": "POST",
+              "form": {
+                "cmd": "TOUR_CONTENT_BODY_DETAIL",
+                "cotId": "bc4ad83e-e9a2-4b56-b1e8-d9b03feaabbe",
+                "locationx": "",
+                "locationy": "",
+                "stampId": ""
+              }
+            }
+          },
+          "viewImageReviewed": false
+        }
+      ],
+      "searches": [
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EC%88%B2%EC%86%8D%EC%9E%A5%EC%88%98%EC%B4%8C&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://place.map.kakao.com/61123582",
+      "name": "메밀면묵밥리 앙성온천점",
+      "address": "충북 충주시 앙성면 가곡로 1509 1층 2호",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "가곡로 1509 1층 2호의 식당을 언급한 공식 여행기사와 제3자 사진 후보를 찾았으나, 해당 지점 사진의 재사용 허락을 확인하지 못했다. 연수동 동명 식당과 권리 미확인 후기 사진은 제외했다.",
+      "candidates": [],
+      "searches": [
+        {
+          "url": "https://access.visitkorea.or.kr/cos/detail.do?cotId=19c80a5e-fb70-45af-8ffa-f3669746f690",
+          "result": "음식점 목록에 식당과 주소를 명시. 기사에는 공공누리 제4유형 표시가 있으나 이 지점 사진으로 특정 가능한 이미지는 확보하지 못함.",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        },
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EB%A9%94%EB%B0%80%EB%A9%B4%EB%AC%B5%EB%B0%A5%EB%A6%AC&srnamespace=6&srlimit=3&format=json",
+          "result": "파일 검색 결과 없음",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    },
+    {
+      "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=c7199f1f-e721-4d2e-a84c-e040efe0471b",
+      "name": "복서울해장국",
+      "address": "충청북도 충주시 관아1길 16",
+      "checkedAt": "2026-10-17T05:14:50.560419Z",
+      "status": "unavailable",
+      "photos": [],
+      "reason": "공식 상세의 Public 사진 후보는 찾았으나, 개별 사진의 재사용 라이선스·권리자·출처표시 조건을 확인하지 못했다. Public은 자유이용 허락 표시로 해석하지 않았다. 권리 확인 전 다운로드와 채택을 보류했다.",
+      "candidates": [
+        {
+          "photoUrl": "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=3c58bda9-6e25-40e8-b385-defbd5756f77",
+          "originalSourcePage": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=c7199f1f-e721-4d2e-a84c-e040efe0471b",
+          "sourcePublisher": "한국관광공사 대한민국 구석구석",
+          "photographer": null,
+          "rightsHolder": null,
+          "licenseName": null,
+          "licenseUrl": null,
+          "attributionText": null,
+          "localPath": null,
+          "checkedAt": "2026-10-17T05:14:50.560419Z",
+          "reuseStatus": "unverified_do_not_download_or_publish",
+          "identityEvidence": {
+            "status": "metadata_only_not_visually_verified",
+            "sourceTitle": "복서울해장국",
+            "sourceAddress": "충청북도 충주시 관아1길 16",
+            "sourceImageCaption": "복서울해장국  0",
+            "basis": "공식 상세 조회의 publicImage 첫 항목이 이 장소 상세에 연결됨. 사진 원본·간판·현 주소의 일치는 미확인이다.",
+            "readRequest": {
+              "url": "https://korean.visitkorea.or.kr/call",
+              "method": "POST",
+              "form": {
+                "cmd": "TOUR_CONTENT_BODY_DETAIL",
+                "cotId": "c7199f1f-e721-4d2e-a84c-e040efe0471b",
+                "locationx": "",
+                "locationy": "",
+                "stampId": ""
+              }
+            }
+          },
+          "viewImageReviewed": false
+        }
+      ],
+      "searches": [
+        {
+          "url": "https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=%EB%B3%B5%EC%84%9C%EC%9A%B8%ED%95%B4%EC%9E%A5%EA%B5%AD&srnamespace=6&srlimit=3&format=json",
+          "result": "직접 API 조회 HTTP 오류. Commons에 사진이 없다고 단정하지 않음.",
+          "checkedAt": "2026-10-17T05:14:50.560419Z"
+        }
+      ],
+      "nextAction": "권리자의 해당 지점 사진 사용·저장·재배포 허락 또는 개별 사진의 공공누리/CC 라이선스 근거를 확보한 뒤 원본을 시각 검증한다."
+    }
+  ]
+}
