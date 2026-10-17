@@ -82,6 +82,40 @@ describe("server schedule quality pipeline", () => {
       ).errors.map((e) => e.code),
     ).toContain("PACE_OVERLOAD");
   });
+  it("checks last entry and meal ordering cutoffs while accepting their exact boundary", () => {
+    const schedule = demoSchedule(plannerInput),
+      catalog = structuredClone(demoCatalog);
+    const lunch = schedule.days[0].stops.find(
+      (stop) => stop.purpose === "lunch",
+    )!;
+    const restaurant = catalog.find(
+      (candidate) => candidate.id === lunch.candidateId,
+    )!;
+    restaurant.hours = {
+      [plannerInput.startDate]: [
+        {
+          open: "09:00",
+          close: "22:00",
+          lastEntry: lunch.start,
+          lastOrder: lunch.start,
+        },
+      ],
+    };
+    expect(evaluateSchedule(schedule, plannerInput, catalog).valid).toBe(true);
+    restaurant.hours[plannerInput.startDate][0].lastOrder = "11:59";
+    expect(
+      evaluateSchedule(schedule, plannerInput, catalog).errors.map(
+        (issue) => issue.code,
+      ),
+    ).toContain("CLOSED_VENUE");
+    restaurant.hours[plannerInput.startDate][0].lastOrder = lunch.start;
+    restaurant.hours[plannerInput.startDate][0].lastEntry = "11:59";
+    expect(
+      evaluateSchedule(schedule, plannerInput, catalog).errors.map(
+        (issue) => issue.code,
+      ),
+    ).toContain("CLOSED_VENUE");
+  });
   it("repairs a bad proposal once, validates exact pins and caps repeated invalid proposals", async () => {
     let calls = 0;
     const valid = demoSchedule(plannerInput),

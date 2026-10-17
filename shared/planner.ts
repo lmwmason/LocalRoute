@@ -128,7 +128,10 @@ export type Candidate = {
     verification: "canonical" | "provider" | "demo";
   };
   endorsements: { versionId: string; text: string }[];
-  hours?: Record<string, { open: string; close: string }[]>;
+  hours?: Record<
+    string,
+    { open: string; close: string; lastEntry?: string; lastOrder?: string }[]
+  >;
   dietaryVerified?: string[];
   possiblyClosed?: boolean;
   accessibilityVerified?: boolean;
@@ -202,6 +205,34 @@ export function distanceMeters(
     6371000 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(Math.max(0, 1 - x))),
   );
 }
+function mealWindowOverlap(input: Pick<TripInput, "startTime" | "endTime">) {
+  const start = minutes(input.startTime),
+    end = minutes(input.endTime);
+  const overlap = (open: number, close: number) =>
+    Math.max(0, Math.min(end, close) - Math.max(start, open));
+  return { lunch: overlap(660, 840), dinner: overlap(1050, 1230) };
+}
+export function requiredMeals(input: Pick<TripInput, "startTime" | "endTime">) {
+  const overlap = mealWindowOverlap(input);
+  // A 90-minute overlap leaves 45 minutes for the meal and 45 for flexibility.
+  return { lunch: overlap.lunch >= 90, dinner: overlap.dinner >= 90 };
+}
+function matchesActivity(
+  candidate: Candidate,
+  activities: TripInput["activities"],
+) {
+  return activities.some((activity) =>
+    activity === "food"
+      ? candidate.kind === "restaurant"
+      : candidate.tags.includes(activity),
+  );
+}
+function matchesFood(candidate: Candidate, foodTypes: TripInput["foodTypes"]) {
+  return (
+    candidate.kind === "restaurant" &&
+    foodTypes.some((type) => candidate.tags.includes(type))
+  );
+}
 export function evaluateSchedule(
   schedule: Schedule,
   input: TripInput,
@@ -226,6 +257,9 @@ export function evaluateSchedule(
     byId = new Map(catalog.map((c) => [c.id, c])),
     seen = new Set<string>();
   const dates = tripDates(input.startDate, input.endDate);
+  const meals = requiredMeals(input);
+  let activityMatched = false,
+    foodMatched = false;
   const checks = {
     stopCount: 0,
     localMeals: 0,
@@ -303,7 +337,13 @@ export function evaluateSchedule(
         checks.verifiedHours++;
         if (
           !hours.some(
-            (h) => start >= minutes(h.open) && end <= minutes(h.close),
+            (h) =>
+              start >= minutes(h.open) &&
+              end <= minutes(h.close) &&
+              (!h.lastEntry || start <= minutes(h.lastEntry)) &&
+              (!(stop.purpose === "lunch" || stop.purpose === "dinner") ||
+                !h.lastOrder ||
+                start <= minutes(h.lastOrder)),
           )
         )
           errors.push({ code: "CLOSED_VENUE", ...issue });
@@ -334,20 +374,21 @@ export function evaluateSchedule(
       }
       if (stop.purpose === "break" || gap >= input.transferBufferMinutes + 30)
         rest = true;
-      if (
-        c.tags.some((tag) =>
-          [...input.activities, ...input.foodTypes].includes(tag as never),
-        )
-      )
-        checks.preferenceMatches++;
+      const activityMatch = matchesActivity(c, input.activities);
+      const foodMatch =
+        (stop.purpose === "lunch" || stop.purpose === "dinner") &&
+        matchesFood(c, input.foodTypes);
+      activityMatched ||= activityMatch;
+      foodMatched ||= foodMatch;
+      if (activityMatch || foodMatch) checks.preferenceMatches++;
       previous = c;
       previousEnd = end;
     }
     const windowStart = minutes(input.startTime),
       windowEnd = minutes(input.endTime);
-    if (windowStart <= 780 && windowEnd >= 840 && lunch !== 1)
+    if (meals.lunch && lunch !== 1)
       errors.push({ code: "LUNCH_COVERAGE", day: day.date });
-    if (windowStart <= 1170 && windowEnd >= 1200 && dinner !== 1)
+    if (meals.dinner && dinner !== 1)
       errors.push({ code: "DINNER_COVERAGE", day: day.date });
     if (lunch > 1 || dinner > 1)
       errors.push({ code: "DUPLICATE_MEAL", day: day.date });
@@ -361,11 +402,24 @@ export function evaluateSchedule(
     )
       errors.push({ code: "ACTIVITY_REQUIRED", day: day.date });
   }
-  if (
-    (input.activities.length || input.foodTypes.length) &&
-    !checks.preferenceMatches
-  )
-    errors.push({ code: "PREFERENCES_NOT_MATCHED" });
+  if (input.activities.length && !activityMatched) {
+    if (
+      catalog.some((candidate) => matchesActivity(candidate, input.activities))
+    )
+      errors.push({ code: "ACTIVITY_PREFERENCES_NOT_MATCHED" });
+    else warnings.push({ code: "ACTIVITY_PREFERENCE_UNAVAILABLE" });
+  }
+  if (input.foodTypes.length && !foodMatched) {
+    const mealPossible = Object.values(mealWindowOverlap(input)).some(
+      (overlap) => overlap >= 45,
+    );
+    if (
+      mealPossible &&
+      catalog.some((candidate) => matchesFood(candidate, input.foodTypes))
+    )
+      errors.push({ code: "FOOD_PREFERENCES_NOT_MATCHED" });
+    else warnings.push({ code: "FOOD_PREFERENCE_UNAVAILABLE" });
+  }
   if (input.budget === "value") warnings.push({ code: "PRICES_UNVERIFIED" });
   return { valid: errors.length === 0, errors, warnings, checks };
 }
