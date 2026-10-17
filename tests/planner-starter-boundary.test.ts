@@ -147,6 +147,8 @@ function setup(
     lng: destination.lng,
     tags: ["korean"],
     endorsements: [],
+    rating: null,
+    reviewCount: 0,
     source: "localroute",
     officialSources: [
       {
