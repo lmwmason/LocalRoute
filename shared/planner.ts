@@ -107,6 +107,7 @@ export const tripSchema = z
   });
 export type TripInput = z.infer<typeof tripSchema>;
 export type Candidate = {
+  displayMedia?: import("./display-media").DisplayMedia;
   sourcePhoto?: import("./source-photos").SourcePhoto;
   starterRecommendation?: true;
   officialSources?: { url: string; observedAt: string }[];

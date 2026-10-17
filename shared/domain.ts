@@ -17,6 +17,7 @@ export type Endorsement = {
   helpfulCount: number;
 };
 export type Place = {
+  displayMedia?: import("./display-media").DisplayMedia;
   sourcePhoto?: SourcePhoto;
   officialSources?: { url: string; observedAt: string }[];
   photo?: {
