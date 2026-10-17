@@ -7,6 +7,7 @@ import { localitySchema, type Locality } from "../../shared/locality";
 import { HomeRegionFields } from "./HomeRegionFields";
 export function Workspace() {
   const { t } = useI18n();
+  const [regionValid, setRegionValid] = useState(false);
 
   const [data, setData] = useState<WorkspaceData | null>(null),
     [name, setName] = useState(""),
@@ -61,7 +62,11 @@ export function Workspace() {
           maxLength={40}
         />
       </label>
-      <HomeRegionFields value={locality} onChange={setLocality} />
+      <HomeRegionFields
+        value={locality}
+        onChange={setLocality}
+        onValidityChange={setRegionValid}
+      />
       <p className="fine-print">{t("profile.regionHelp")}</p>
       {coverage && (
         <p className="notice-box">
@@ -83,8 +88,11 @@ export function Workspace() {
       </a>
       <button
         className="secondary full"
-        disabled={busy || !localitySchema.safeParse(locality).success}
+        disabled={
+          busy || !regionValid || !localitySchema.safeParse(locality).success
+        }
         onClick={async () => {
+          if (!regionValid) return;
           setBusy(true);
           try {
             await api.profile(

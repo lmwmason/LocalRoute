@@ -10,6 +10,7 @@ import {
   requiredAccepted,
 } from "../legal/ConsentFields";
 import { LegalNotices } from "../legal/LegalPage";
+import "./Login.css";
 
 export function Login() {
   const { t, language } = useI18n();
@@ -23,6 +24,7 @@ export function Login() {
     localityScope: "auto",
   });
   const [status, setStatus] = useState("");
+  const [regionValid, setRegionValid] = useState(false);
   const [busy, setBusy] = useState(false);
   return (
     <form
@@ -38,7 +40,10 @@ export function Login() {
           );
           return;
         }
-        if (mode === "signup" && !localitySchema.safeParse(locality).success) {
+        if (
+          mode === "signup" &&
+          (!regionValid || !localitySchema.safeParse(locality).success)
+        ) {
           setStatus(t("profile.regionRequired"));
           return;
         }
@@ -132,7 +137,11 @@ export function Login() {
       </label>
       {mode === "signup" && (
         <>
-          <HomeRegionFields value={locality} onChange={setLocality} />
+          <HomeRegionFields
+            value={locality}
+            onChange={setLocality}
+            onValidityChange={setRegionValid}
+          />
           <p id="signup-region-help" className="fine-print">
             {t("profile.regionHelp")}
           </p>
@@ -155,7 +164,9 @@ export function Login() {
       <button
         className="primary full"
         disabled={
-          !supabase || busy || (mode === "signup" && !requiredAccepted(choices))
+          !supabase ||
+          busy ||
+          (mode === "signup" && (!regionValid || !requiredAccepted(choices)))
         }
       >
         {busy ? t("보내는 중…") : t("로그인 링크 받기")}

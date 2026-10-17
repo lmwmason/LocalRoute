@@ -1,0 +1,25 @@
+.login-form .legal-consent-fields label.legal-choice {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  column-gap: 10px;
+  min-height: 44px;
+  margin: 0;
+  padding: 11px 0;
+  cursor: pointer;
+}
+
+.login-form .legal-choice input[type="checkbox"] {
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  align-self: start;
+}
+
+.login-form .legal-choice span {
+  min-width: 0;
+  line-height: 22px;
+}

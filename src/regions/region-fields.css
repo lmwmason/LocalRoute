@@ -1,0 +1,104 @@
+.administrative-region-fields {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.administrative-region-fields label,
+.administrative-region-fields .region-select {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.administrative-region-fields input,
+.administrative-region-fields select,
+.administrative-region-fields button {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  max-width: 100%;
+  font: inherit;
+  padding: 10px;
+  border: 1px solid #b8c2d1;
+  border-radius: 10px;
+  background: #fff;
+  color: #172338;
+}
+.administrative-region-fields select {
+  text-overflow: ellipsis;
+}
+.administrative-region-fields input:focus-visible,
+.administrative-region-fields select:focus-visible,
+.administrative-region-fields button:focus-visible {
+  outline: 3px solid #2864d8;
+  outline-offset: 2px;
+}
+.administrative-region-fields p,
+.administrative-region-fields small,
+.administrative-region-fields a {
+  overflow-wrap: anywhere;
+}
+.administrative-region-fields small {
+  color: #536077;
+}
+.administrative-region-fields a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.administrative-region-fields .region-combobox {
+  border: 1px solid #b8c2d1;
+  border-radius: 10px;
+  overflow: clip;
+  background: #fff;
+}
+.administrative-region-fields .region-combobox:focus-within {
+  outline: 3px solid #2864d8;
+  outline-offset: 2px;
+}
+.administrative-region-fields .region-combobox-control {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.administrative-region-fields .region-combobox-control input {
+  flex: 1;
+  width: 0;
+  border: 0;
+  outline: 0;
+  border-radius: 0;
+}
+.administrative-region-fields .region-combobox-control .region-toggle {
+  flex: 0 0 44px;
+  width: 44px;
+  border: 0;
+  border-radius: 0;
+  font-size: 22px;
+  cursor: pointer;
+}
+.administrative-region-fields .region-options {
+  max-height: 240px;
+  max-height: min(240px, 36dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid #b8c2d1;
+}
+.administrative-region-fields .region-options button {
+  display: block;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+  min-height: 44px;
+  cursor: pointer;
+}
+.administrative-region-fields .region-options button[data-active="true"] {
+  background: #edf3ff;
+}
+.administrative-region-fields .region-options button[aria-selected="true"] {
+  color: #174eac;
+  font-weight: 700;
+}
+.administrative-region-fields .region-options p {
+  margin: 12px;
+}

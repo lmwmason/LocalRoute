@@ -94,7 +94,9 @@ export function localityRestaurantCounts(locality: Locality, places: Place[]) {
     city: inCity.length,
     area: area
       ? inCity.filter((p) =>
-          p.address.toLocaleLowerCase().split(/\s+/).includes(area),
+          ` ${p.address.toLocaleLowerCase().trim().replace(/\s+/g, " ")} `.includes(
+            ` ${area.replace(/\s+/g, " ")} `,
+          ),
         ).length
       : 0,
   };
