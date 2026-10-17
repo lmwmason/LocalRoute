@@ -79,6 +79,76 @@ export function ContributionForm({
   const [external, setExternal] = useState<Place[]>([]);
   const [searchStatus, setSearchStatus] = useState("");
   const [searchBusy, setSearchBusy] = useState(false);
+  const [searchCapability, setSearchCapability] = useState<
+    "checking" | "enabled" | "disabled" | "unavailable"
+  >(config.demo ? "disabled" : "checking");
+  const searchRevision = useRef(0);
+  const searchController = useRef<AbortController | null>(null);
+  const searchCopy =
+    language === "en"
+      ? {
+          enabled:
+            "Search HeyYumi restaurants, then select a result to fill in its location.",
+          disabled:
+            "HeyYumi search is not enabled. You can select a LocalRoute place or enter a location yourself.",
+          checking: "Checking restaurant search availability…",
+          unavailable:
+            "Restaurant search availability could not be verified. Select a LocalRoute place or enter a location yourself.",
+          local: "Already on LocalRoute",
+          external: "HeyYumi restaurant search results",
+          empty:
+            "No HeyYumi results. Try another name or enter the place yourself.",
+          failure:
+            "HeyYumi search is unavailable right now. Try again or enter the place yourself.",
+        }
+      : {
+          enabled:
+            "HeyYumi 식당 검색 · 결과를 한 번 선택하면 위치가 자동으로 입력돼요.",
+          disabled:
+            "HeyYumi 검색이 아직 활성화되지 않았어요. LocalRoute 장소를 선택하거나 직접 입력할 수 있어요.",
+          checking: "식당 검색 연결 상태를 확인하고 있어요…",
+          unavailable:
+            "식당 검색 연결 상태를 확인하지 못했어요. LocalRoute 장소를 선택하거나 직접 입력해 주세요.",
+          local: "LocalRoute에 등록된 장소",
+          external: "HeyYumi 식당 검색 결과",
+          empty:
+            "HeyYumi 검색 결과가 없어요. 다른 이름으로 검색하거나 직접 입력해 주세요.",
+          failure:
+            "지금 HeyYumi 검색을 이용할 수 없어요. 다시 검색하거나 직접 입력해 주세요.",
+        };
+  function clearSearch() {
+    searchRevision.current += 1;
+    searchController.current?.abort();
+    setExternal([]);
+    setSearchBusy(false);
+    setSearchStatus("");
+  }
+  useEffect(() => {
+    if (config.demo) return;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      controller.abort();
+      setSearchCapability("unavailable");
+    }, 8000);
+    fetch("/api/health", { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Health unavailable");
+        const health: { capabilities?: { search?: boolean } } =
+          await response.json();
+        if (!controller.signal.aborted)
+          setSearchCapability(
+            health.capabilities?.search === true ? "enabled" : "disabled",
+          );
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setSearchCapability("unavailable");
+      })
+      .finally(() => clearTimeout(timeout));
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, []);
   const pending = useRef(false);
   const requestId = useRef(draft?.requestId || crypto.randomUUID());
   useEffect(() => {
@@ -156,35 +226,42 @@ export function ContributionForm({
     confirmed: true,
   });
   useEffect(() => {
-    if (config.demo || query.trim().length < 2 || step !== "place") return;
+    if (
+      searchCapability !== "enabled" ||
+      query.trim().length < 2 ||
+      step !== "place"
+    )
+      return;
     const controller = new AbortController();
+    searchController.current = controller;
+    const revision = ++searchRevision.current;
+    const current = () =>
+      !controller.signal.aborted && revision === searchRevision.current;
     const timer = setTimeout(() => {
       setSearchBusy(true);
       setSearchStatus("");
       api
         .search(query, controller.signal)
         .then((result) => {
+          if (!current()) return;
           setExternal(result.places);
-          if (!result.places.length)
-            setSearchStatus(
-              "외부 검색 결과가 없어요. 직접 장소를 알려 주세요.",
-            );
+          if (!result.places.length) setSearchStatus(searchCopy.empty);
         })
-        .catch((e) => {
-          if (!controller.signal.aborted) {
+        .catch(() => {
+          if (current()) {
             setExternal([]);
-            setSearchStatus(e.message);
+            setSearchStatus(searchCopy.failure);
           }
         })
         .finally(() => {
-          if (!controller.signal.aborted) setSearchBusy(false);
+          if (current()) setSearchBusy(false);
         });
     }, 450);
     return () => {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query, step]);
+  }, [query, step, searchCapability, searchCopy.empty, searchCopy.failure]);
   function preview() {
     if (!photo && !photoId) {
       setError(t("photos.error.required"));
@@ -275,44 +352,70 @@ export function ContributionForm({
         <>
           <h3>{t("어떤 곳을 추천하고 싶나요?")}</h3>
           <p className="muted">{t("먼저 등록된 장소를 찾아볼게요.")}</p>
+          <p className="fine-print" role="status">
+            {searchCopy[searchCapability]}
+          </p>
           <label className="search-field">
             <Search size={18} />
             <input
               aria-label={t("추천할 장소 검색")}
               placeholder={t("가게 이름으로 검색")}
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                clearSearch();
+                setQuery(e.target.value);
+              }}
             />
           </label>
-          <div className="candidate-list">
-            {[
-              ...filterPlaces(places, query, "전체"),
-              ...(query.trim().length >= 2 ? external : []),
-            ].map((p) => (
-              <button
-                key={p.id}
-                onClick={() => {
-                  setSelected(p);
-                  resetPhoto();
-                  setManual(false);
-                  setStep("write");
-                }}
-              >
-                <MapPin size={19} />
-                <span>
-                  <strong>{p.name}</strong>
-                  <small>
-                    {p.address}
-                    {p.source === "heyyumi" ? t(" · HeyYumi 제공") : ""}
-                  </small>
-                  {p.possiblyClosed && (
-                    <small>{t("영업 상태 확인 필요")}</small>
-                  )}
-                </span>
-                <Check size={18} />
-              </button>
-            ))}
-          </div>
+          {[
+            {
+              title: searchCopy.local,
+              entries: filterPlaces(places, query, "전체"),
+            },
+            {
+              title: searchCopy.external,
+              entries: query.trim().length >= 2 ? external : [],
+            },
+          ].map(
+            (group) =>
+              group.entries.length > 0 && (
+                <section key={group.title} aria-label={group.title}>
+                  <p className="fine-print">{group.title}</p>
+                  <div className="candidate-list">
+                    {group.entries.map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => {
+                          clearSearch();
+                          setSelected(p);
+                          setName(p.name);
+                          setAddress(p.address);
+                          setLat(String(p.lat));
+                          setLng(String(p.lng));
+                          setKind(p.kind || "restaurant");
+                          resetPhoto();
+                          setManual(false);
+                          setStep("write");
+                        }}
+                      >
+                        <MapPin size={19} />
+                        <span>
+                          <strong>{p.name}</strong>
+                          <small>
+                            {p.address}
+                            {p.source === "heyyumi" ? t(" · HeyYumi 제공") : ""}
+                          </small>
+                          {p.possiblyClosed && (
+                            <small>{t("영업 상태 확인 필요")}</small>
+                          )}
+                        </span>
+                        <Check size={18} />
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ),
+          )}
           {searchBusy && (
             <p className="fine-print" role="status">
               {t("외부 장소를 찾고 있어요…")}
@@ -323,14 +426,17 @@ export function ContributionForm({
               {searchStatus}
             </p>
           )}
-          {filterPlaces(places, query, "전체").length === 0 && (
-            <p className="empty-inline">
-              {t("등록된 장소가 없어요. 아래에서 직접 알려 주세요.")}
-            </p>
-          )}
+          {filterPlaces(places, query, "전체").length === 0 &&
+            external.length === 0 &&
+            !searchBusy && (
+              <p className="empty-inline">
+                {t("등록된 장소가 없어요. 아래에서 직접 알려 주세요.")}
+              </p>
+            )}
           <button
             className="secondary full"
             onClick={() => {
+              clearSearch();
               setManual(true);
               resetPhoto();
               setSelected(undefined);
@@ -339,9 +445,6 @@ export function ContributionForm({
           >
             {t("찾는 장소가 없어요 · 직접 입력")}
           </button>
-          <p className="fine-print">
-            {t("외부 장소 검색은 HeyYumi 사용 권한 확인 후 연결됩니다.")}
-          </p>
         </>
       )}
       {step === "write" && (
@@ -517,6 +620,8 @@ export function ContributionForm({
               {t("photos.label")}
               <input
                 type="file"
+                required={!photoId}
+                aria-required={!photoId}
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(e) => {
                   const next = e.target.files?.[0];
