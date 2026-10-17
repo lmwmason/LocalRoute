@@ -33,13 +33,17 @@ npm run dev
 | `HEYYUMI_TERMS_VERIFIED`                                      | 계정 요금·표시·영속 저장 권한을 직접 확인한 경우에만 true    |
 | `HEYYUMI_REQUESTS_PER_HOUR`                                   | 단일 서버 프로세스의 시간당 호출 상한(기본 30)               |
 | `GEMINI_API_KEY`, `GEMINI_MODEL`                              | 서버 AI 연결 설정                                            |
+| `FEATURE_STARTER_ITINERARIES`                                | 출처 기반 운영자 초기 추천 사용. 서버 정책이 0 LP일 때만 허용 |
+| `FEATURE_AI_PLANNING`, `PLANNING_POLICY_APPROVED`, `GEMINI_DATA_PROCESSING_APPROVED` | 서버 일정 생성과 처리 고지 승인 플래그 |
+| `FEATURE_KAKAO_DISCOVERY`, `FEATURE_KAKAO_DESTINATIONS`, `KAKAO_TERMS_VERIFIED` | 실제 여행 지역·관광 후보 조회 |
+| `FEATURE_KAKAO_ROUTING`, `KAKAO_ROUTING_TERMS_VERIFIED`, `ROUTING_REQUESTS_PER_HOUR`, `AI_REQUESTS_PER_HOUR` | 서버 경로·AI 호출 제어. 프로세스별 한도이며 계정 전체 비용 상한이 아님 |
 | `FEATURE_GEMINI_MENU_EXTRACTION`, `FEATURE_GEMINI_MODERATION` | AI 기능 제어                                                 |
 | `FEATURE_HEYYUMI_BOOKING`, `FEATURE_LP_REWARDS`               | 검증 전 비활성 유지                                          |
 | `KAKAO_REST_API_KEY`, `KAKAO_MOBILITY_API_KEY`                | 선택적 서버 검색/경로 연결용                                 |
 | `APP_BASE_URL`, `APP_TIMEZONE`                                | 로컬 서비스 기준 URL·시간대                                  |
 | `KSKILL_ANALYTICS_DISABLED`                                   | 선택적 개발 도구 설정. 앱에서 k-skill을 실행하지 않음        |
 
-`live` 전환 전 로컬 마이그레이션을 검토·적용하고 Supabase Auth 이메일 링크의 허용 URL에 개발 주소를 등록해야 합니다. 이 저장소 작성만으로 호스팅 DB를 변경하지 않습니다. 원격 적용과 배포는 별도 승인 대상입니다.
+창업자의 명시적 승인으로 LocalRoute 프로젝트에 20개 마이그레이션과 출처 기반 장소 29곳·라이선스 사진 6장을 적용했습니다. 현재 초기 일정 생성은 0 LP이며 LP 발급·차감과 실제 결제는 없습니다. 원격 확인 결과는 [DB 적용 기록](docs/DATABASE_SETUP.md)에 정리했습니다. Supabase Auth 이메일 링크의 허용 URL에는 실제 접속 주소를 등록해야 합니다. 한·영 인증 메일 템플릿과 적용 방법은 [인증 메일 설정](docs/AUTH_EMAIL_SETUP.md)을 참고하세요.
 
 ## 보안과 데이터
 
@@ -80,8 +84,7 @@ DB 테스트는 PGlite의 실제 PostgreSQL 엔진에 폐기 가능한 auth 스�
 
 현재 구현: 모바일 탐색·지도·검색/분류·상세·추천 미리보기·로그인 진입·수동 검토 제출·외부 장소 선택/식별 어댑터·브라우저 여행 목록. 실행 상태와 제한은 `/api/health`에서 확인합니다.
 
-PRD 전체 MVP는 작업 중입니다. 원격 DB 적용, 실제 제공자 권한/비용 검증, 보상/예약 활성화는 완료되지 않았습니다. `QA_REPORT.md`는 독립 리뷰어가 관리하며 구현자가 수정하지 않습니다.
-
+PRD 전체 MVP는 작업 중입니다. 원격 DB 스키마는 적용했지만 실제 제공자 권한/비용 검증, 보상/예약 활성화는 완료되지 않았습니다. `QA_REPORT.md`는 독립 리뷰어가 관리하며 구현자가 수정하지 않습니다.
 
 ## 일정·화면 이동과 공유
 
