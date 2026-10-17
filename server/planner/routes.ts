@@ -6,7 +6,10 @@ import {
   tripSchema,
   type Candidate,
   type Itinerary,
+  type Schedule,
+  type TripInput,
 } from "../../shared/planner";
+import type { Place } from "../../shared/domain";
 import type { Actor, Repository } from "../repository";
 import type { ServerConfig } from "../config";
 import { AppError } from "../errors";
@@ -44,6 +47,43 @@ type Reservation = {
   result?: Itinerary;
   cost?: number;
 };
+function currentCatalog(
+  places: Place[],
+  activities: Candidate[],
+  input: TripInput,
+) {
+  // Keep canonical LocalRoute facts when the current sources share an ID.
+  return [
+    ...new Map(
+      [...activities, ...localCandidates(places, input)].map((candidate) => [
+        candidate.id,
+        candidate,
+      ]),
+    ).values(),
+  ];
+}
+function unavailablePins(
+  schedule: Schedule,
+  input: TripInput,
+  catalog: Candidate[],
+  pins: PinnedStop[],
+) {
+  const ids = new Set(pins.map(({ stop }) => stop.candidateId));
+  const relationalIssues = new Set([
+    "TIME_CONFLICT",
+    "UNREALISTIC_ROUTE",
+    "INSUFFICIENT_TRANSFER_BUFFER",
+    "DUPLICATE_STOP",
+  ]);
+  // Check individual pinned facts using the same validator as final acceptance.
+  // Non-pinned stops and their ordering may change during regeneration.
+  return evaluateSchedule(schedule, input, catalog).errors.filter(
+    (issue) =>
+      issue.candidateId &&
+      ids.has(issue.candidateId) &&
+      !relationalIssues.has(issue.code),
+  );
+}
 export function attachPlanner(
   app: Express,
   config: ServerConfig,
@@ -168,9 +208,9 @@ export function attachPlanner(
     }
     try {
       const pins: PinnedStop[] = [];
-      let pinnedCatalog: Candidate[] = [];
+      let original: Itinerary | undefined;
       if (payload.sourcePlanId) {
-        const original = (await repository!.planning(user, "get", null, {
+        original = (await repository!.planning(user, "get", null, {
           id: payload.sourcePlanId,
         })) as Itinerary;
         if (
@@ -187,23 +227,18 @@ export function attachPlanner(
               pins.push({ date: day.date, stop });
         if (pins.length !== payload.pinIds.length)
           throw new AppError(400, "INVALID_PIN");
-        pinnedCatalog = original.catalog.filter((c) =>
-          payload.pinIds.includes(c.id),
-        );
       } else if (payload.pinIds.length) throw new AppError(400, "INVALID_PIN");
       const [places, activities] = await Promise.all([
         repository!.places(undefined, canonicalInput.destination),
         deps.activities.search(canonicalInput),
       ]);
-      const catalog = [
-        ...new Map(
-          [
-            ...localCandidates(places, canonicalInput),
-            ...activities,
-            ...pinnedCatalog,
-          ].map((c) => [c.id, c]),
-        ).values(),
-      ];
+      const catalog = currentCatalog(places, activities, canonicalInput);
+      if (
+        original &&
+        pins.length &&
+        unavailablePins(original.schedule, canonicalInput, catalog, pins).length
+      )
+        throw new AppError(422, "SCHEDULE_QUALITY_FAILED");
       const generated = await generateValidated(
         deps.gemini,
         canonicalInput,
@@ -259,10 +294,42 @@ export function attachPlanner(
     const original = (await repository!.planning(user, "get", null, {
       id,
     })) as Itinerary;
+    const allowedIds = new Set(
+      original.catalog.map((candidate) => candidate.id),
+    );
+    if (
+      payload.schedule.days.some((day) =>
+        day.stops.some((stop) => !allowedIds.has(stop.candidateId)),
+      )
+    ) {
+      res
+        .status(422)
+        .json({
+          error: "SCHEDULE_QUALITY_FAILED",
+          issues: [{ code: "UNKNOWN_PLACE" }],
+        });
+      return;
+    }
+    if (typeof original.input.destination === "string")
+      throw new AppError(400, "DESTINATION_SELECTION_INVALID");
+    const canonicalInput = {
+      ...original.input,
+      destination: await destinations.verifySelection(
+        original.input.destination,
+      ),
+    };
+    const [places, activities] = await Promise.all([
+      repository!.places(undefined, canonicalInput.destination),
+      deps.activities.search(canonicalInput),
+    ]);
+    // Replacements remain within the original choice set, with current facts.
+    const catalog = currentCatalog(places, activities, canonicalInput).filter(
+      (candidate) => allowedIds.has(candidate.id),
+    );
     const evaluation = evaluateSchedule(
       payload.schedule,
-      original.input,
-      original.catalog,
+      canonicalInput,
+      catalog,
     );
     if (!evaluation.valid) {
       res
@@ -272,8 +339,8 @@ export function attachPlanner(
     }
     const checked = await assessTransport(
       payload.schedule,
-      original.input,
-      original.catalog,
+      canonicalInput,
+      catalog,
       routing.lookup,
     );
     evaluation.errors.push(...checked.errors);
@@ -291,6 +358,8 @@ export function attachPlanner(
         revision: payload.revision,
         result: {
           ...original,
+          input: canonicalInput,
+          catalog,
           schedule: payload.schedule,
           evaluation,
           transport: checked.transport,
