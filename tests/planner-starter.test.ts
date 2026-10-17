@@ -47,6 +47,27 @@ const starterCatalog = () =>
   localCandidates(initialPlaces(), plannerInput, { allowStarter: true });
 
 describe("explicit operator starter catalog", () => {
+  it("matches activities from verified public place categories when the starter listing has no authored tags", () => {
+    const places = initialPlaces().slice(0, 3);
+    places[0].category = "도시공원";
+    places[1].category = "박물관";
+    places[2].category = "미술관";
+    for (const place of places) {
+      place.tags = [];
+      place.kind = "attraction";
+    }
+    const catalog = localCandidates(places, plannerInput, {
+      allowStarter: true,
+    });
+    expect(catalog.map((candidate) => candidate.tags)).toEqual([
+      ["nature"],
+      ["history"],
+      ["art"],
+    ]);
+    expect(
+      catalog.every((candidate) => candidate.endorsements.length === 0),
+    ).toBe(true);
+  });
   it("keeps official listings out of the independent recommendation pool by default", () => {
     const places = initialPlaces();
     expect(localCandidates(places, plannerInput)).toEqual([]);

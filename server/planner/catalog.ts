@@ -55,7 +55,17 @@ export function localCandidates(
       address: p.address,
       lat: p.lat,
       lng: p.lng,
-      tags: [...p.tags, ...categoryTags(p.category)],
+      tags: [
+        ...new Set([
+          ...p.tags,
+          ...categoryTags(p.category),
+          ...(/공원|정원|산책|자연|동굴/.test(p.category) ? ["nature"] : []),
+          ...(/박물관|유적|사적|문화재|역사/.test(p.category)
+            ? ["history"]
+            : []),
+          ...(/미술|갤러리|전시/.test(p.category) ? ["art"] : []),
+        ]),
+      ],
       source: {
         provider: "localroute",
         observedAt: p.observedAt || new Date().toISOString(),
