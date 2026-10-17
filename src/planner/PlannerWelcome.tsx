@@ -86,28 +86,33 @@ export function PlannerWelcome({
           {t("planner.preferencesTitle")}
         </button>
       )}
-      <div className="home-itinerary-heading">
-        <h2>
-          {config.demo
-            ? `Day 1 · ${language === "ko" ? "서울 성수동" : "Seongsu, Seoul"}`
-            : t("planner.mySchedules")}
-        </h2>
-        <div
-          className="itinerary-view-toggle"
-          role="group"
-          aria-label={t("planner.view")}
-        >
-          <button aria-pressed={view === "map"} onClick={() => setView("map")}>
-            {t("planner.mapView")}
-          </button>
-          <button
-            aria-pressed={view === "timeline"}
-            onClick={() => setView("timeline")}
+      {config.demo && (
+        <div className="home-itinerary-heading">
+          <h2>
+            {config.demo
+              ? `Day 1 · ${language === "ko" ? "서울 성수동" : "Seongsu, Seoul"}`
+              : t("planner.mySchedules")}
+          </h2>
+          <div
+            className="itinerary-view-toggle"
+            role="group"
+            aria-label={t("planner.view")}
           >
-            {t("planner.timelineView")}
-          </button>
+            <button
+              aria-pressed={view === "map"}
+              onClick={() => setView("map")}
+            >
+              {t("planner.mapView")}
+            </button>
+            <button
+              aria-pressed={view === "timeline"}
+              onClick={() => setView("timeline")}
+            >
+              {t("planner.timelineView")}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
       {config.demo ? (
         <>
           <p className="sample-disclosure">{t("planner.sampleLabel")}</p>
