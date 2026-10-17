@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { CalendarDays, Users, Clock3, Check, RotateCw } from "lucide-react";
 import {
   reservationConsent,
   reservationSchema,
@@ -21,7 +22,16 @@ type Props = {
   onReservation?: (reservation: Reservation) => void;
 };
 export function BookingButton(props: Props) {
-  return <BookingSupport key={JSON.stringify([props.placeId, props.initialDate, props.initialTime])} {...props} />;
+  return (
+    <BookingSupport
+      key={JSON.stringify([
+        props.placeId,
+        props.initialDate,
+        props.initialTime,
+      ])}
+      {...props}
+    />
+  );
 }
 function BookingSupport(props: Props) {
   const { api, placeId, language = "ko" } = props;
@@ -60,13 +70,13 @@ function BookingSupport(props: Props) {
         }
       }
       const v = await api.capabilities();
-        if (!v.enabled) return;
-        const venue = await api.venue(placeId);
-        if (active) {
-          setEnabled(venue.supported);
-          setFallback(venue);
-        }
-      })()
+      if (!v.enabled) return;
+      const venue = await api.venue(placeId);
+      if (active) {
+        setEnabled(venue.supported);
+        setFallback(venue);
+      }
+    })()
       .catch((error) => {
         if (active) {
           if (error instanceof BookingApiError && error.retryAfter)
@@ -89,7 +99,7 @@ function BookingSupport(props: Props) {
   }, [api, placeId, props.initialDate, retry]);
   if (checking)
     return (
-      <p className="lr-booking-note" role="status">
+      <p className="lr-booking-note lr-booking-loading" role="status">
         {language === "ko"
           ? "예약 지원 여부를 확인하고 있어요…"
           : "Checking booking support…"}
@@ -97,7 +107,7 @@ function BookingSupport(props: Props) {
     );
   if (failure)
     return (
-      <div className="lr-booking" role="alert">
+      <div className="lr-booking lr-booking-error" role="alert">
         <p>
           {failure === "auth"
             ? language === "ko"
@@ -111,14 +121,31 @@ function BookingSupport(props: Props) {
         {failure === "auth" && (
           <a href="/login">{language === "ko" ? "로그인하기" : "Sign in"}</a>
         )}
-        {retryAt > now && <p role="status">{language === "ko" ? `${Math.ceil((retryAt-now)/1000)}초 후 다시 확인할 수 있어요.` : `Retry in ${Math.ceil((retryAt-now)/1000)} seconds.`}</p>}
-        <button type="button" disabled={retryAt > now} onClick={() => setRetry((n) => n + 1)}>
+        {retryAt > now && (
+          <p role="status">
+            {language === "ko"
+              ? `${Math.ceil((retryAt - now) / 1000)}초 후 다시 확인할 수 있어요.`
+              : `Retry in ${Math.ceil((retryAt - now) / 1000)} seconds.`}
+          </p>
+        )}
+        <button
+          type="button"
+          disabled={retryAt > now}
+          onClick={() => setRetry((n) => n + 1)}
+        >
           {language === "ko" ? "예약 정보 다시 확인" : "Retry booking details"}
         </button>
       </div>
     );
   if (existing)
-    return <ExistingBooking api={api} reservation={existing} language={language} onChange={setExisting} />;
+    return (
+      <ExistingBooking
+        api={api}
+        reservation={existing}
+        language={language}
+        onChange={setExisting}
+      />
+    );
   // Host can render a separately verified contact route when disabled.
   if (!enabled)
     return (
@@ -140,19 +167,106 @@ function BookingSupport(props: Props) {
     </div>
   );
 }
-function ExistingBooking({api,reservation,language,onChange}:{api:BookingApi;reservation:Reservation;language:"ko"|"en";onChange:(reservation:Reservation)=>void}) {
-  const t=messages[language];
-  const [busy,setBusy]=useState(false),[error,setError]=useState("");
-  const active=useRef(true);
-  useEffect(()=>{active.current=true;return()=>{active.current=false;};},[]);
-  return <section className="lr-booking">
-    <p>{language==="ko"?"이 날짜에 기존 예약 요청이 있어요. 새 요청을 자동으로 보내지 않아요.":"An existing reservation request was found for this date. No new request is sent automatically."}</p>
-    <p role="status">{t[reservation.state as keyof typeof t] || t["booking.unavailable"]}</p>
-    <p>{new Date(reservation.reservationTime).toLocaleString(language==="ko"?"ko-KR":"en-GB",{timeZone:"Asia/Seoul"})} (KST) · {reservation.guestCount}</p>
-    {(reservation.reconciliationRequired||reservation.state==="unknown")&&<p>{t.reconcile}</p>}
-    <button type="button" disabled={busy} onClick={async()=>{if(busy)return;setBusy(true);setError("");try{const result=await api.refresh(reservation.id);if(active.current)onChange(result);}catch{if(active.current)setError(t["booking.unavailable"]);}finally{if(active.current)setBusy(false);}}}>{busy?t.busy:t.refresh}</button>
-    {error&&<p role="alert">{error}</p>}
-  </section>;
+function ExistingBooking({
+  api,
+  reservation,
+  language,
+  onChange,
+}: {
+  api: BookingApi;
+  reservation: Reservation;
+  language: "ko" | "en";
+  onChange: (reservation: Reservation) => void;
+}) {
+  const t = messages[language];
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
+  return (
+    <section
+      className={`lr-booking lr-booking-status-card ${reservation.state === "confirmed" ? "lr-booking-confirmed" : ""}`}
+    >
+      <div className="lr-booking-status-heading">
+        <span className="lr-booking-status-icon" aria-hidden="true">
+          {reservation.state === "confirmed" ? (
+            <Check size={22} />
+          ) : (
+            <Clock3 size={22} />
+          )}
+        </span>
+        <div>
+          <span className="lr-booking-eyebrow">
+            {language === "ko" ? "나의 예약" : "YOUR RESERVATION"}
+          </span>
+          <p className="lr-booking-status-title" role="status">
+            {t[reservation.state as keyof typeof t] || t["booking.unavailable"]}
+          </p>
+        </div>
+      </div>
+      <p className="lr-booking-status-description">
+        {language === "ko"
+          ? "이 날짜에 기존 예약 요청이 있어요. 새 요청을 자동으로 보내지 않아요."
+          : "An existing reservation request was found for this date. No new request is sent automatically."}
+      </p>
+      <div className="lr-booking-facts">
+        <p>
+          <CalendarDays size={16} aria-hidden="true" />
+          <span>
+            {new Date(reservation.reservationTime).toLocaleString(
+              language === "ko" ? "ko-KR" : "en-GB",
+              {
+                timeZone: "Asia/Seoul",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              },
+            )}{" "}
+            <small>KST</small>
+          </span>
+        </p>
+        <p>
+          <Users size={16} aria-hidden="true" />
+          <span>
+            {language === "ko"
+              ? `${reservation.guestCount}명`
+              : `${reservation.guestCount} guests`}
+          </span>
+        </p>
+      </div>
+      {(reservation.reconciliationRequired ||
+        reservation.state === "unknown") && <p>{t.reconcile}</p>}
+      <button
+        className="lr-booking-status-refresh"
+        type="button"
+        disabled={busy}
+        onClick={async () => {
+          if (busy) return;
+          setBusy(true);
+          setError("");
+          try {
+            const result = await api.refresh(reservation.id);
+            if (active.current) onChange(result);
+          } catch {
+            if (active.current) setError(t["booking.unavailable"]);
+          } finally {
+            if (active.current) setBusy(false);
+          }
+        }}
+      >
+        <RotateCw size={16} aria-hidden="true" />
+        {busy ? t.busy : t.refresh}
+      </button>
+      {error && <p role="alert">{error}</p>}
+    </section>
+  );
 }
 export function BookingForm(props: Props) {
   // Changing the itinerary context discards old lookups, errors, review and
