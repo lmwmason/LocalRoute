@@ -36,7 +36,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "8. 위탁·국외 처리·변경",
-          text: "인증·DB·기여 사진 저장은 Supabase를 이용하며 확인된 기본 DB 보관 국가는 인도(뭄바이, ap-south-1)입니다. 실제 웹 서비스 localroute.vercel.app의 호스팅·콘텐츠 전송·API 실행에는 Vercel을 이용합니다. Vercel 처리 위치는 Supabase DB 리전과 같다고 보장하지 않습니다. 상세 항목·이전 시기·제공자·미확인 범위·거부 방법은 국외 이전/처리위탁 안내에 기재합니다. 실예약 제출·보상 지급은 비활성이며 개인위치 추적은 제공하지 않습니다. 방침 변경 시 버전과 시행일을 공개하고, 동의가 필요한 변경은 다시 동의를 받습니다.",
+          text: "인증·DB·기여 사진 저장은 Supabase를 이용하며 확인된 기본 DB 보관 국가는 인도(뭄바이, ap-south-1)입니다. 실제 웹 서비스 localroute.vercel.app의 호스팅·콘텐츠 전송·API 실행에는 Vercel을 이용합니다. Vercel 처리 위치는 Supabase DB 리전과 같다고 보장하지 않습니다. 상세 항목·이전 시기·제공자·미확인 범위·거부 방법은 국외 이전/처리위탁 안내에 기재합니다. 지원 매장의 예약 요청은 매번 정보 재확인과 별도 제출 동의를 거쳐 사용자가 직접 제출합니다. 요청은 업체 확인 전까지 확정 예약이 아니며 미지원 매장에서는 제출할 수 없습니다. 보상 지급은 비활성이며 개인위치 추적은 제공하지 않습니다. 방침 변경 시 버전과 시행일을 공개하고, 동의가 필요한 변경은 다시 동의를 받습니다.",
         },
       ],
     },
@@ -49,7 +49,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "2. 서비스 범위와 한계",
-          text: "기본 탐색은 무료이며 데모와 실제 자료를 구별합니다. 독립 기여자의 지역 추천은 개인의 경험·의견입니다. 운영자 초기 추천은 확인한 공개 장소 사실을 바탕으로 별도 표시하며 현지인의 직접 방문·후기·추천으로 간주하지 않습니다. 어느 자료도 전체 업소의 전수조사나 품질 보증이 아닙니다. AI 일정은 초안이며 영업시간·가격·이동시간·접근성·식이 안전·예약 가능성을 보장하지 않습니다. 방문 전 업소와 교통편을 확인하세요. 실시간 교통·위치 추적·방문 자동 인증·계정 자동 삭제를 제공한다고 해석하지 않습니다. 실예약 제출은 비활성이며 실제 API 권한 확인과 별도 안내·동의가 필요합니다. 예약 프로필 저장은 실제 예약이 아닙니다.",
+          text: "기본 탐색은 무료이며 데모와 실제 자료를 구별합니다. 독립 기여자의 지역 추천은 개인의 경험·의견입니다. 운영자 초기 추천은 확인한 공개 장소 사실을 바탕으로 별도 표시하며 현지인의 직접 방문·후기·추천으로 간주하지 않습니다. 어느 자료도 전체 업소의 전수조사나 품질 보증이 아닙니다. AI 일정은 초안이며 영업시간·가격·이동시간·접근성·식이 안전·예약 가능성을 보장하지 않습니다. 방문 전 업소와 교통편을 확인하세요. 실시간 교통·위치 추적·방문 자동 인증·계정 자동 삭제를 제공한다고 해석하지 않습니다. 연동이 지원되는 매장에서만 예약 정보를 재확인하고 별도 안내·동의 후 사용자가 예약 요청을 직접 제출할 수 있습니다. 제출은 확정이 아니며 업체의 확인 결과를 기다려야 합니다. 미지원 매장에서는 예약 요청을 제공하지 않고, 예약 프로필 저장만으로 예약되지 않습니다.",
         },
         {
           title: "3. 기여와 권리",
@@ -90,7 +90,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "5. 지도·장소 검색·예약",
-          text: "기본 지도는 브라우저에서 OpenFreeMap 타일·스타일·글꼴을 요청하므로 IP·브라우저 정보와 조회 지도 영역이 외부에 전달됩니다. 운영자는 헝가리 Hyperknot Software Kft.(privacy@openfreemap.org)이며 배포 서버의 모든 처리 국가는 확인되지 않았습니다. 제공자 정책상 기본 접속 로그에는 IP를 저장하지 않으나 오류 로그는 7일, 보안 조사 시 임시 IP 로그는 최대 30일 보관할 수 있습니다. 지도 실패 시 OpenStreetMap Foundation(영국, privacy@osmfoundation.org)의 tile.openstreetmap.org로 대체 타일을 요청할 수 있습니다. 이때도 IP·브라우저·조회 타일 영역이 전달되며 전 세계 CDN에서 처리되고 로그 보유는 해당 정책에 따릅니다. 선택한 지도 URL이 다르면 제공자도 달라지므로 출시 전 고지를 갱신해야 합니다. HeyYumi 검색은 활성화 시 서버에서 검색어를 전송하며, Kakao 활동 검색은 목적지 지역 중심좌표·분류를 전송합니다. 사용자 GPS·예약 연락처를 이 검색에 보내지 않습니다. 예약업체로 고객 정보를 제출하는 기능은 기본 비활성이며, 실제 API 권한·연동 조건은 검증 대상입니다. 향후 예약마다 수신자·항목·목적·보유·국외 처리와 제출 동의를 다시 확인합니다.",
+          text: "기본 지도는 브라우저에서 OpenFreeMap 타일·스타일·글꼴을 요청하므로 IP·브라우저 정보와 조회 지도 영역이 외부에 전달됩니다. 운영자는 헝가리 Hyperknot Software Kft.(privacy@openfreemap.org)이며 배포 서버의 모든 처리 국가는 확인되지 않았습니다. 제공자 정책상 기본 접속 로그에는 IP를 저장하지 않으나 오류 로그는 7일, 보안 조사 시 임시 IP 로그는 최대 30일 보관할 수 있습니다. 지도 실패 시 OpenStreetMap Foundation(영국, privacy@osmfoundation.org)의 tile.openstreetmap.org로 대체 타일을 요청할 수 있습니다. 이때도 IP·브라우저·조회 타일 영역이 전달되며 전 세계 CDN에서 처리되고 로그 보유는 해당 정책에 따릅니다. 선택한 지도 URL이 다르면 제공자도 달라지므로 출시 전 고지를 갱신해야 합니다. HeyYumi 검색은 서버에서 검색어를 전송하며, Kakao 활동 검색은 목적지 지역 중심좌표·분류를 전송합니다. 사용자 GPS·예약 연락처를 이 검색에 보내지 않습니다. 예약 요청은 지원 매장에 한해 사용자가 직접 제출하며 매번 수신자·항목·목적·보유·국외 처리 안내, 고객 정보와 별도 제출 동의를 재확인합니다. 요청은 업체가 확인하기 전까지 대기 상태이며 미지원 매장은 제출할 수 없습니다.",
         },
       ],
     },
@@ -146,7 +146,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "8. Processors and changes",
-          text: "Supabase provides authentication, database and contribution-photo storage; the confirmed primary database is Mumbai, India (ap-south-1). The live website localroute.vercel.app uses Vercel for hosting, content delivery and API execution. Vercel processing locations are not necessarily the Supabase database region. The transfer notice describes providers, data, timing, unconfirmed details and refusal routes. Real booking submission, reward payouts and personal location tracking are disabled. Notice changes publish a version/effective date and obtain renewed consent when required.",
+          text: "Supabase provides authentication, database and contribution-photo storage; the confirmed primary database is Mumbai, India (ap-south-1). The live website localroute.vercel.app uses Vercel for hosting, content delivery and API execution. Vercel processing locations are not necessarily the Supabase database region. The transfer notice describes providers, data, timing, unconfirmed details and refusal routes. For supported venues, users submit reservation requests themselves after reconfirming details and giving separate submission consent each time. Requests are not confirmed bookings until the provider confirms them; unsupported venues cannot receive submissions. Reward payouts and personal location tracking remain disabled. Notice changes publish a version/effective date and obtain renewed consent when required.",
         },
       ],
     },
@@ -159,7 +159,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "2. Scope and limitations",
-          text: "Basic discovery is free and demo content is identified. Independent local contributions are personal opinions. Operator starter recommendations are separately labeled selections based on checked public place facts; they are not independent local visits, reviews or endorsements. Neither source is a complete venue census or quality guarantee. AI itineraries are drafts, not assurances about hours, prices, travel times, accessibility, dietary safety or availability. Check with venues and transport providers before visiting. Real-time traffic, location tracking, automatic visit verification and automatic account erasure are not offered. Real booking submission is disabled and requires verified API access plus separate notice/consent. Saving a booking profile does not create a reservation.",
+          text: "Basic discovery is free and demo content is identified. Independent local contributions are personal opinions. Operator starter recommendations are separately labeled selections based on checked public place facts; they are not independent local visits, reviews or endorsements. Neither source is a complete venue census or quality guarantee. AI itineraries are drafts, not assurances about hours, prices, travel times, accessibility, dietary safety or availability. Check with venues and transport providers before visiting. Real-time traffic, location tracking, automatic visit verification and automatic account erasure are not offered. At supported venues, users may submit a reservation request themselves after reviewing their details, the disclosure and separate consent. Submission is not confirmation; wait for the provider result. Unsupported venues do not offer submission, and saving a booking profile does not create a reservation.",
         },
         {
           title: "3. Contributions and rights",
@@ -200,7 +200,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "5. Maps, place search and reservations",
-          text: "The default browser map fetches OpenFreeMap styles, tiles and fonts, exposing IP/browser information and viewed map areas to an external service. Its operator is Hyperknot Software Kft., Hungary (privacy@openfreemap.org); all serving locations have not been confirmed. Its policy excludes IPs from default access logs, but permits error logs for 7 days and temporary security IP logs for up to 30 days. If the map fails, fallback tiles may be requested from tile.openstreetmap.org, operated by the OpenStreetMap Foundation, UK (privacy@osmfoundation.org). IP/browser and requested tile areas reach its global CDN; log retention follows its policy. Changing the map URL changes the provider and requires updated notice before launch. If enabled, server-side HeyYumi search receives search terms; Kakao activity search receives destination-center coordinates and categories, not user GPS or booking contacts. Reservation submission is disabled by default; actual API access and integration terms require verification. Future bookings require confirmation of the recipient, data, purpose, retention, overseas handling and explicit submission consent each time.",
+          text: "The default browser map fetches OpenFreeMap styles, tiles and fonts, exposing IP/browser information and viewed map areas to an external service. Its operator is Hyperknot Software Kft., Hungary (privacy@openfreemap.org); all serving locations have not been confirmed. Its policy excludes IPs from default access logs, but permits error logs for 7 days and temporary security IP logs for up to 30 days. If the map fails, fallback tiles may be requested from tile.openstreetmap.org, operated by the OpenStreetMap Foundation, UK (privacy@osmfoundation.org). IP/browser and requested tile areas reach its global CDN; log retention follows its policy. Changing the map URL changes the provider and requires updated notice before launch. Server-side HeyYumi search receives search terms; Kakao activity search receives destination-center coordinates and categories, not user GPS or booking contacts. Reservation requests are available only at supported venues and are submitted directly by the user. Each submission requires reconfirming customer details, the recipient, data, purpose, retention and overseas-handling notice, and separate explicit submission consent. A request remains pending until provider confirmation; unsupported venues cannot receive submissions.",
         },
       ],
     },
