@@ -3,6 +3,7 @@
 ## Mission
 Build LocalRoute: a mobile-first, map-based travel planner powered by useful, independently contributed local restaurant recommendations. Optimize for user trust, simple contribution UX, and sustainable reward economics, not feature count.
 - The core product is a **timed travel itinerary scheduler** for Korean and international travelers. Provide Korean/English primary flows. Collect purpose, preferred activities/food, time window, pace and travel mode; use server-side Gemini to combine grounded regional activities with locally recommended restaurants at appropriate meal times. Validate schedule quality before a single atomic LP debit; failed/invalid generation must not cost LP.
+- Founder scheduling update: precompute feasible grounded slots before Gemini, excluding confirmed closures and enforcing known hours, meals, pins and non-overlapping user transfer buffers. Ask Gemini to explain those choices and verify again afterward. Cross-day revisits and preferred-pace overruns may be disclosed warnings; same-day duplicates, known closures, fabricated venues and time conflicts remain blocking.
 
 ## Sources of truth
 1. `PRD.md`: product behavior, scope, acceptance criteria, and business rules.
