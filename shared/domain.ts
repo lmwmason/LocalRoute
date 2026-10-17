@@ -16,6 +16,7 @@ export type Endorsement = {
   helpfulCount: number;
 };
 export type Place = {
+  officialSources?: { url: string; observedAt: string }[];
   photo?: {
     id: string;
     width: number;

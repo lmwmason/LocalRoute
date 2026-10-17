@@ -1,0 +1,262 @@
+[
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=48a0552a-2b19-4373-8793-0f119c3ff86a",
+    "observedAt": "2026-10-17T04:51:36.020Z",
+    "name": "대성갈비",
+    "address": "서울특별시 성동구 상원1길 26 (성수동1가) 서울숲 A타워 101호~103호",
+    "lat": 37.546194354247156,
+    "lng": 127.04843236710661,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc0fe900-cf60-4ff5-8acc-418025c625ea",
+    "observedAt": "2026-10-17T04:51:35.989Z",
+    "name": "성수족발",
+    "address": "서울특별시 성동구 아차산로7길 7 (성수동2가)",
+    "lat": 37.54598715041313,
+    "lng": 127.05427073959858,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=5b34b854-c575-44d5-8df3-ec8676274390",
+    "observedAt": "2026-10-17T04:51:36.020Z",
+    "name": "성수부두",
+    "address": "서울특별시 성동구 연무장길 41-26 (성수동2가) 지하1층",
+    "lat": 37.54341722604326,
+    "lng": 127.05427256148846,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=02f56ab2-5e53-470f-8ec3-95cf8fb88aa4",
+    "observedAt": "2026-10-17T04:53:07.389Z",
+    "name": "서울숲",
+    "address": "서울특별시 성동구 뚝섬로 273",
+    "lat": 37.543071581483325,
+    "lng": 127.04179844597822,
+    "kind": "attraction",
+    "category": "도시공원"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/10376369",
+    "observedAt": "2026-10-17T04:51:10.065Z",
+    "name": "수도박물관",
+    "address": "서울 성동구 성수동1가 642-1 1층",
+    "lat": 37.5384603660401,
+    "lng": 127.04279245170706,
+    "kind": "culture",
+    "category": "박물관"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/1819728691",
+    "observedAt": "2026-10-17T04:51:09.675Z",
+    "name": "성수연방",
+    "address": "서울 성동구 성수이로14길 14",
+    "lat": 37.54139884962453,
+    "lng": 127.05696077520759,
+    "kind": "attraction",
+    "category": "복합문화공간"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=9d34d695-3e4a-4555-885a-c328c9baa851",
+    "observedAt": "2026-10-17T04:53:34.185Z",
+    "name": "메밀마당 충주 중앙탑본점",
+    "address": "충청북도 충주시 중앙탑면 중앙탑길 103",
+    "lat": 37.0175914141272,
+    "lng": 127.864321447212,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=ff7fb6b9-f8e4-47b1-9f6b-f1d92c838e82",
+    "observedAt": "2026-10-17T04:53:34.730Z",
+    "name": "운정식당",
+    "address": "충청북도 충주시 중원대로 3432-1 (문화동)",
+    "lat": 36.9728390535064,
+    "lng": 127.92213319629,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/11891870",
+    "observedAt": "2026-10-17T04:51:10.257Z",
+    "name": "대장군",
+    "address": "충북 충주시 수안보면 미륵송계로 105 1층",
+    "lat": 36.841698118172985,
+    "lng": 128.0161755650381,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/12800097",
+    "observedAt": "2026-10-17T04:51:10.518Z",
+    "name": "상록수식당",
+    "address": "충북 충주시 수안보면 주정산로 19 1층",
+    "lat": 36.84749611464185,
+    "lng": 127.98984215263224,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=3a074b6f-56e3-4bf3-a504-ac65b9230f1f",
+    "observedAt": "2026-10-17T04:51:36.563Z",
+    "name": "영화식당",
+    "address": "충청북도 충주시 수안보면 물탕1길 11",
+    "lat": 36.8474082346647,
+    "lng": 127.99040525529,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=bc4ad83e-e9a2-4b56-b1e8-d9b03feaabbe",
+    "observedAt": "2026-10-17T04:51:36.563Z",
+    "name": "숲속장수촌",
+    "address": "충청북도 충주시 쇠저울1길 36 (금릉동)",
+    "lat": 36.98965018439137,
+    "lng": 127.92317881179689,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/61123582",
+    "observedAt": "2026-10-17T04:51:10.797Z",
+    "name": "메밀면묵밥리 앙성온천점",
+    "address": "충북 충주시 앙성면 가곡로 1509 1층 2호",
+    "lat": 37.09024218315855,
+    "lng": 127.80084883699055,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=c7199f1f-e721-4d2e-a84c-e040efe0471b",
+    "observedAt": "2026-10-17T04:51:36.563Z",
+    "name": "복서울해장국",
+    "address": "충청북도 충주시 관아1길 16",
+    "lat": 36.9702600299,
+    "lng": 127.9350792392,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/17697891",
+    "observedAt": "2026-10-17T04:51:10.696Z",
+    "name": "중앙탑사적공원",
+    "address": "충북 충주시 중앙탑면 탑정안길 6",
+    "lat": 37.017117700946805,
+    "lng": 127.86685803536334,
+    "kind": "attraction",
+    "category": "역사공원"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/8585447",
+    "observedAt": "2026-10-17T04:51:11.284Z",
+    "name": "충주박물관",
+    "address": "충북 충주시 중앙탑면 중앙탑길 112-28",
+    "lat": 37.01616221952152,
+    "lng": 127.86542688719354,
+    "kind": "culture",
+    "category": "역사박물관"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/531411391",
+    "observedAt": "2026-10-17T04:51:11.356Z",
+    "name": "활옥동굴",
+    "address": "충북 충주시 목벌동 319-16",
+    "lat": 36.96114794786167,
+    "lng": 128.00662688793955,
+    "kind": "attraction",
+    "category": "관광동굴"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=83305ab8-af95-41a8-b129-389de4bddb9a",
+    "observedAt": "2026-10-17T04:53:34.386Z",
+    "name": "충주고구려비전시관",
+    "address": "충청북도 충주시 중앙탑면 감노로 2319",
+    "lat": 37.0282782042354,
+    "lng": 127.848185933541,
+    "kind": "culture",
+    "category": "역사전시관"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/10025826",
+    "observedAt": "2026-10-17T04:51:11.786Z",
+    "name": "충주고구려천문과학관",
+    "address": "충북 충주시 중앙탑면 묘곡내동길 100",
+    "lat": 37.04031773370562,
+    "lng": 127.84843624779725,
+    "kind": "culture",
+    "category": "천문과학관"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=8a6e7ebc-e526-47a3-954c-d35844a21cd7",
+    "observedAt": "2026-10-17T04:51:37.235Z",
+    "name": "충주자연생태체험관",
+    "address": "충청북도 충주시 동량면 지등로 260",
+    "lat": 37.0252554957259,
+    "lng": 127.951703834122,
+    "kind": "experience",
+    "category": "생태체험관"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/14508671",
+    "observedAt": "2026-10-17T04:51:11.688Z",
+    "name": "충주세계무술박물관",
+    "address": "충북 충주시 남한강로 26",
+    "lat": 36.98844323168408,
+    "lng": 127.90775545469533,
+    "kind": "culture",
+    "category": "무술문화박물관"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=44ab3132-75a4-4179-b1e7-262db516c677",
+    "observedAt": "2026-10-17T04:51:37.235Z",
+    "name": "오대호아트팩토리",
+    "address": "충청북도 충주시 앙성면 가곡로 1434",
+    "lat": 37.094394296878185,
+    "lng": 127.79449787068826,
+    "kind": "culture",
+    "category": "미술관"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/11495420",
+    "observedAt": "2026-10-17T04:51:12.024Z",
+    "name": "비내섬",
+    "address": "충북 충주시 소태면 복탄리 908",
+    "lat": 37.107632444677655,
+    "lng": 127.81772698713424,
+    "kind": "attraction",
+    "category": "하천섬"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=cfda5364-2ef5-48cb-90b7-2b55fed9bab7",
+    "observedAt": "2026-10-17T04:51:37.166Z",
+    "name": "충주 탄금대",
+    "address": "충청북도 충주시 탄금대안길 105 (칠금동)",
+    "lat": 36.98825035024837,
+    "lng": 127.89829116086217,
+    "kind": "attraction",
+    "category": "역사유적"
+  },
+  {
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=b5650a0c-3f97-4f3b-89cd-e5f0a36cc36c",
+    "observedAt": "2026-10-17T04:51:37.625Z",
+    "name": "수안보온천 관광특구",
+    "address": "충청북도 충주시 수안보면 주정산로 12",
+    "lat": 36.8483108776871,
+    "lng": 127.989010918672,
+    "kind": "attraction",
+    "category": "온천문화공원"
+  },
+  {
+    "sourceUrl": "https://place.map.kakao.com/793335766",
+    "observedAt": "2026-10-17T04:51:12.732Z",
+    "name": "국립충주 기상과학관",
+    "address": "충북 충주시 번영대로 270-10",
+    "lat": 36.985672081138254,
+    "lng": 127.9487146993508,
+    "kind": "culture",
+    "category": "기상과학관"
+  }
+]

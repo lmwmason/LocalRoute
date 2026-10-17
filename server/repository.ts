@@ -288,7 +288,7 @@ export class SupabaseRepository implements Repository {
     let query = this.auth
       .from("places")
       .select(
-        "id,name,kind,category,address,lat,lng,created_at,place_facts(id,field,value,source,status,observed_at),place_external_ids(provider,external_id,possibly_closed,observed_at),place_reviews(rating,verification_state),endorsements!endorsements_place_id_fkey(id,user_id,endorsement_versions!endorsement_versions_endorsement_id_fkey(id,text,endorsement_ratings(helpfulness)))",
+        "id,name,kind,category,address,lat,lng,created_at,operator_place_sources(source_url,observed_at),place_facts(id,field,value,source,status,observed_at),place_external_ids(provider,external_id,possibly_closed,observed_at),place_reviews(rating,verification_state),endorsements!endorsements_place_id_fkey(id,user_id,endorsement_versions!endorsement_versions_endorsement_id_fkey(id,text,endorsement_ratings(helpfulness)))",
       )
       .eq("status", "published")
       .limit(100);
@@ -349,6 +349,10 @@ export class SupabaseRepository implements Repository {
           : undefined;
       })(),
       id: p.id,
+      officialSources: (p.operator_place_sources || []).map((source) => ({
+        url: source.source_url,
+        observedAt: source.observed_at,
+      })),
       kind: p.kind,
       observedAt: p.created_at,
       name: p.name,

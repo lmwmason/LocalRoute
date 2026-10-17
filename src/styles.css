@@ -161,6 +161,21 @@ small {
   color: #7e8999;
   margin-top: 5px;
 }
+.catalog-origin {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0;
+  color: #6b7686;
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.catalog-origin a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #315d9f;
+}
 .desktop-tabs {
   display: flex;
   align-items: center;
