@@ -1,3 +1,8 @@
+import {
+  bilingualDestinationLabel,
+  destinationSearchTerm,
+  findRegionAlias,
+} from "../../shared/region-search-aliases";
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import {
   destinationErrorCodes,
@@ -36,10 +41,10 @@ const copy = {
   },
   en: {
     label: "Travel region",
-    hint: "Enter at least two characters for a Korean city, county, district, town or township. Try 충주시 살미면.",
+    hint: "Enter at least two characters for a Korean city, county, district, town or township. Try Seoul, Busan or Chungju.",
     loading: "Searching regions…",
     empty:
-      "No selectable regions found. Include the province or city name. Korean names may work better.",
+      "No selectable regions found. Include the province or city name. Choose a city, district, town or township; provinces and neighborhoods are not selectable.",
     selected: "Selected region",
     clear: "Clear region selection",
     retry: "Search again",
@@ -210,7 +215,13 @@ export function DestinationSearch({
         id={id}
         ref={input}
         type="search"
-        value={value?.label ?? query}
+        value={
+          value
+            ? language === "en"
+              ? bilingualDestinationLabel(value)
+              : value.label
+            : query
+        }
         disabled={disabled}
         maxLength={100}
         autoComplete="off"
@@ -238,6 +249,14 @@ export function DestinationSearch({
         }}
       />
       <small id={`${id}-hint`}>{text.hint}</small>
+      {findRegionAlias(query) &&
+        destinationSearchTerm(query) !== findRegionAlias(query)?.names[0] && (
+          <small role="note">
+            {language === "en"
+              ? `${query}: searching the supported city/district (${destinationSearchTerm(query)}), rather than the whole island or neighborhood.`
+              : `${query}: 선택 가능한 시·구(${destinationSearchTerm(query)})를 검색해요. 동·섬 전체 범위와는 달라요.`}
+          </small>
+        )}
       <div
         id={`${id}-status`}
         role="status"
@@ -245,7 +264,7 @@ export function DestinationSearch({
         aria-busy={busy}
       >
         {value
-          ? `${text.selected}: ${value.label}`
+          ? `${text.selected}: ${language === "en" ? bilingualDestinationLabel(value) : value.label}`
           : visible &&
             (busy
               ? text.loading
@@ -313,7 +332,9 @@ export function DestinationSearch({
                   input.current?.focus();
                 }}
               >
-                {destination.label}
+                {language === "en"
+                  ? bilingualDestinationLabel(destination)
+                  : destination.label}
               </button>
             </li>
           ))}

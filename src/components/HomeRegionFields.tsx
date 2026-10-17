@@ -1,3 +1,8 @@
+import {
+  findRegionAlias,
+  regionSearchTerm,
+  bilingualRegionName,
+} from "../../shared/region-search-aliases";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   type Locality,
@@ -50,7 +55,11 @@ function RegionSelect({
   const id = useId();
   const ko = language === "ko";
   const blank = { value: "", label: ko ? "선택 안 함" : "Leave blank" };
-  const filtered = searchRegions(options, query, (option) => option.label);
+  const localQuery =
+    findRegionAlias(query)?.names.find((name) =>
+      options.some((option) => option.label.includes(name)),
+    ) ?? regionSearchTerm(query);
+  const filtered = searchRegions(options, localQuery, (option) => option.label);
   const visible = optional && !query ? [blank, ...filtered] : filtered;
   const selected = options.find((option) => option.value === value);
   const activeOption = visible[active];
@@ -325,7 +334,7 @@ export function HomeRegionFields({
           <p className="fine-print">
             {ko
               ? "시·도부터 순서대로 선택해 주세요. 읍·면·동은 선택 사항이며 상세 주소는 받지 않아요. 행정구역 이름은 공식 한국어 명칭입니다."
-              : "Choose your province, then municipality. Neighborhood is optional; no street address is collected. Official region names are shown in Korean."}
+              : "Choose your province, then municipality. Neighborhood is optional; no street address is collected. Known English names are shown alongside the original Korean names."}
           </p>
           {!data && !error && (
             <p role="status">
@@ -378,7 +387,7 @@ export function HomeRegionFields({
                 label={ko ? "시·도" : "Province / metropolitan city"}
                 options={provinces(data).map((name) => ({
                   value: name,
-                  label: name,
+                  label: language === "en" ? bilingualRegionName(name) : name,
                 }))}
                 value={selection.province}
                 onChange={(id) => choose("province", id)}
@@ -390,7 +399,7 @@ export function HomeRegionFields({
                 label={ko ? "시·군·구" : "City / county / district"}
                 options={districts(data, selection.province).map((name) => ({
                   value: name,
-                  label: name,
+                  label: language === "en" ? bilingualRegionName(name) : name,
                 }))}
                 value={selection.district}
                 onChange={(id) => choose("district", id)}

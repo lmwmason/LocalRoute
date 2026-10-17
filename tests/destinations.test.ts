@@ -261,3 +261,38 @@ describe("Kakao travel regions (synthetic responses; no live requests)", () => {
     expect(fetcher).toHaveBeenCalledTimes(13);
   });
 });
+
+describe("English region aliases preserve provider provenance", () => {
+  it.each([
+    ["Seoul", "서울"],
+    [" BUSAN ", "부산"],
+    ["Chung-Ju", "충주시"],
+    ["Jeju", "제주시"],
+    ["Seong Su", "서울 성동구"],
+    ["EULJI-RO", "서울 중구"],
+    ["Unknown English", "Unknown English"],
+    ["충주시", "충주시"],
+  ])(
+    "forwards %s as %s without fabricating results",
+    async (query, translated) => {
+      const { service, fetcher } = setup(body([]));
+      expect((await service.search(query, 2)).destinations).toEqual([]);
+      const url = new URL(String(fetcher.mock.calls[0][0]));
+      expect(url.searchParams.get("query")).toBe(translated);
+      expect(url.searchParams.get("page")).toBe("2");
+    },
+  );
+  it("only returns the provider's region and coordinates for an alias", async () => {
+    const { service } = setup(body([doc("서울", "성동구", "")]));
+    const result = await service.search("Seongsu");
+    expect(result.destinations[0]).toMatchObject({
+      label: "서울 성동구",
+      lat: 36.9,
+      lng: 127.9,
+      source: { provider: "kakao" },
+    });
+    expect(await service.verifySelection(result.destinations[0])).toMatchObject(
+      { label: "서울 성동구" },
+    );
+  });
+});

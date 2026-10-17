@@ -270,4 +270,40 @@ describe("DestinationSearch browser interaction (only local mocked API)", () => 
     ).toBe(0);
     await context.close();
   });
+  for (const width of [360, 390])
+    it(`English alias input and bilingual selections, empty/error at ${width}px`, async () => {
+      const { context, page } = await open(width, "en");
+      await mock(page, result());
+      await page.locator("input").fill("Chungju");
+      const choice = page.locator("li button").first();
+      await choice.waitFor();
+      expect(await choice.innerText()).toContain("Chungju");
+      expect(await choice.innerText()).toContain("충주시");
+      await choice.tap();
+      expect(await page.locator("input").inputValue()).toContain("Chungju");
+      expect(await page.locator("output").textContent()).toBe(
+        "충북 충주시 살미면",
+      );
+      await page
+        .getByRole("button", { name: "Clear region selection" })
+        .click();
+      await mock(page, { error: "DESTINATIONS_UNAVAILABLE" }, 503);
+      await page.locator("input").fill("Seongsu");
+      await page.getByText("Region search failed.", { exact: false }).waitFor();
+      expect(await page.getByRole("note").innerText()).toContain("서울 성동구");
+      await mock(page, { destinations: [], page: 1, hasMore: false });
+      await page
+        .getByRole("button", { name: "Search again", exact: true })
+        .click();
+      await page
+        .getByText("No selectable regions found.", { exact: false })
+        .waitFor();
+      expect(await page.locator("li").count()).toBe(0);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await context.close();
+    });
 });

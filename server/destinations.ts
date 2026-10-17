@@ -10,6 +10,7 @@ import {
   type DestinationSearchResponse,
 } from "../shared/destinations";
 import { AppError } from "./errors";
+import { destinationSearchTerm } from "../shared/region-search-aliases";
 
 export function readDestinationConfig(env: NodeJS.ProcessEnv) {
   return {
@@ -169,7 +170,8 @@ export class KakaoDestinations {
     if (!this.config.enabled) throw new AppError(503, "DESTINATIONS_DISABLED");
     if (!this.config.key.trim())
       throw new AppError(503, "DESTINATIONS_KEY_MISSING");
-    const key = `${p.data}:${q.data}`;
+    const providerQuery = destinationSearchTerm(q.data);
+    const key = `${p.data}:${providerQuery}`;
     const existing = this.inFlight.get(key);
     if (existing) return existing;
     if (Date.now() >= this.reset) {
@@ -182,7 +184,7 @@ export class KakaoDestinations {
         "DESTINATIONS_RATE_LIMITED",
         String(Math.ceil((this.reset - Date.now()) / 1000)),
       );
-    const task = this.lookup(q.data, p.data);
+    const task = this.lookup(providerQuery, p.data);
     this.inFlight.set(key, task);
     try {
       return await task;
