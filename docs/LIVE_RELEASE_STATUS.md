@@ -1,6 +1,13 @@
 # LocalRoute live release status
 
-2026-10-17 통합 담당자가 보고한 현재 상태와 실행 증거다. 이 문서 정정 작업에서는 원격 설정 변경·DB 조회·배포를 수행하지 않았다.
+2026-10-17 통합 담당자가 보고한 현재 상태와 실행 증거다. 아래 14:46 추가 검증은 메인 구현 담당자가 원격 DB와 실제 배포에서 직접 확인했다.
+
+## 14:46 KST 추가 검증
+
+- 배포 `dpl_6X9ZGg7Y4ixLRgoNyWxnCHLjSzap`가 READY이며 `https://localroute.vercel.app`에 연결됐다. 실제 `/api/health`는 HTTP 200, live, database=true, search=true, booking=true를 반환했다. `/api/places`는 HTTP 200, 장소 29곳, DB 표시 미디어 14개를 반환했다. 이는 API/공개 읽기 검증이며 실예약이나 인증 회원 전체 흐름 검증을 대신하지 않는다.
+- 인증 링크 이후 동의 조회 실패의 원인은 관리되는 `auth.users`에 대한 서비스 역할의 읽기 권한 누락이었다. `SECURITY INVOKER` RPC를 유지하고 `service_role`에 신원·이메일 확인용 4개 열만 읽도록 마이그레이션 `20261017054300`을 적용했다. 비밀번호 열 읽기는 false이고 anon/authenticated의 이메일 열 읽기도 false임을 원격 확인했다.
+- 실제 이메일 확인 계정에 대해 서비스 역할로 `legal_consent_action(...,'status')`가 성공했다. 이 검증은 읽기만 실행했으며 사용자를 대신해 동의하지 않았다. 관련 회귀/기존 테스트 17개, 담당 lint, 전체 typecheck가 통과했다. 커밋 `40c4bf7`.
+- 현재 적용된 마이그레이션은 22개다. 아래 21개 표기는 이전 검사 시점의 수치다.
 
 - 사용자는 지정 LocalRoute DB 적용과 유료 기능을 제외한 연동, 무료 일정 시연, 제공한 장소 사진의 공개 연결을 승인했다. 사용자는 HeyYumi 키가 서비스 연동 허가를 받은 키라고 명시했다. 이는 사용자의 권한 확인 답변이며 운영 계약 전체를 독립 감사했다는 뜻은 아니다.
 - 서비스는 https://localroute.vercel.app에 배포됐다. 무료 AI 일정은 0 LP이며 이 흐름은 LP를 발급하거나 차감하지 않는다. 실제 결제와 보상 지급은 비활성이다.
