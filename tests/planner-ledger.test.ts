@@ -23,7 +23,7 @@ async function action(
 beforeAll(async () => {
   db = new PGlite();
   await db.exec(
-    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key,email_confirmed_at timestamptz default now());create function auth.uid()returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema public,auth to anon,authenticated,service_role;grant select on auth.users to service_role;insert into auth.users(id) values('${user}'),('${other}');`,
+    `create role anon;create role authenticated;create role service_role bypassrls;create schema auth;create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz default now(),is_anonymous boolean default false);create function auth.uid()returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema public,auth to anon,authenticated,service_role;grant select on auth.users to service_role;insert into auth.users(id,email) values('${user}','planner@test.invalid'),('${other}','other-planner@test.invalid');`,
   );
   for (const file of readdirSync("supabase/migrations")
     .filter((f) => f.endsWith(".sql"))
@@ -35,7 +35,11 @@ beforeAll(async () => {
       "insert into public.legal_consent_events(user_id,request_id,version,language,terms,privacy,supabase_transfer,adult,public_local_area)values($1,$2,'2026-10-17.1','en',true,true,true,true,false)",
       [id, crypto.randomUUID()],
     );
-  await db.exec("update public.lp_policy set planning_enabled=true");
+  // Exercise multiple paid reservations with an explicit test-only budget;
+  // the production default allowance is verified in monthly-allowance.test.ts.
+  await db.exec(
+    "update public.lp_policy set planning_enabled=true,monthly_promo=300",
+  );
 });
 afterAll(async () => {
   await db?.close();

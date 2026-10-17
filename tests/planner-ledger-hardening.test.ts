@@ -97,7 +97,7 @@ beforeAll(async () => {
   await db.exec(`
     create role anon; create role authenticated; create role service_role bypassrls;
     create schema auth;
-    create table auth.users(id uuid primary key,email_confirmed_at timestamptz default now());
+    create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz default now(),is_anonymous boolean default false);
     create function auth.uid()returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
     grant usage on schema public,auth to anon,authenticated,service_role;
     grant select on auth.users to service_role;
@@ -114,7 +114,10 @@ beforeEach(async () => {
   user = crypto.randomUUID();
   other = crypto.randomUUID();
   for (const id of [user, other]) {
-    await db.query("insert into auth.users(id) values($1)", [id]);
+    await db.query("insert into auth.users(id,email) values($1,$2)", [
+      id,
+      `${id}@test.invalid`,
+    ]);
     await db.query(
       "insert into public.legal_consent_events(user_id,request_id,version,language,terms,privacy,supabase_transfer,adult,public_local_area)values($1,$2,'2026-10-17.1','en',true,true,true,true,false)",
       [id, crypto.randomUUID()],

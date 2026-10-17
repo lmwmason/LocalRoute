@@ -193,6 +193,23 @@ export class SupabaseRepository implements Repository {
     requestId: string | null,
     payload: Record<string, unknown>,
   ) {
+    if (action === "balance") {
+      const { error: allowanceError } = await this.admin.rpc(
+        "claim_monthly_lp",
+        {
+          p_actor: actor.id,
+        },
+      );
+      if (allowanceError)
+        throw new AppError(
+          allowanceError.code === "28000"
+            ? 401
+            : allowanceError.code === "42501"
+              ? 403
+              : 503,
+          "MONTHLY_ALLOWANCE_UNAVAILABLE",
+        );
+    }
     const { data, error } = await this.admin.rpc("planning_action", {
       p_actor: actor.id,
       p_action: action,

@@ -57,7 +57,7 @@ export const ko: Record<string, string> = {
   "planner.promo": "이번 달 프로모션",
   "planner.earned": "활동으로 모은 LP",
   "planner.held": "다른 생성에 예약된 LP",
-  "planner.expiry": "프로모션 LP는 월말에 만료됩니다.",
+  "planner.expiry": "기본 100 LP는 매월 한 번 지급되며 월말에 만료됩니다.",
   "planner.confirm":
     "가격과 검증되지 않은 정보를 확인했고 일정을 만들겠습니다.",
   "planner.generate": "{cost} LP로 일정 만들기",
@@ -240,7 +240,8 @@ export const en: Record<string, string> = {
   "planner.promo": "This month’s promotional LP",
   "planner.earned": "LP you have earned",
   "planner.held": "LP reserved for other requests",
-  "planner.expiry": "Promotional LP expires at the end of the month.",
+  "planner.expiry":
+    "100 basic LP is granted once a month and expires at month end.",
   "planner.confirm":
     "I have checked the price and unverified information, and want to create this itinerary.",
   "planner.generate": "Create itinerary · {cost} LP",
@@ -420,6 +421,10 @@ const errors: Record<string, [string, string]> = {
   PLANNING_STORAGE_UNAVAILABLE: [
     "일정 저장 상태를 확인하지 못했어요. 다시 확인해 주세요.",
     "We could not confirm the saved itinerary. Please check again.",
+  ],
+  MONTHLY_ALLOWANCE_UNAVAILABLE: [
+    "이번 달 기본 LP를 확인하지 못했어요. 잠시 후 다시 확인해 주세요.",
+    "We could not confirm this month’s basic LP. Please try again shortly.",
   ],
   GENERATION_FAILED: [
     "생성을 완료하지 못했어요. 다시 시도해 주세요.",
