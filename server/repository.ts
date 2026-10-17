@@ -8,6 +8,11 @@ import { localitySchema } from "../shared/locality";
 
 export type Actor = { id: string; role: "traveler" | "moderator" | "admin" };
 export interface Repository {
+  shares(
+    actor: Actor | null,
+    action: string,
+    payload: Record<string, unknown>,
+  ): Promise<unknown>;
   bookingProfile(
     actor: Actor,
     action: string,
@@ -33,7 +38,7 @@ export interface Repository {
     payload: Record<string, unknown>,
   ): Promise<unknown>;
   authenticate(token: string): Promise<Actor>;
-  places(): Promise<Place[]>;
+  places(id?: string, center?: { lat: number; lng: number }): Promise<Place[]>;
   contribute(
     actor: Actor,
     payload: Contribution,
@@ -41,6 +46,35 @@ export interface Repository {
   ): Promise<{ id: string; status: "pending" }>;
 }
 export class SupabaseRepository implements Repository {
+  async shares(
+    actor: Actor | null,
+    action: string,
+    payload: Record<string, unknown>,
+  ) {
+    const { data, error } = await this.admin.rpc("itinerary_share_action", {
+      p_actor: actor?.id || null,
+      p_action: action,
+      p_payload: payload,
+    });
+    if (error)
+      throw new AppError(
+        error.code === "LR404"
+          ? 404
+          : error.code === "LR409"
+            ? 409
+            : error.code === "LR429"
+              ? 429
+              : 503,
+        error.code === "LR404"
+          ? "sharing.unavailable"
+          : error.code === "LR409"
+            ? "sharing.changed"
+            : error.code === "LR429"
+              ? "sharing.limit"
+              : "sharing.failed",
+      );
+    return data;
+  }
   async bookingProfile(
     actor: Actor,
     action: string,
@@ -246,14 +280,25 @@ export class SupabaseRepository implements Repository {
       );
     return { id: data.user.id, role: roleResult.data?.role || "traveler" };
   }
-  async places(): Promise<Place[]> {
-    const { data, error } = await this.auth
+  async places(
+    id?: string,
+    center?: { lat: number; lng: number },
+  ): Promise<Place[]> {
+    let query = this.auth
       .from("places")
       .select(
         "id,name,kind,category,address,lat,lng,created_at,place_reviews(rating,verification_state),endorsements!endorsements_place_id_fkey(id,user_id,endorsement_versions!endorsement_versions_endorsement_id_fkey(id,text,endorsement_ratings(helpfulness)))",
       )
       .eq("status", "published")
       .limit(100);
+    if (id) query = query.eq("id", id);
+    if (center)
+      query = query
+        .gte("lat", center.lat - 0.05)
+        .lte("lat", center.lat + 0.05)
+        .gte("lng", center.lng - 0.065)
+        .lte("lng", center.lng + 0.065);
+    const { data, error } = await query;
     if (error)
       throw new AppError(
         503,

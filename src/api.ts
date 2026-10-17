@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { sharedItinerarySchema, type ShareLink } from "../shared/sharing";
 import type { BookingProfile, BookingProfileResponse } from "../shared/booking";
 import type { Locality } from "../shared/locality";
 import type { Itinerary, Schedule, TripInput } from "../shared/planner";
@@ -27,6 +28,26 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body as T;
 }
 export const api = {
+  shares: (id: string) => request<ShareLink[]>(`/itineraries/${id}/shares`),
+  createShare: (id: string, revision: number, expiresInDays: number) =>
+    request<ShareLink & { path: string }>(`/itineraries/${id}/shares`, {
+      method: "POST",
+      body: JSON.stringify({
+        revision,
+        expiresInDays,
+        consentVersion: "unlisted-itinerary-v1",
+      }),
+    }),
+  revokeShare: (id: string) =>
+    request(`/itinerary-shares/${id}`, { method: "DELETE" }),
+  shared: async (token: string) => {
+    const response = await fetch(
+      `/api/shared-itineraries/${encodeURIComponent(token)}`,
+      { referrerPolicy: "no-referrer" },
+    );
+    if (!response.ok) throw new Error("sharing.unavailable");
+    return sharedItinerarySchema.parse(await response.json());
+  },
   bookingProfile: () => request<BookingProfileResponse>("/me/booking-profile"),
   saveBookingProfile: (profile: BookingProfile) =>
     request("/me/booking-profile", {
@@ -49,6 +70,8 @@ export const api = {
       held: number;
       policyVersion: string;
     }>("/planning/quote"),
+  plan: (id: string) =>
+    request<Itinerary>(`/itineraries/${encodeURIComponent(id)}`),
   plans: () =>
     request<{ id: string; result: Itinerary; revision: number }[]>(
       "/itineraries",
@@ -118,6 +141,7 @@ export const api = {
     }),
   places: (signal?: AbortSignal) =>
     request<{ places: Place[] }>("/places", { signal }),
+  place: (id: string) => request<Place>(`/places/${encodeURIComponent(id)}`),
   search: (query: string, signal?: AbortSignal) =>
     request<{ places: Place[] }>(`/search?q=${encodeURIComponent(query)}`, {
       signal,

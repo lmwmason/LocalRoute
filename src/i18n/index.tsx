@@ -10,6 +10,7 @@ import { en, ko } from "./locales/planner";
 import { discoveryEn } from "./locales/discovery";
 import { photosKo, photosEn } from "./locales/photos";
 import { bookingKo, bookingEn } from "./locales/booking";
+import { sharingKo, sharingEn } from "./locales/sharing";
 export type Language = "ko" | "en";
 type Translator = (
   key: string,
@@ -42,6 +43,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     (key, vars) => {
       const messages = language === "ko" ? ko : en;
       let result =
+        (language === "ko" ? sharingKo : sharingEn)[key] ||
         (language === "ko" ? bookingKo : bookingEn)[key] ||
         (language === "ko" ? photosKo : photosEn)[key] ||
         messages[key] ||

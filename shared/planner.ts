@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { destinationSchema, type Destination } from "./destinations";
 
 export const regions = {
   seongsu: {
@@ -15,6 +16,18 @@ export const regions = {
     lng: 129.1635,
   },
 } as const;
+export function regionForDestination(
+  destination: keyof typeof regions | Destination,
+) {
+  return typeof destination === "string"
+    ? regions[destination]
+    : {
+        lat: destination.lat,
+        lng: destination.lng,
+        ko: destination.label,
+        en: destination.label,
+      };
+}
 export const clockSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 export function minutes(clock: string) {
   const [h, m] = clock.split(":").map(Number);
@@ -38,15 +51,29 @@ export function tripDates(start: string, end: string) {
 }
 export const tripSchema = z
   .object({
-    destination: z.enum(["seongsu", "jongno", "haeundae"]),
+    destination: z.union([
+      z.enum(["seongsu", "jongno", "haeundae"]),
+      destinationSchema,
+    ]),
     startDate: z.iso.date(),
     endDate: z.iso.date(),
     startTime: clockSchema,
     endTime: clockSchema,
     purpose: z.enum(["relax", "culture", "food", "explore"]),
     activities: z
-      .array(z.enum(["art", "nature", "shopping", "history", "coffee"]))
-      .max(5),
+      .array(
+        z.enum([
+          "food",
+          "art",
+          "nature",
+          "shopping",
+          "history",
+          "coffee",
+          "hotspots",
+        ]),
+      )
+      .max(7)
+      .refine((values) => new Set(values).size === values.length),
     foodTypes: z
       .array(z.enum(["korean", "japanese", "western", "cafe"]))
       .max(4),
@@ -154,6 +181,12 @@ export type Itinerary = {
   model: string;
   provenance: "gemini" | "demo";
   cost: number;
+  transport?: {
+    date: string;
+    fromId: string;
+    toId: string;
+    leg: import("./transport").TransportLegResult;
+  }[];
 };
 export function distanceMeters(
   a: Pick<Candidate, "lat" | "lng">,

@@ -9,9 +9,13 @@ import { demoPlaces } from "../shared/demo";
 const live = readConfig({ VITE_DATA_MODE: "live" });
 function repository(): Repository {
   return {
-    bookingProfile:vi.fn(async()=>({profile:null,onboardingSeen:false})),
-    uploadPhoto:vi.fn(async()=>({id:crypto.randomUUID()})),
-    photo:vi.fn(async()=>Buffer.from('test-image')),
+    shares: vi.fn(async () => ({})),
+    bookingProfile: vi.fn(async () => ({
+      profile: null,
+      onboardingSeen: false,
+    })),
+    uploadPhoto: vi.fn(async () => ({ id: crypto.randomUUID() })),
+    photo: vi.fn(async () => Buffer.from("test-image")),
     planning: vi.fn(async () => ({})),
     community: vi.fn(async () => ({})),
     authenticate: vi.fn(async (token) => {
@@ -81,7 +85,7 @@ describe("HTTP boundary", () => {
     ).toBe(400);
     expect(repo.contribute).not.toHaveBeenCalled();
     const payload = {
-      photoId:crypto.randomUUID(),
+      photoId: crypto.randomUUID(),
       requestId: crypto.randomUUID(),
       placeId: demoPlaces[0].id,
       text: "직접 방문한 추천 한마디입니다.",
@@ -107,7 +111,7 @@ describe("HTTP boundary", () => {
     });
     const app = createApp(live, repo);
     const payload = {
-      photoId:crypto.randomUUID(),
+      photoId: crypto.randomUUID(),
       requestId: crypto.randomUUID(),
       placeId: demoPlaces[0].id,
       text: "맛있는 메뉴를 추천합니다.",
