@@ -11,6 +11,7 @@ import { localCandidates } from "../server/planner/catalog";
 import { generateValidated } from "../server/planner/generate";
 import type { Gemini } from "../server/gemini";
 import { plannerInput } from "./fixtures/planning";
+import { blueprintResponse } from "./fixtures/blueprint-response";
 
 function initialPlaces(): Place[] {
   return demoCatalog.map((candidate) => ({
@@ -256,7 +257,9 @@ describe("starter-aware Gemini boundary", () => {
       ) => {
         systems.push(system);
         inputs.push(input);
-        return schema.parse(demoSchedule(plannerInput));
+        return schema.parse(
+          blueprintResponse(demoSchedule(plannerInput), input),
+        );
       },
     };
     const result = await generateValidated(model, plannerInput, catalog);

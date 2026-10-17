@@ -5,9 +5,10 @@ import { AppError } from "../server/errors";
 import { generateValidated } from "../server/planner/generate";
 import { demoCatalog, demoSchedule } from "../shared/planner-demo";
 import { plannerInput } from "./fixtures/planning";
+import { blueprintResponse } from "./fixtures/blueprint-response";
 
 describe("bounded itinerary quality repair", () => {
-  it("accepts a valid third proposal and feeds back structural data without prose", async () => {
+  it("restores non-pinned model timing from the server blueprint without another AI call", async () => {
     const payloads: unknown[] = [];
     const valid = demoSchedule(plannerInput);
     const bad = structuredClone(valid);
@@ -16,30 +17,23 @@ describe("bounded itinerary quality repair", () => {
     bad.days[0].stops[0].explanation = "PRIVATE_PREVIOUS_EXPLANATION";
     bad.days[0].stops[1].start = "10:00";
     const model: Pick<Gemini, "structured"> = {
-      structured: async <T>(schema: z.ZodType<T>, _system: string, data: unknown) => {
+      structured: async <T>(
+        schema: z.ZodType<T>,
+        _system: string,
+        data: unknown,
+      ) => {
         payloads.push(structuredClone(data));
-        return schema.parse(payloads.length < 3 ? bad : valid);
+        const response = blueprintResponse(valid, data);
+        response.days[0].stops[0].start = "08:00";
+        response.days[0].stops[0].end = "08:30";
+        return schema.parse(response);
       },
     };
     const result = await generateValidated(model, plannerInput, demoCatalog);
     expect(result.evaluation.valid).toBe(true);
-    expect(payloads).toHaveLength(3);
+    expect(payloads).toHaveLength(1);
     expect(JSON.stringify(payloads)).not.toContain("PRIVATE_PREVIOUS_");
-    for (const payload of payloads.slice(1)) {
-      const feedback = (payload as {
-        validationErrorsFromPreviousAttempt: {
-          errors: { code: string }[];
-          previousSchedule: { date: string; stops: Record<string, unknown>[] }[];
-        };
-      }).validationErrorsFromPreviousAttempt;
-      expect(feedback.errors.some((issue) => issue.code === "TIME_CONFLICT")).toBe(true);
-      expect(feedback.previousSchedule[0].stops[0]).toEqual({
-        candidateId: bad.days[0].stops[0].candidateId,
-        start: bad.days[0].stops[0].start,
-        end: bad.days[0].stops[0].end,
-        purpose: bad.days[0].stops[0].purpose,
-      });
-    }
+    expect(result.schedule.days[0].stops[0].start).not.toBe("08:00");
   });
 
   it("rejects all three invalid proposals without weakening validation", async () => {
@@ -52,7 +46,9 @@ describe("bounded itinerary quality repair", () => {
         return schema.parse(bad);
       },
     };
-    await expect(generateValidated(model, plannerInput, demoCatalog)).rejects.toMatchObject({
+    await expect(
+      generateValidated(model, plannerInput, demoCatalog),
+    ).rejects.toMatchObject({
       message: "SCHEDULE_QUALITY_FAILED",
     });
     expect(calls).toBe(3);
@@ -63,13 +59,22 @@ describe("bounded itinerary quality repair", () => {
     async (code) => {
       let calls = 0;
       const model: Pick<Gemini, "structured"> = {
-        structured: async <T>(schema: z.ZodType<T>) => {
+        structured: async <T>(
+          schema: z.ZodType<T>,
+          _system: string,
+          data: unknown,
+        ) => {
           calls++;
           if (calls < 3) throw new AppError(502, code);
-          return schema.parse(demoSchedule(plannerInput));
+          return schema.parse(
+            blueprintResponse(demoSchedule(plannerInput), data),
+          );
         },
       };
-      expect((await generateValidated(model, plannerInput, demoCatalog)).evaluation.valid).toBe(true);
+      expect(
+        (await generateValidated(model, plannerInput, demoCatalog)).evaluation
+          .valid,
+      ).toBe(true);
       expect(calls).toBe(3);
     },
   );
@@ -84,7 +89,9 @@ describe("bounded itinerary quality repair", () => {
           throw new AppError(502, code);
         },
       };
-      await expect(generateValidated(model, plannerInput, demoCatalog)).rejects.toMatchObject({message: code});
+      await expect(
+        generateValidated(model, plannerInput, demoCatalog),
+      ).rejects.toMatchObject({ message: code });
       expect(calls).toBe(3);
     },
   );
@@ -106,7 +113,9 @@ describe("bounded itinerary quality repair", () => {
         throw error;
       },
     };
-    await expect(generateValidated(model, plannerInput, demoCatalog)).rejects.toBe(error);
+    await expect(
+      generateValidated(model, plannerInput, demoCatalog),
+    ).rejects.toBe(error);
     expect(calls).toBe(1);
   });
 });

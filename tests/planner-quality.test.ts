@@ -5,6 +5,7 @@ import { evaluateSchedule, tripSchema } from "../shared/planner";
 import { generateValidated } from "../server/planner/generate";
 import type { Gemini } from "../server/gemini";
 import { plannerInput } from "./fixtures/planning";
+import { blueprintResponse } from "./fixtures/blueprint-response";
 describe("server schedule quality pipeline", () => {
   it("accepts a grounded schedule and distinguishes unknown facts from calculated straight-line checks", () => {
     const result = evaluateSchedule(
@@ -122,9 +123,17 @@ describe("server schedule quality pipeline", () => {
       bad = structuredClone(valid);
     bad.days[0].stops[0].candidateId = "fabricated";
     const model: Pick<Gemini, "structured"> = {
-      structured: async <T>(schema: z.ZodType<T>) => {
+      structured: async <T>(
+        schema: z.ZodType<T>,
+        _system: string,
+        data: unknown,
+      ) => {
         calls++;
-        return schema.parse(calls === 1 ? bad : valid);
+        const response = blueprintResponse(valid, data);
+        if (calls === 1)
+          response.days[0].stops[0].candidateId =
+            bad.days[0].stops[0].candidateId;
+        return schema.parse(response);
       },
     };
     const result = await generateValidated(model, plannerInput, demoCatalog);
@@ -133,10 +142,16 @@ describe("server schedule quality pipeline", () => {
     const pin = { date: valid.days[0].date, stop: valid.days[0].stops[0] };
     let tries = 0;
     const changed: Pick<Gemini, "structured"> = {
-      structured: async <T>(schema: z.ZodType<T>) => {
+      structured: async <T>(
+        schema: z.ZodType<T>,
+        _system: string,
+        data: unknown,
+      ) => {
         tries++;
-        const altered = structuredClone(valid);
-        altered.days[0].stops[0].start = "09:35";
+        const altered = blueprintResponse(valid, data);
+        altered.days[0].stops.find(
+          (stop) => stop.candidateId === pin.stop.candidateId,
+        )!.start = "09:35";
         return schema.parse(altered);
       },
     };

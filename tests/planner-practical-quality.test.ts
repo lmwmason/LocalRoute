@@ -4,6 +4,8 @@ import { demoCatalog, demoSchedule } from "../shared/planner-demo";
 import { evaluateSchedule } from "../shared/planner";
 import { generateValidated } from "../server/planner/generate";
 import { plannerInput } from "./fixtures/planning";
+import { blueprintResponse } from "./fixtures/blueprint-response";
+import type { Schedule } from "../shared/planner";
 
 describe("practical itinerary quality with unchanged safety boundaries", () => {
   it("allows cross-day repeat visits with explicit warnings while rejecting repeats within a day", () => {
@@ -67,15 +69,29 @@ describe("practical itinerary quality with unchanged safety boundaries", () => {
       date: input.startDate,
       stop: structuredClone(original.days[0].stops[0]),
     };
+    let planned: Schedule | undefined;
     const gemini = {
-      structured: async <T>(schema: z.ZodType<T>) => schema.parse(schedule),
+      structured: async <T>(
+        schema: z.ZodType<T>,
+        _system: string,
+        data: unknown,
+      ) => {
+        planned = blueprintResponse(schedule, data);
+        const reversed = structuredClone(planned);
+        for (const day of reversed.days) day.stops.reverse();
+        return schema.parse(reversed);
+      },
     };
     const structured = vi.spyOn(gemini, "structured");
     const result = await generateValidated(gemini, input, demoCatalog, [pin]);
     expect(result.evaluation.valid).toBe(true);
     expect(structured).toHaveBeenCalledTimes(1);
-    expect(result.schedule.days[0].stops).toEqual(original.days[0].stops);
-    expect(result.schedule.days[1].stops).toEqual(original.days[0].stops);
+    expect(result.schedule).toEqual(planned);
+    expect(
+      result.schedule.days[0].stops.find(
+        (stop) => stop.candidateId === pin.stop.candidateId,
+      ),
+    ).toEqual(pin.stop);
     expect(
       result.evaluation.warnings.some(
         (issue) => issue.code === "CROSS_DAY_REVISIT",

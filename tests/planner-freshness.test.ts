@@ -17,6 +17,7 @@ import {
 } from "../shared/planner";
 import type { TransportLegResult, TransportRequest } from "../shared/transport";
 import { plannerInput } from "./fixtures/planning";
+import { blueprintResponse } from "./fixtures/blueprint-response";
 
 const destination: Destination = {
   id: destinationId("서울 성동구"),
@@ -156,8 +157,11 @@ function setup() {
     planning,
   } as unknown as Repository;
   const gemini = {
-    structured: async <T>(schema: z.ZodType<T>) =>
-      schema.parse(structuredClone(original.schedule)),
+    structured: async <T>(
+      schema: z.ZodType<T>,
+      _system: string,
+      data: unknown,
+    ) => schema.parse(blueprintResponse(original.schedule, data)),
   };
   vi.spyOn(gemini, "structured");
   const deps = {
@@ -279,7 +283,12 @@ describe("fresh candidate facts for pinned regeneration", () => {
     );
     const response = await fixture.generate();
     expect(response.status).toBe(201);
-    expect(response.body.schedule).toEqual(fixture.original.schedule);
+    for (const day of fixture.original.schedule.days)
+      expect(
+        response.body.schedule.days.find(
+          (actual: { date: string }) => actual.date === day.date,
+        ).stops,
+      ).toEqual(expect.arrayContaining(day.stops));
     expect(
       response.body.catalog.every(
         (candidate: Candidate) => candidate.source.observedAt === freshTime,

@@ -7,6 +7,7 @@ import { demoCatalog, demoSchedule } from "../shared/planner-demo";
 import { destinationId, kakaoAddressEndpoint } from "../shared/destinations";
 import type { TransportLegResult, TransportRequest } from "../shared/transport";
 import { plannerInput } from "./fixtures/planning";
+import { blueprintResponse } from "./fixtures/blueprint-response";
 
 function modelReturning(proposals: Schedule[]) {
   const inputs: unknown[] = [];
@@ -17,9 +18,17 @@ function modelReturning(proposals: Schedule[]) {
       data: unknown,
     ) => {
       inputs.push(structuredClone(data));
-      return schema.parse(
-        proposals[Math.min(inputs.length - 1, proposals.length - 1)],
-      );
+      const proposal =
+        proposals[Math.min(inputs.length - 1, proposals.length - 1)];
+      const response = blueprintResponse(proposal, data);
+      const unknown = proposal.days
+        .flatMap((day) => day.stops)
+        .find(
+          (stop) =>
+            !demoCatalog.some((candidate) => candidate.id === stop.candidateId),
+        );
+      if (unknown) response.days[0].stops[0].candidateId = unknown.candidateId;
+      return schema.parse(response);
     },
   };
   return { model, inputs };
@@ -202,13 +211,12 @@ describe("planner model data minimization", () => {
     const { model, inputs } = modelReturning([demoSchedule(input)]);
     await expect(
       generateValidated(model, input, demoCatalog),
-    ).rejects.toMatchObject({ message: "SCHEDULE_QUALITY_FAILED" });
-    expect(inputs).toHaveLength(3);
+    ).rejects.toMatchObject({ message: "SCHEDULE_CONSTRAINTS_INFEASIBLE" });
+    expect(inputs).toHaveLength(0);
     expect(JSON.stringify(inputs)).not.toContain("PRIVATE_MEDICAL_RESTRICTION");
-    expect(JSON.stringify(inputs[1])).toContain("DIETARY_UNVERIFIED");
   });
 
-  it("repairs route conflicts with timing evidence rather than provider payloads", async () => {
+  it("rejects verified route conflicts before sending any provider payload or calling AI", async () => {
     const { model, inputs } = modelReturning([demoSchedule(plannerInput)]);
     const lookup = async (
       request: TransportRequest,
@@ -234,24 +242,8 @@ describe("planner model data minimization", () => {
     });
     await expect(
       generateValidated(model, plannerInput, demoCatalog, [], lookup),
-    ).rejects.toMatchObject({ message: "SCHEDULE_QUALITY_FAILED" });
-    expect(inputs).toHaveLength(3);
+    ).rejects.toMatchObject({ message: "SCHEDULE_CONSTRAINTS_INFEASIBLE" });
+    expect(inputs).toHaveLength(0);
     expect(JSON.stringify(inputs)).not.toContain("PRIVATE_PROVIDER_URL");
-    const repair = inputs[1] as {
-      validationErrorsFromPreviousAttempt: {
-        currentTransportEvidence: Record<string, unknown>[];
-      };
-    };
-    expect(
-      repair.validationErrorsFromPreviousAttempt.currentTransportEvidence[0],
-    ).toMatchObject({
-      durationSeconds: 36000,
-      distanceMeters: 100,
-      status: "estimated",
-      provider: "kakao_maps",
-    });
-    expect(
-      repair.validationErrorsFromPreviousAttempt.currentTransportEvidence[0],
-    ).not.toHaveProperty("leg");
   });
 });
