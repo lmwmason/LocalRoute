@@ -16,6 +16,11 @@ const manifest = JSON.parse(
   places: { sourceUrl: string; name: string }[];
 };
 const first = manifest.places[0];
+const exampleManifest = JSON.parse(
+  readFileSync("scripts/data/euljiro-example-images.json", "utf8"),
+) as {
+  illustrations: { placeKey: string; assetPath: string; sha256: string }[];
+};
 const place: IllustrationPlace = {
   kind: "restaurant",
   source: "localroute",
@@ -60,6 +65,67 @@ describe("bounded demo restaurant illustrations", () => {
     expect(placeIllustration(candidate)).toEqual(placeIllustration(place));
     expect(JSON.stringify(candidate)).toBe(before);
     expect(placeIllustration(place)).toBe(placeIllustration(place));
+  });
+
+  it("uses the two approved example assets for their exact canonical identities", () => {
+    const examples = [
+      {
+        placeKey: "wooraeok",
+        kind: "restaurant",
+        url: "https://korean.visitseoul.net/citycenter/%EC%9A%B0%EB%9E%98%EC%98%A5-Wooraeok/KOP003207",
+      },
+      {
+        placeKey: "hidemeplease-euljiro",
+        kind: "cafe",
+        url: "https://www.spacecloud.kr/space/59739",
+      },
+    ];
+    for (const entry of examples) {
+      const image = exampleManifest.illustrations.find(
+        (image) => image.placeKey === entry.placeKey,
+      )!;
+      const official = {
+        kind: entry.kind,
+        officialSources: [{ url: entry.url }],
+      };
+      const result = placeIllustration(official);
+      expect(result?.asset).toBe(image.assetPath);
+      expect(result?.assetType).toBe("ai_generated_generic_illustration");
+      expect(result?.label).toEqual({
+        ko: manifest.disclosure.ko,
+        en: manifest.disclosure.en,
+      });
+      expect(
+        placeIllustration({ kind: entry.kind, source: { url: entry.url } }),
+      ).toEqual(result);
+      expect(
+        placeIllustration(official, { privatePreview: true }),
+      ).toBeUndefined();
+      expect(
+        placeIllustration({ ...official, photo: { id: "actual" } }),
+      ).toBeUndefined();
+      expect(
+        placeIllustration({ ...official, sourcePhoto: {} }),
+      ).toBeUndefined();
+      expect(
+        createHash("sha256")
+          .update(readFileSync(`public${image.assetPath}`))
+          .digest("hex"),
+      ).toBe(image.sha256);
+      expect(
+        placeIllustration({
+          kind: entry.kind,
+          officialSources: [{ url: `${entry.url}#not-exact` }],
+        }),
+      ).toBeUndefined();
+      expect(
+        placeIllustration({
+          ...official,
+          kind: entry.kind === "cafe" ? "restaurant" : "cafe",
+        }),
+      ).toBeUndefined();
+    }
+    expect(placeIllustration({ ...place, kind: "cafe" })).toBeUndefined();
   });
 
   it("never replaces contributor/source photos or private contribution previews", () => {
