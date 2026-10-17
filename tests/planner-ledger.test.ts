@@ -38,7 +38,7 @@ beforeAll(async () => {
   // Exercise multiple paid reservations with an explicit test-only budget;
   // the production default allowance is verified in monthly-allowance.test.ts.
   await db.exec(
-    "update public.lp_policy set planning_enabled=true,monthly_promo=300",
+    "update public.lp_policy set planning_enabled=true,monthly_promo=300,plan_cost=100,version='pilot-v1'",
   );
 });
 afterAll(async () => {
@@ -63,7 +63,11 @@ describe("atomic LP reservations, save and debit", () => {
     await db.exec("update public.lp_policy set planning_enabled=true");
   });
   const payload = {
-    input: { destination: "seongsu" },
+    input: {
+      destination: "seongsu",
+      startDate: "2026-11-01",
+      endDate: "2026-11-01",
+    },
     expectedCost: 100,
     policyVersion: "pilot-v1",
     consent: true,

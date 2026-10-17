@@ -67,7 +67,7 @@ beforeAll(async () => {
     [placeId],
   );
   await db.exec(
-    "update public.lp_policy set planning_enabled=true,monthly_promo=300",
+    "update public.lp_policy set planning_enabled=true,monthly_promo=300,plan_cost=100,version='pilot-v1'",
   );
 }, 30000);
 afterAll(async () => {
@@ -247,7 +247,11 @@ describe("release security: complete migration set in disposable PostgreSQL", ()
   });
   it("keeps grant/debit idempotent, releases failures and rejects foreign requests/stale edits", async () => {
     const value = {
-      input: { destination: "fixture" },
+      input: {
+        destination: "fixture",
+        startDate: "2026-11-01",
+        endDate: "2026-11-01",
+      },
       expectedCost: 100,
       policyVersion: "pilot-v1",
       consent: true,

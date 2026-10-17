@@ -6,7 +6,11 @@ let db: PGlite;
 let user: string;
 let other: string;
 const intent = {
-  input: { destination: "seongsu" },
+  input: {
+    destination: "seongsu",
+    startDate: "2026-11-01",
+    endDate: "2026-11-01",
+  },
   expectedCost: 100,
   policyVersion: "pilot-v1",
   consent: true,
