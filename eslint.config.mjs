@@ -8,6 +8,8 @@ export default tseslint.config(
       "node_modules/**",
       "test-results/**",
       "playwright-report/**",
+      "server-runtime/**",
+      "artifacts/**",
     ],
   },
   js.configs.recommended,
