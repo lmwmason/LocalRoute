@@ -45,6 +45,7 @@ beforeAll(async () => {
     grant usage on schema storage to anon,authenticated;
     grant all on storage.objects to anon,authenticated;
     create policy legacy_other_app_policy on storage.objects for all to anon,authenticated using(true) with check(true);`);
+  await db.exec("alter default privileges in schema public grant execute on functions to anon,authenticated");
   for (const migration of migrations) await db.exec(migration.sql);
   for (const id of [owner, stranger, moderator, unverified])
     await db.query("insert into auth.users values($1,$2,$3,false)", [
@@ -169,7 +170,7 @@ describe("release security: complete migration set in disposable PostgreSQL", ()
       ),
     ).rejects.toThrow(/permission denied/);
   });
-  it("CONFIRMED RS-002: planning quote grants LP before required membership consent", async () => {
+  it("RS-002 regression: quote cannot issue LP before membership consent", async () => {
     const network = vi
       .spyOn(globalThis, "fetch")
       .mockRejectedValue(new Error("Remote access forbidden by review"));
@@ -188,7 +189,7 @@ describe("release security: complete migration set in disposable PostgreSQL", ()
       const config = readConfig({
         VITE_DATA_MODE: "live",
         SUPABASE_URL: "https://pjdawapasozsrpnrtsfx.supabase.co",
-        VITE_SUPABASE_ANON_KEY: "fake-public",
+        VITE_SUPABASE_ANON_KEY: "sb_publishable_fixture_public_key_only",
         SUPABASE_SECRET_KEY: "fake-private",
         FEATURE_AI_PLANNING: "true",
         PLANNING_POLICY_APPROVED: "true",
@@ -218,8 +219,7 @@ describe("release security: complete migration set in disposable PostgreSQL", ()
       const response = await request(app)
         .get("/api/planning/quote")
         .set("Authorization", "Bearer fixture-only");
-      expect(response.status).toBe(200);
-      expect(response.body.promo).toBe(300);
+      expect(response.status).toBe(403);
       expect(
         (
           await db.query(
@@ -232,7 +232,10 @@ describe("release security: complete migration set in disposable PostgreSQL", ()
         "select amount from public.lp_ledger where user_id=$1",
         [stranger],
       );
-      expect(grants.rows).toEqual([{ amount: 300 }]);
+      expect(grants.rows).toEqual([]);
+      await expect(rpc(stranger, "planning_action", "balance")).rejects.toThrow(
+        /Membership consent required/,
+      );
       expect(network).not.toHaveBeenCalled();
     } finally {
       network.mockRestore();

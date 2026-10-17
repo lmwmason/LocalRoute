@@ -33,7 +33,7 @@ const stranger: Actor = {
 const config = readConfig({
   VITE_DATA_MODE: "live",
   SUPABASE_URL: "https://pjdawapasozsrpnrtsfx.supabase.co",
-  VITE_SUPABASE_ANON_KEY: "fake-public",
+  VITE_SUPABASE_ANON_KEY: "sb_publishable_fixture_public_key_only",
   SUPABASE_SECRET_KEY: "fake-private",
 });
 beforeEach(() => {

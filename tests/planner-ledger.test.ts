@@ -29,6 +29,12 @@ beforeAll(async () => {
     .filter((f) => f.endsWith(".sql"))
     .sort())
     await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
+  // Membership was independently accepted before these accounting-only fixtures.
+  for (const id of [user, other])
+    await db.query(
+      "insert into public.legal_consent_events(user_id,request_id,version,language,terms,privacy,supabase_transfer,adult,public_local_area)values($1,$2,'2026-10-17.1','en',true,true,true,true,false)",
+      [id, crypto.randomUUID()],
+    );
   await db.exec("update public.lp_policy set planning_enabled=true");
 });
 afterAll(async () => {

@@ -1,4 +1,4 @@
-import { isLocalRouteSupabase } from "../shared/config";
+import { isLocalRouteSupabase, isPublicSupabaseKey } from "../shared/config";
 import { readDestinationConfig } from "./destinations";
 
 export type ServerConfig = ReturnType<typeof readConfig>;
@@ -14,7 +14,14 @@ export function readConfig(env: NodeJS.ProcessEnv) {
       "VITE_DATA_MODE는 demo 또는 live여야 합니다. demo로 시작합니다.",
     );
   const live = mode === "live";
-  const database = isLocalRouteSupabase(url) && Boolean(publicKey && secret);
+  const database =
+    isLocalRouteSupabase(url) &&
+    isPublicSupabaseKey(publicKey) &&
+    Boolean(secret);
+  if (publicKey && !isPublicSupabaseKey(publicKey))
+    warnings.push(
+      "Supabase 공개 키 설정에 올바른 publishable/anon 키를 넣어 주세요. 서버 비밀 키는 사용할 수 없어요.",
+    );
   if (live && !database)
     warnings.push(
       "실제 저장 기능이 비활성화되었습니다. SUPABASE_URL, 공개 키, 서버 비밀 키를 확인하세요.",
@@ -30,6 +37,7 @@ export function readConfig(env: NodeJS.ProcessEnv) {
       database &&
       env.FEATURE_AI_PLANNING === "true" &&
       env.PLANNING_POLICY_APPROVED === "true" &&
+      env.GEMINI_DATA_PROCESSING_APPROVED === "true" &&
       env.FEATURE_KAKAO_DISCOVERY === "true" &&
       env.KAKAO_TERMS_VERIFIED === "true" &&
       Boolean(env.GEMINI_API_KEY && env.KAKAO_REST_API_KEY),
@@ -57,6 +65,7 @@ export function readConfig(env: NodeJS.ProcessEnv) {
       Math.min(1000, Number(env.HEYYUMI_REQUESTS_PER_HOUR) || 30),
     ),
     geminiKey: env.GEMINI_API_KEY || "",
+    aiDataApproved: env.GEMINI_DATA_PROCESSING_APPROVED === "true",
     geminiModel: env.GEMINI_MODEL || "gemini-3.1-flash-lite",
     menuExtraction: env.FEATURE_GEMINI_MENU_EXTRACTION === "true",
     moderation: env.FEATURE_GEMINI_MODERATION === "true",

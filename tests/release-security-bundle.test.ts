@@ -28,7 +28,35 @@ const privateMarkers = {
 };
 afterEach(() => vi.unstubAllEnvs());
 describe("release security: production bundle and startup configuration", () => {
-  it("CONFIRMED RS-001: a legacy service_role JWT in the public key setting survives the actual production build", async () => {
+  it("builds with a public key while excluding every server-only marker", async () => {
+    for (const [key, value] of Object.entries(privateMarkers))
+      vi.stubEnv(key, value);
+    vi.stubEnv("VITE_SUPABASE_URL", "https://pjdawapasozsrpnrtsfx.supabase.co");
+    vi.stubEnv(
+      "VITE_SUPABASE_PUBLISHABLE_KEY",
+      "sb_publishable_fixture_public_key_only",
+    );
+    vi.stubEnv("VITE_SUPABASE_ANON_KEY", "");
+    const outDir = mkdtempSync(join(tmpdir(), "localroute-safe-bundle-"));
+    try {
+      await build({
+        envDir: false,
+        logLevel: "silent",
+        build: { outDir, emptyOutDir: true, sourcemap: false },
+      });
+      const names = readdirSync(join(outDir, "assets"));
+      const code = names
+        .filter((name) => name.endsWith(".js"))
+        .map((name) => readFileSync(join(outDir, "assets", name), "utf8"))
+        .join("\n");
+      for (const value of Object.values(privateMarkers))
+        expect(code).not.toContain(value);
+      expect(names.some((name) => name.endsWith(".map"))).toBe(false);
+    } finally {
+      rmSync(outDir, { recursive: true, force: true });
+    }
+  }, 60000);
+  it("RS-001 regression: rejects a service-role key before emitting any browser bundle", async () => {
     for (const [key, value] of Object.entries(privateMarkers))
       vi.stubEnv(key, value);
     vi.stubEnv("VITE_SUPABASE_URL", "https://pjdawapasozsrpnrtsfx.supabase.co");
@@ -37,50 +65,40 @@ describe("release security: production bundle and startup configuration", () => 
     vi.stubEnv("VITE_DATA_MODE", "live");
     const outDir = mkdtempSync(join(tmpdir(), "localroute-security-bundle-"));
     try {
-      await build({
-        envDir: false,
-        logLevel: "silent",
-        build: { outDir, emptyOutDir: true, sourcemap: false },
-      });
-      const assets = readdirSync(join(outDir, "assets")).filter((name) =>
-        name.endsWith(".js"),
-      );
-      const code = assets
-        .map((name) => readFileSync(join(outDir, "assets", name), "utf8"))
-        .join("\n");
-      // This is a vulnerability reproduction, NOT an assertion that key handling is safe.
-      expect(code.includes(fakeServiceJwt)).toBe(true);
-      for (const value of Object.values(privateMarkers))
-        expect(code.includes(value)).toBe(false);
-      expect(
-        readdirSync(join(outDir, "assets")).some((name) =>
-          name.endsWith(".map"),
-        ),
-      ).toBe(false);
+      await expect(
+        build({
+          envDir: false,
+          logLevel: "silent",
+          build: { outDir, emptyOutDir: true, sourcemap: false },
+        }),
+      ).rejects.toThrow(/publishable or anon/);
+      expect(readdirSync(outDir)).toHaveLength(0);
     } finally {
       rmSync(outDir, { recursive: true, force: true });
     }
   }, 60000);
-  it("CONFIRMED RS-001: server configuration accepts a service credential as its public client key", () => {
+  it("RS-001 regression: server rejects a service credential as the public client key", () => {
     const config = readConfig({
       VITE_DATA_MODE: "live",
       SUPABASE_URL: "https://pjdawapasozsrpnrtsfx.supabase.co",
       VITE_SUPABASE_ANON_KEY: fakeServiceJwt,
       SUPABASE_SECRET_KEY: "fake-server-only",
     });
-    expect(config.database).toBe(true);
-    expect(config.publicKey === fakeServiceJwt).toBe(true);
+    expect(config.database).toBe(false);
+    expect(config.warnings.some((warning) => warning.includes("공개 키"))).toBe(
+      true,
+    );
   });
   it("disables database/planning with a wrong project or missing credentials without printing their values", () => {
     for (const env of [
       {
         SUPABASE_URL: "https://wrong-project.supabase.co",
-        VITE_SUPABASE_ANON_KEY: "FAKE_PUBLIC",
+        VITE_SUPABASE_ANON_KEY: "sb_publishable_fixture_public_key_only",
         SUPABASE_SECRET_KEY: "FAKE_PRIVATE",
       },
       {
         SUPABASE_URL: "https://pjdawapasozsrpnrtsfx.supabase.co",
-        VITE_SUPABASE_ANON_KEY: "FAKE_PUBLIC",
+        VITE_SUPABASE_ANON_KEY: "sb_publishable_fixture_public_key_only",
       },
       { SUPABASE_URL: "not-a-url", SUPABASE_SECRET_KEY: "FAKE_PRIVATE" },
     ]) {

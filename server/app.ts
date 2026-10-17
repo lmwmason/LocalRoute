@@ -6,6 +6,12 @@ import { demoPlaces } from "../shared/demo";
 import { bookingProfileSchema } from "../shared/booking";
 import { AppError } from "./errors";
 import { attachShares } from "./sharing";
+import { attachVisitRewards, readVisitRewardSettings } from "./visit-rewards";
+import {
+  createAiAssistance,
+  createAssistanceModel,
+  attachAiAssistance,
+} from "./ai-assistance";
 import { attachLegal, createLegalStore } from "./legal";
 import { KakaoDestinations, attachDestinations } from "./destinations";
 import { attachBooking } from "./booking";
@@ -35,6 +41,12 @@ export function createApp(
     live: config.live && config.database,
     booking: readBookingSettings(process.env),
   };
+  const aiEnabled =
+    config.live &&
+    config.database &&
+    config.aiDataApproved &&
+    Boolean(repository && config.geminiKey) &&
+    (config.menuExtraction || config.moderation);
   const candidates = candidateSigner();
   const resUser = new WeakMap<Request, Actor>();
   app.disable("x-powered-by");
@@ -82,10 +94,13 @@ export function createApp(
     app.post("/api/reports", legal.requireConsent);
     app.use("/api/admin", legal.requireConsent);
     app.post("/api/planning/generate", legal.requireConsent);
+    app.get("/api/planning/quote", legal.requireConsent);
     app.get("/api/planning/status/:requestId", legal.requireConsent);
     app.use("/api/itineraries", legal.requireConsent);
     app.use("/api/itinerary-shares", legal.requireConsent);
     app.post("/api/booking/reservations", legal.requireConsent);
+    app.use("/api/ai-assistance", legal.requireConsent);
+    app.use("/api/visit-rewards", legal.requireConsent);
   }
   async function actor(req: Request): Promise<Actor> {
     if (!config.live || !repository)
@@ -102,8 +117,8 @@ export function createApp(
       database: Boolean(repository),
       capabilities: {
         search: config.heyyumi,
-        menuExtraction: false,
-        moderation: false,
+        menuExtraction: aiEnabled && config.menuExtraction,
+        moderation: aiEnabled && config.moderation,
         booking: bookingEnabled(bookingConfig),
         lp: config.planning,
       },
@@ -366,7 +381,40 @@ export function createApp(
       await repository!.community(user, "decide", payload.requestId, payload),
     );
   });
+  if (repository) {
+    const enabled = aiEnabled;
+    attachAiAssistance(
+      app,
+      createAiAssistance({
+        repository,
+        enabled,
+        menuEnabled: config.menuExtraction,
+        reviewEnabled: config.moderation,
+        model: enabled
+          ? createAssistanceModel({
+              key: config.geminiKey,
+              model: config.geminiModel,
+              budget: config.aiBudget,
+              timeoutMs: 15000,
+            })
+          : undefined,
+        maxCalls: enabled ? config.aiBudget : 0,
+        perUserCalls: 3,
+        timeoutMs: 15000,
+        maxConcurrent: 2,
+      }),
+    );
+  }
   attachPlanner(app, config, repository, actor, plannerDependencies);
+  attachVisitRewards(
+    app,
+    {
+      ...config,
+      live: config.live && config.database,
+      visitRewards: readVisitRewardSettings(process.env),
+    },
+    actor,
+  );
   attachShares(app, repository, actor, limit);
   app.use("/api", (_req, _res, next) =>
     next(new AppError(404, "요청한 기능을 찾을 수 없어요.")),
