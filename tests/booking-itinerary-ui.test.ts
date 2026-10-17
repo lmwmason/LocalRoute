@@ -54,7 +54,12 @@ describe("itinerary booking prefills (mock API only)", () => {
     await browser?.close();
     await server?.close();
   });
-  async function setup(ko = false, width = 390, mode = "editor") {
+  async function setup(
+    ko = false,
+    width = 390,
+    mode = "editor",
+    existingOn20 = false,
+  ) {
     // A deliberately different browser timezone catches accidental UTC/browser conversions.
     const context = await browser.newContext({
       viewport: { width, height: 844 },
@@ -67,6 +72,7 @@ describe("itinerary booking prefills (mock API only)", () => {
       path: string;
       method: string;
       body: Record<string, unknown> | null;
+      date: string | null;
     }[] = [];
     let delayedVenue: Promise<void> | null = null,
       releaseVenue: () => void = () => {},
@@ -82,7 +88,29 @@ describe("itinerary booking prefills (mock API only)", () => {
         path: url.pathname,
         method: request.method(),
         body: request.postDataJSON(),
+        date: url.searchParams.get("date"),
       });
+      if (url.pathname === "/api/booking/reservations/existing")
+        return route.fulfill({
+          json: {
+            reservation:
+              existingOn20 && url.searchParams.get("date") === dates[0]
+                ? {
+                    id: "80000000-0000-4000-8000-000000000001",
+                    requestId: "80000000-0000-4000-8000-000000000002",
+                    placeId,
+                    state: "pending",
+                    reservationTime: "2026-10-20T13:15:00+09:00",
+                    guestCount: 2,
+                    providerReference: null,
+                    expiresAt: null,
+                    updatedAt: "2026-10-17T00:00:00Z",
+                    revision: 1,
+                    reconciliationRequired: false,
+                  }
+                : null,
+          },
+        });
       if (url.pathname.endsWith("/capabilities"))
         return route.fulfill({ json: { enabled: true } });
       if (url.pathname.includes("/venues/")) {
@@ -214,6 +242,63 @@ describe("itinerary booking prefills (mock API only)", () => {
 
   for (const ko of [true, false])
     for (const width of [360, 390]) {
+      it(`${ko ? "ko" : "en"} ${width}px: reuses an existing pending October 20 reservation and keeps October 21 separately bookable without submitting`, async () => {
+        const { page, context, calls } = await setup(ko, width, "editor", true);
+        const t = labels(ko);
+        try {
+          const pending = ko
+            ? "예약 요청됨 · 확정 대기"
+            : "Requested · awaiting confirmation";
+          await page.getByRole("status").filter({ hasText: pending }).waitFor();
+          expect(
+            await page
+              .getByRole("button", { name: t.open, exact: true })
+              .count(),
+          ).toBe(0);
+          expect(await page.getByLabel(t.time, { exact: true }).count()).toBe(
+            0,
+          );
+          await page
+            .getByRole("group", { name: "Fixture plans" })
+            .getByRole("button", { name: dates[1], exact: true })
+            .click();
+          const open = page.getByRole("button", { name: t.open, exact: true });
+          await open.waitFor();
+          expect(
+            await page.getByRole("status").filter({ hasText: pending }).count(),
+          ).toBe(0);
+          await open.click();
+          expect(
+            await page.getByLabel(t.time, { exact: true }).inputValue(),
+          ).toBe(`${dates[1]}T13:15`);
+          await page
+            .getByRole("group", { name: "Fixture plans" })
+            .getByRole("button", { name: dates[0], exact: true })
+            .click();
+          await page.getByRole("status").filter({ hasText: pending }).waitFor();
+          expect(
+            await page
+              .getByRole("button", { name: t.open, exact: true })
+              .count(),
+          ).toBe(0);
+          expect(
+            calls
+              .filter(
+                (call) => call.path === "/api/booking/reservations/existing",
+              )
+              .map((call) => call.date),
+          ).toEqual([dates[0], dates[1], dates[0]]);
+          expect(calls.filter((call) => call.method !== "GET")).toHaveLength(0);
+          expect(submissions(calls)).toHaveLength(0);
+          expect(
+            await page.evaluate(
+              () => document.documentElement.scrollWidth <= innerWidth,
+            ),
+          ).toBe(true);
+        } finally {
+          await context.close();
+        }
+      }, 30000);
       it(`${ko ? "ko" : "en"} ${width}px: each October 20–23 plan passes its actual day and 13:15, editable before review`, async () => {
         const { page, context, calls } = await setup(ko, width),
           t = labels(ko);
@@ -289,8 +374,8 @@ describe("itinerary booking prefills (mock API only)", () => {
       await context.close();
     }
   });
-  it("props reset prior lookups/errors/consent while ordinary rerenders preserve the user's date override; legacy empty props stay empty", async () => {
-    const { page, context, calls, delayVenue, venueCalls } = await setup(
+  it("props reset review and consent while preserving ordinary date overrides and reusing venue facts; legacy empty props stay empty", async () => {
+    const { page, context, calls, venueCalls } = await setup(
       false,
       360,
       "form",
@@ -304,8 +389,7 @@ describe("itinerary booking prefills (mock API only)", () => {
       await page.getByRole("button", { name: "Unchanged context" }).click();
       expect(await time.inputValue()).toBe("2026-10-23T17:00");
       await preview(page);
-      const count = venueCalls(),
-        release = delayVenue();
+      const count = venueCalls();
       await page
         .getByRole("button", { name: "2026-10-21", exact: true })
         .click();
@@ -313,16 +397,24 @@ describe("itinerary booking prefills (mock API only)", () => {
       await page
         .getByRole("button", { name: "2026-10-22", exact: true })
         .click();
+      await page
+        .getByRole("button", { name: "Book a table", exact: true })
+        .click();
       await time.waitFor();
       expect(await time.inputValue()).toBe("2026-10-22T13:15");
-      expect(venueCalls()).toBeGreaterThan(count);
-      release();
+      expect(venueCalls()).toBe(count);
       await page.waitForTimeout(100);
       expect(await time.inputValue()).toBe("2026-10-22T13:15");
       expect(await page.getByRole("checkbox").count()).toBe(0);
       await page.getByRole("button", { name: "Change planned time" }).click();
+      await page
+        .getByRole("button", { name: "Book a table", exact: true })
+        .click();
       expect(await time.inputValue()).toBe("2026-10-22T14:30");
       await page.getByRole("button", { name: "Clear prefill" }).click();
+      await page
+        .getByRole("button", { name: "Book a table", exact: true })
+        .click();
       expect(await time.inputValue()).toBe("");
       expect(submissions(calls)).toHaveLength(0);
     } finally {
@@ -356,7 +448,7 @@ describe("itinerary booking prefills (mock API only)", () => {
       await context.close();
     }
   });
-  it("changing dates cannot bypass recovery or resend an ambiguous earlier request", async () => {
+  it("isolates ambiguous recovery to the original date without resending that request", async () => {
     const { page, context, calls, failSubmit } = await setup(
       false,
       390,
@@ -374,6 +466,18 @@ describe("itinerary booking prefills (mock API only)", () => {
       await page.getByRole("alert").waitFor();
       await page
         .getByRole("button", { name: "2026-10-21", exact: true })
+        .click();
+      await page
+        .getByRole("button", { name: "Book a table", exact: true })
+        .click();
+      expect(await page.getByLabel(labels(false).time).inputValue()).toBe(
+        "2026-10-21T13:15",
+      );
+      await page
+        .getByRole("button", { name: "2026-10-20", exact: true })
+        .click();
+      await page
+        .getByRole("button", { name: "Book a table", exact: true })
         .click();
       await page
         .getByRole("status")
