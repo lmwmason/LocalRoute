@@ -2,16 +2,22 @@ import { useEffect, useState } from "react";
 import { ImageOff } from "lucide-react";
 import { api } from "../api";
 import { useI18n } from "../i18n";
+import {
+  sourcePhotoSchema,
+  type SourcePhoto,
+} from "../../shared/source-photos";
 
 // Only persisted, reviewed contributor photographs may be public venue images.
 // Missing/failed photographs stay empty; never substitute synthetic or unrelated imagery.
 export function PlacePhoto({
   id,
+  sourcePhoto,
   name,
   privatePreview = false,
   className = "place-photo",
 }: {
   id?: string;
+  sourcePhoto?: SourcePhoto;
   name: string;
   privatePreview?: boolean;
   className?: string;
@@ -40,17 +46,21 @@ export function PlacePhoto({
       cancelled = true;
       if (url) URL.revokeObjectURL(url);
     };
-  }, [id, privatePreview]);
+  }, [id, privatePreview, sourcePhoto?.assetPath]);
+  const reviewedSource =
+    !privatePreview && !id ? sourcePhotoSchema.safeParse(sourcePhoto) : null;
   const src = privatePreview
     ? privateUrl
     : id
       ? `/api/place-photos/${id}/image`
-      : "";
+      : reviewedSource?.success
+        ? reviewedSource.data.assetPath
+        : "";
   return src && !failed ? (
     <img
       className={className}
       src={src}
-      alt={name}
+      alt={reviewedSource?.success ? reviewedSource.data.caption : name}
       loading="lazy"
       onError={() => setFailed(true)}
     />

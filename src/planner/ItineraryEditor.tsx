@@ -23,6 +23,7 @@ import type { Place } from "../../shared/domain";
 import { useI18n } from "../i18n";
 import { api } from "../api";
 import { PlacePhoto } from "../components/PlacePhoto";
+import { PlaceOrigin } from "../components/PlaceOrigin";
 import { ShareItinerary } from "./ShareItinerary";
 import { TransportLeg } from "./TransportLeg";
 const PlaceMap = lazy(() => import("../components/Map"));
@@ -263,9 +264,13 @@ export function ItineraryEditor({
                   <div className="stop-content">
                     <PlacePhoto
                       id={candidate.photo?.id}
+                      sourcePhoto={candidate.sourcePhoto}
                       name={candidate.name}
                       className="stop-photo"
                     />
+                    {!candidate.photo && (
+                      <PlaceOrigin sourcePhoto={candidate.sourcePhoto} />
+                    )}
                     <div className="stop-title">
                       <button
                         onClick={() => {

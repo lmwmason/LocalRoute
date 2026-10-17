@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { confirmedMenuSchema } from "./ai-assistance";
+import type { SourcePhoto } from "./source-photos";
 import type {
   DateHours,
   HoursProvenance,
@@ -16,6 +17,7 @@ export type Endorsement = {
   helpfulCount: number;
 };
 export type Place = {
+  sourcePhoto?: SourcePhoto;
   officialSources?: { url: string; observedAt: string }[];
   photo?: {
     id: string;

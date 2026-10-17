@@ -47,6 +47,7 @@ export function localCandidates(
       id: p.id,
       name: p.name,
       photo: p.photo,
+      sourcePhoto: p.sourcePhoto,
       hours: p.hours,
       hoursProvenance: p.hoursProvenance,
       externalIds: p.externalIds,

@@ -6,6 +6,7 @@ import type { ProviderVenue } from "./heyyumi";
 import type { PhotoTarget, ProcessedPhoto } from "./photos";
 import { localitySchema } from "../shared/locality";
 import { approvedPlaceHours, placeExternalIds } from "../shared/place-facts";
+import { sourcePhotoSchema } from "../shared/source-photos";
 
 export type Actor = { id: string; role: "traveler" | "moderator" | "admin" };
 export interface Repository {
@@ -288,7 +289,7 @@ export class SupabaseRepository implements Repository {
     let query = this.auth
       .from("places")
       .select(
-        "id,name,kind,category,address,lat,lng,created_at,operator_place_sources(source_url,observed_at),place_facts(id,field,value,source,status,observed_at),place_external_ids(provider,external_id,possibly_closed,observed_at),place_reviews(rating,verification_state),endorsements!endorsements_place_id_fkey(id,user_id,endorsement_versions!endorsement_versions_endorsement_id_fkey(id,text,endorsement_ratings(helpfulness)))",
+        "id,name,kind,category,address,lat,lng,created_at,place_source_photos(id,asset_path,source_page_url,author,license,license_url,title,caption,captured_at,changes,prior_changes,verified_at,sha256),operator_place_sources(source_url,observed_at),place_facts(id,field,value,source,status,observed_at),place_external_ids(provider,external_id,possibly_closed,observed_at),place_reviews(rating,verification_state),endorsements!endorsements_place_id_fkey(id,user_id,endorsement_versions!endorsement_versions_endorsement_id_fkey(id,text,endorsement_ratings(helpfulness)))",
       )
       .eq("status", "published")
       .limit(100);
@@ -331,6 +332,30 @@ export class SupabaseRepository implements Repository {
     if (photos.error || identities.error)
       throw new AppError(503, "장소 사진과 추천자 정보를 불러오지 못했어요.");
     return (data || []).map((p) => ({
+      sourcePhoto: (() => {
+        const photo = [...(p.place_source_photos || [])].sort(
+          (a, b) =>
+            b.verified_at.localeCompare(a.verified_at) ||
+            a.id.localeCompare(b.id),
+        )[0];
+        if (!photo) return undefined;
+        const result = sourcePhotoSchema.safeParse({
+          id: photo.id,
+          assetPath: photo.asset_path,
+          sourcePageUrl: photo.source_page_url,
+          author: photo.author,
+          license: photo.license,
+          licenseUrl: photo.license_url,
+          title: photo.title,
+          caption: photo.caption,
+          capturedAt: photo.captured_at,
+          changes: photo.changes,
+          priorChanges: photo.prior_changes,
+          verifiedAt: photo.verified_at,
+          sha256: photo.sha256,
+        });
+        return result.success ? result.data : undefined;
+      })(),
       ...approvedPlaceHours(p.place_facts || []),
       externalIds: placeExternalIds(p.place_external_ids || []),
       possiblyClosed: (p.place_external_ids || []).some(
