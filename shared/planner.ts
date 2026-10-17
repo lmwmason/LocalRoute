@@ -107,6 +107,8 @@ export const tripSchema = z
   });
 export type TripInput = z.infer<typeof tripSchema>;
 export type Candidate = {
+  starterRecommendation?: true;
+  officialSources?: { url: string; observedAt: string }[];
   photo?: {
     id: string;
     width: number;
@@ -236,6 +238,15 @@ function matchesFood(candidate: Candidate, foodTypes: TripInput["foodTypes"]) {
     foodTypes.some((type) => candidate.tags.includes(type))
   );
 }
+export function isMealCandidate(candidate: Candidate) {
+  return (
+    candidate.kind === "restaurant" &&
+    (candidate.endorsements.length > 0 ||
+      (candidate.starterRecommendation === true &&
+        candidate.source.provider === "localroute" &&
+        candidate.source.verification === "canonical"))
+  );
+}
 export function evaluateSchedule(
   schedule: Schedule,
   input: TripInput,
@@ -335,6 +346,8 @@ export function evaluateSchedule(
       }
       if (c.possiblyClosed)
         errors.push({ code: "STATUS_NEEDS_VERIFICATION", ...issue });
+      if (c.starterRecommendation === true)
+        warnings.push({ code: "STARTER_RECOMMENDATION", ...issue });
       const hours = c.hours?.[day.date];
       if (hours) {
         checks.verifiedHours++;
@@ -354,9 +367,9 @@ export function evaluateSchedule(
       if (input.mobility === "wheelchair" && !c.accessibilityVerified)
         warnings.push({ code: "ACCESSIBILITY_UNKNOWN", ...issue });
       if (stop.purpose === "lunch" || stop.purpose === "dinner") {
-        if (c.kind !== "restaurant" || !c.endorsements.length)
+        if (!isMealCandidate(c))
           errors.push({ code: "LOCAL_MEAL_REQUIRED", ...issue });
-        else checks.localMeals++;
+        else if (c.endorsements.length) checks.localMeals++;
         if (stop.purpose === "lunch") {
           lunch++;
           if (start < 660 || start > 840 || duration < 45)

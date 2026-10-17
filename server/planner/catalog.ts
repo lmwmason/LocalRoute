@@ -20,6 +20,7 @@ const categoryTags = (category: string) =>
 export function localCandidates(
   places: Place[],
   input: TripInput,
+  options: { allowStarter?: boolean } = {},
 ): Candidate[] {
   const center = regionForDestination(input.destination);
   return places
@@ -27,11 +28,22 @@ export function localCandidates(
       (p) =>
         p.source !== "demo" &&
         distanceMeters(center, p) < 5000 &&
-        p.endorsements.length &&
+        (p.endorsements.some((endorsement) => endorsement.versionId) ||
+          (options.allowStarter === true &&
+            Boolean(p.officialSources?.length))) &&
         !p.possiblyClosed &&
         !p.externalIds?.some((external) => external.possiblyClosed),
     )
     .map((p) => ({
+      ...(options.allowStarter === true &&
+      p.officialSources?.length &&
+      !p.endorsements.some((endorsement) => endorsement.versionId)
+        ? { starterRecommendation: true as const }
+        : {}),
+      officialSources: p.officialSources?.map(({ url, observedAt }) => ({
+        url,
+        observedAt,
+      })),
       id: p.id,
       name: p.name,
       photo: p.photo,
@@ -47,6 +59,7 @@ export function localCandidates(
         provider: "localroute",
         observedAt: p.observedAt || new Date().toISOString(),
         verification: "canonical",
+        url: p.officialSources?.[0]?.url,
       },
       endorsements: p.endorsements
         .filter((e) => e.versionId)
