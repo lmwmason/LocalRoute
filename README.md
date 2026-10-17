@@ -1,61 +1,183 @@
 # LocalRoute
 
-현지인의 독립적인 추천으로 식당을 발견하고 여행에 담는 모바일 우선 웹 앱입니다. 요구사항은 `PRD.md`, 개발 규칙은 `AGENTS.md`가 기준입니다.
+[![React](https://img.shields.io/badge/React-Mobile%20web-149ECA?logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Frontend%20%26%20server-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20Postgres-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com/)
+[![Gemini](https://img.shields.io/badge/Gemini-Server--side%20AI-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-D22128?logo=apache&logoColor=white)](./LICENSE)
 
-## 실행
+<img src="./public/localroute-logo.png" alt="LocalRoute logo" width="160">
 
-Node.js 22.12 이상을 사용합니다.
+LocalRoute is a mobile-first travel planner that combines local restaurant
+recommendations with nearby activities in an editable, timed itinerary. Travelers
+choose where and when to go, what they enjoy, and how they want to travel. The
+server builds a schedule from identified places, checks its timing, and makes
+uncertain opening hours and transport information visible.
 
-```sh
+The app supports Korean and English. Contributors can recommend a real place
+with an exact location, a photograph they took, and a short personal note.
+Operator-curated listings and examples are labeled separately from independent
+local recommendations.
+
+The repository contains the main parts of the service:
+
+- **Travel planner** — a preference wizard, server-side Gemini generation,
+  schedule validation, stop editing and replacement, regeneration, maps, and
+  read-only itinerary sharing.
+- **Place discovery** — searchable maps, place details, saved places, and
+  server-side HeyYumi place lookup with canonical place matching.
+- **Contributions** — place photographs, optional menu photographs, editable AI
+  menu extraction, recommendations, and separate place and recommendation ratings.
+- **Accounts and credits** — Supabase email-link authentication, confirmation
+  recovery, recorded consent, private booking profiles, and an atomic LP ledger.
+- **Reservations** — a gated HeyYumi booking module with customer review,
+  separate consent, request recovery, and explicit pending or unknown states.
+- **Moderation and operations** — review tools, evidence-based AI assistance,
+  upload processing, database migrations, and mocked provider tests.
+
+## Planning flow
+
+1. **Choose a destination** — select a supported region and travel dates, then
+   set the daily time window, purpose, activities, food preferences, pace, and
+   transport mode.
+2. **Review the cost** — the current policy charges **10 LP per travel day**,
+   including both the start and end dates, for trips of one to five days. The
+   total is shown before confirmation.
+3. **Build a grounded itinerary** — the server selects from identified places
+   and checks the schedule's dates, meal windows, geography, opening information,
+   and travel gaps. Missing information stays unverified.
+4. **Save before charging** — a valid itinerary must be saved before the final
+   atomic LP debit. Failed or invalid generation costs 0 LP; repeated requests
+   reuse their request identity to prevent duplicate charges.
+5. **Adjust the trip** — change visit times, replace or reorder stops, pin
+   places, and review any new validation warnings.
+6. **Share or request a booking** — create an expiring read-only share link, or
+   open a supported venue's reservation form. Booking forms start with the stop's
+   date and visit time in Korea Standard Time and remain editable. A request is
+   submitted only after reviewing the details and giving separate consent.
+
+Provider route times are estimates at the time of lookup. Planned travel buffers
+are labeled separately. Neither an itinerary nor a reservation request guarantees
+opening hours, accessibility, seat availability, or arrival time.
+
+## Tech stack
+
+- **Frontend:** React 19, TypeScript, Vite, React Router, and Noto Sans KR.
+- **Maps:** MapLibre GL with an OpenFreeMap style by default; Leaflet and
+  OpenStreetMap provide a fallback when the primary renderer is unavailable.
+- **Server:** Node.js, Express, TypeScript, and Zod request validation.
+- **Database and identity:** Supabase Auth, PostgreSQL, private Storage, RLS,
+  and server-authorized database functions.
+- **Place discovery:** HeyYumi for supported restaurant data; Kakao for region
+  lookup and activity discovery.
+- **Routing:** server-side Kakao/Kakao Mobility adapters with call budgets,
+  timeouts, structured results, and explicit unsupported or unavailable states.
+- **AI:** server-side Gemini for itinerary generation, visible menu-text
+  extraction, and moderation assistance.
+- **Image processing:** browser upload preparation and server-side Sharp
+  validation, conversion, and metadata removal.
+- **Testing:** Vitest, Playwright, Supertest, and disposable PGlite databases for
+  PostgreSQL permission, transaction, and RLS tests.
+- **Deployment:** a Vite frontend and an Express API adapter for Vercel.
+
+## Getting started
+
+### Local development
+
+Use **Node.js 22.12 or newer** and npm. Install the pinned dependencies from the
+committed lockfile:
+
+```bash
 npm ci
 npm run dev
 ```
 
-웹: http://127.0.0.1:5173 · 서버: http://127.0.0.1:3001
+The development command starts both services:
 
-기본 `VITE_DATA_MODE=demo`에서는 비밀 키 없이 시작됩니다. 화면에 표시되는 가게·추천·평점은 가상 데이터이며, 데모 추천은 현재 탭의 sessionStorage에만 저장됩니다. 지도 타일은 OpenFreeMap에서 가져오며 외부 통신 실패 시 목록을 계속 사용할 수 있습니다. 게스트 여행 목록은 현재 브라우저의 localStorage에 저장됩니다.
+| Service | Address               |
+| ------- | --------------------- |
+| Web app | http://127.0.0.1:5173 |
+| API     | http://127.0.0.1:3001 |
 
-## 환경 설정
+Without configuration, the app starts in **demo mode** and does not require
+provider secrets. Demo places, recommendations, and ratings are fictional and
+labeled accordingly. Map tiles still require an internet connection; the place
+list remains usable when the map fails.
 
-루트 `.env`만 사용합니다. `.env.local`/`.env.example`은 만들지 않습니다. 값은 커밋하거나 출력하지 않습니다.
+Demo contribution drafts use the current tab's session storage. Guest saved
+places use browser local storage. Unsubmitted image files are not persisted in
+browser storage and may need to be selected again after a reload or email-link
+redirect.
 
-| 이름                                                          | 용도                                                         |
-| ------------------------------------------------------------- | ------------------------------------------------------------ |
-| `VITE_DATA_MODE`                                              | `demo`(기본)/`live`                                          |
-| `VITE_SUPABASE_URL`                                           | 브라우저용 Supabase URL                                      |
-| `VITE_SUPABASE_PUBLISHABLE_KEY`                               | 공개 클라이언트 키(우선 사용)                                |
-| `VITE_SUPABASE_ANON_KEY`                                      | 기존 공개 anon 키 호환                                       |
-| `SUPABASE_URL`                                                | 서버 Supabase URL                                            |
-| `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY`           | 서버 전용 관리자 키. 사용자 검증 후 제한된 RPC 호출에만 사용 |
-| `VITE_MAP_STYLE_URL`                                          | MapLibre 스타일 URL. OpenFreeMap Liberty 기본값              |
-| `HEY_YUMI_API_KEY`                                            | 서버 전용 HeyYumi 키                                         |
-| `FEATURE_HEYYUMI_SEARCH`                                      | 외부 검색 활성화(기본 false)                                 |
-| `HEYYUMI_TERMS_VERIFIED`                                      | 계정 요금·표시·영속 저장 권한을 직접 확인한 경우에만 true    |
-| `HEYYUMI_REQUESTS_PER_HOUR`                                   | 단일 서버 프로세스의 시간당 호출 상한(기본 30)               |
-| `GEMINI_API_KEY`, `GEMINI_MODEL`                              | 서버 AI 연결 설정                                            |
-| `FEATURE_STARTER_ITINERARIES`                                | 출처 기반 운영자 초기 추천 사용. 서버 정책이 0 LP일 때만 허용 |
-| `FEATURE_AI_PLANNING`, `PLANNING_POLICY_APPROVED`, `GEMINI_DATA_PROCESSING_APPROVED` | 서버 일정 생성과 처리 고지 승인 플래그 |
-| `FEATURE_KAKAO_DISCOVERY`, `FEATURE_KAKAO_DESTINATIONS`, `KAKAO_TERMS_VERIFIED` | 실제 여행 지역·관광 후보 조회 |
-| `FEATURE_KAKAO_ROUTING`, `KAKAO_ROUTING_TERMS_VERIFIED`, `ROUTING_REQUESTS_PER_HOUR`, `AI_REQUESTS_PER_HOUR` | 서버 경로·AI 호출 제어. 프로세스별 한도이며 계정 전체 비용 상한이 아님 |
-| `FEATURE_GEMINI_MENU_EXTRACTION`, `FEATURE_GEMINI_MODERATION` | AI 기능 제어                                                 |
-| `FEATURE_HEYYUMI_BOOKING`, `FEATURE_LP_REWARDS`               | 검증 전 비활성 유지                                          |
-| `KAKAO_REST_API_KEY`, `KAKAO_MOBILITY_API_KEY`                | 선택적 서버 검색/경로 연결용                                 |
-| `APP_BASE_URL`, `APP_TIMEZONE`                                | 로컬 서비스 기준 URL·시간대                                  |
-| `KSKILL_ANALYTICS_DISABLED`                                   | 선택적 개발 도구 설정. 앱에서 k-skill을 실행하지 않음        |
+To run the services separately:
 
-창업자의 명시적 승인으로 LocalRoute 프로젝트에 20개 마이그레이션과 출처 기반 장소 29곳·라이선스 사진 6장을 적용했습니다. 현재 초기 일정 생성은 0 LP이며 LP 발급·차감과 실제 결제는 없습니다. 원격 확인 결과는 [DB 적용 기록](docs/DATABASE_SETUP.md)에 정리했습니다. Supabase Auth 이메일 링크의 허용 URL에는 실제 접속 주소를 등록해야 합니다. 한·영 인증 메일 템플릿과 적용 방법은 [인증 메일 설정](docs/AUTH_EMAIL_SETUP.md)을 참고하세요.
+```bash
+npm run dev:web
+npm run dev:api
+```
 
-## 보안과 데이터
+### Environment configuration
 
-공개 API는 게시된 장소/추천만 읽습니다. 서버는 Supabase `getUser`로 토큰을 검증하고, 관리자 역할은 서버 소유 `user_roles`에서 확인합니다. 클라이언트는 권한·사용자 ID를 지정할 수 없습니다. 제출 RPC는 service_role만 실행 가능하며 사용자별 중복 요청과 활성 추천을 DB에서 제한합니다. 임시 운영 제한은 사용자당 분당 10건입니다. 신규 수동 장소는 기존 장소에 자동 병합하지 않고 검토 대기합니다.
+For local development, use only the gitignored **root `.env`**. Do not create an
+`.env.example` or a second environment file, and do not commit credentials.
+Variables prefixed with `VITE_` are public browser configuration; provider keys
+and Supabase secret/service-role keys must never use that prefix.
 
-HeyYumi는 core만 요청하고 서버 내부에서 동시 요청을 합칩니다. 외부 ID는 내부 UUID와 구분하며, 선택한 결과는 위변조·만료를 검사한 후 저장합니다. 라이선스가 확인되지 않은 응답 캐시는 사용하지 않습니다. 단일 프로세스 호출 예산은 다중 인스턴스 운영 전 공유 저장소 기반으로 교체해야 합니다.
+| Variable                                                                             | Purpose                                                               |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `VITE_DATA_MODE`                                                                     | `demo` by default; `live` uses the configured backend data.           |
+| `VITE_SUPABASE_URL`                                                                  | Public Supabase project URL.                                          |
+| `VITE_SUPABASE_PUBLISHABLE_KEY`                                                      | Preferred public browser key.                                         |
+| `VITE_SUPABASE_ANON_KEY`                                                             | Legacy public anon key, used when the publishable key is absent.      |
+| `SUPABASE_URL`                                                                       | Server Supabase URL for the same project.                             |
+| `SUPABASE_SECRET_KEY` / `SUPABASE_SERVICE_ROLE_KEY`                                  | Server-only credentials for authorized operations.                    |
+| `VITE_MAP_STYLE_URL`                                                                 | Optional MapLibre style URL; defaults to OpenFreeMap Liberty.         |
+| `HEY_YUMI_API_KEY`                                                                   | Server-only HeyYumi key.                                              |
+| `FEATURE_HEYYUMI_SEARCH`, `HEYYUMI_TERMS_VERIFIED`                                   | Enable place search after verifying provider access and usage rights. |
+| `HEYYUMI_REQUESTS_PER_HOUR`                                                          | Per-process HeyYumi call budget.                                      |
+| `FEATURE_HEYYUMI_BOOKING`                                                            | Gate supported-venue reservation integration.                         |
+| `GEMINI_API_KEY`, `GEMINI_MODEL`                                                     | Server-only Gemini connection settings.                               |
+| `FEATURE_STARTER_ITINERARIES`                                                        | Allow source-backed operator candidates for initial planning.         |
+| `FEATURE_AI_PLANNING`, `PLANNING_POLICY_APPROVED`, `GEMINI_DATA_PROCESSING_APPROVED` | Gate itinerary generation and approved AI processing.                 |
+| `FEATURE_GEMINI_MENU_EXTRACTION`, `FEATURE_GEMINI_MODERATION`                        | Gate menu extraction and review assistance.                           |
+| `AI_REQUESTS_PER_HOUR`                                                               | Per-process AI call budget.                                           |
+| `KAKAO_REST_API_KEY`, `KAKAO_MOBILITY_API_KEY`                                       | Server-only discovery and routing keys.                               |
+| `FEATURE_KAKAO_DISCOVERY`, `FEATURE_KAKAO_DESTINATIONS`, `KAKAO_TERMS_VERIFIED`      | Gate activity discovery and real destination lookup.                  |
+| `FEATURE_KAKAO_ROUTING`, `KAKAO_ROUTING_TERMS_VERIFIED`, `ROUTING_REQUESTS_PER_HOUR` | Gate route lookup and its call budget.                                |
+| `FEATURE_LP_REWARDS`                                                                 | Gate eligible reward issuance.                                        |
+| `APP_BASE_URL`, `APP_TIMEZONE`                                                       | Application origin and timezone settings.                             |
 
-OpenFreeMap 지도에는 OpenMapTiles/OpenStreetMap 출처 표시가 필요합니다. 기본 MapLibre 출처 표시를 유지합니다. 지도 제공자에 이용자의 IP 및 타일 요청 영역이 전송됩니다. 위치 권한이나 백그라운드 위치 기록은 수집하지 않습니다. 폰트는 OFL 라이선스의 Noto Sans KR이며 창업자가 제공한 루트 로고를 사용합니다.
+The only supported runtime database is the LocalRoute Supabase project
+`pjdawapasozsrpnrtsfx` at `https://pjdawapasozsrpnrtsfx.supabase.co`. A different
+project URL is rejected. In-memory databases are disposable test fixtures only.
 
-## 검증
+Optional integrations stay disabled when their configuration or approval is
+missing. Feature flags do not replace provider authorization, billing checks,
+license verification, or the database's entitlement policy. In-memory call
+budgets apply to individual server instances and are not global spending caps.
 
-```sh
+### Live data and authentication
+
+Before connecting live data, review the [database setup record](./docs/DATABASE_SETUP.md),
+[operator catalog guide](./docs/OPERATOR_CATALOG_IMPORT.md), and the latest
+[release status](./docs/LIVE_RELEASE_STATUS.md). Historical setup records may
+describe earlier policies; the current product rules are in [PRD.md](./PRD.md).
+
+Email sign-in uses PKCE. Configure the actual application origin and allowed
+redirects in Supabase, keep email confirmation required, and follow the
+[email setup guide](./docs/AUTH_EMAIL_SETUP.md). Expired links, missing browser
+verification information, and failed code exchanges have Korean/English recovery
+messages and a path to request a new link. Successful callbacks remove
+authentication parameters from the URL.
+
+Protected writes require server-verified identity, confirmed email, and the
+required current consent. Admin permissions come from server-controlled roles.
+The optional private booking profile is separate from public contributor
+identity; saving it does not send a reservation or disclose it to a provider.
+
+### Checks
+
+```bash
 npm run typecheck
 npm run lint
 npm test
@@ -64,38 +186,143 @@ npx playwright install chromium --only-shell
 npm run test:e2e
 ```
 
-DB 테스트는 PGlite의 실제 PostgreSQL 엔진에 폐기 가능한 auth 스키마/역할을 구성합니다. RLS, RPC 실행 권한, 중복 추천, 사용자별 격리, 요청 재처리와 공개 취소를 검사합니다. 호스팅 Supabase의 Auth/Storage 설정까지 검증하는 테스트는 아닙니다. E2E는 360px·390px·1440px에서 수행하며 실제 유료 제공자 호출을 하지 않습니다.
+Playwright projects cover **360px**, **390px**, and **1440px** viewports. Tests use
+mocked providers and disposable data for supported local flows. PGlite tests
+exercise database permissions, RLS, transaction behavior, and idempotency; they
+do not verify hosted Supabase email delivery or Storage configuration.
 
-## 구현 진행
+For the itinerary-to-booking date and time flow:
 
-가입 지역은 도시와 선택적인 구·읍·면·동을 구분합니다. 자동 범위에서 충주시 살미면은 충주시 전체를, 서울특별시 성동구는 구 단위를 제안합니다. 사용자 지정 범위는 유지하며 자동 범위 확대 시 경계를 표시합니다. 지역별 수치는 게시된 LocalRoute 식당 주소 기준이며 실제 식당 분포 전체를 뜻하지 않습니다.
+```bash
+npx vitest run tests/booking-initial-date-time.test.ts tests/booking-itinerary-ui.test.ts
+```
 
-이메일 인증을 마친 신규 계정에는 선택적인 비공개 예약자 프로필(이름·전화번호)을 제안합니다. 프로필에서 수정·삭제할 수 있고, 공개 추천·Auth 메타데이터·Gemini 입력·감사 로그에 연락처를 넣지 않습니다. 저장만으로 HeyYumi에 전송하거나 예약하지 않습니다. 실제 예약 제출·상태 연동은 별도 모듈과 제공자 권한 검증이 필요합니다.
+### Build and deployment
 
-영수증은 후기나 기본 방문 인증의 필수 조건이 아닙니다. 현재 방문 후기는 미검증 상태로 저장하며 LP를 지급하지 않습니다. 도착 체크·예약 확정·장소 사진만으로 검증된 방문이나 보상 자격을 주장하지 않습니다.
+```bash
+npm run build
+```
 
-지역 프로필과 실제 사진: 이메일 인증 가입 시 시·군·구 단위의 거주 지역을 받습니다. 추천에 지역을 공개하는 것은 별도 선택이며 거주 인증을 뜻하지 않습니다. 가게·여행 장소 추천에는 정확한 장소와 본인이 촬영한 실제 사진을 필수로 받습니다. 생성 이미지나 다른 장소의 사진은 넣지 않습니다. 메뉴 사진은 선택입니다.
+The frontend output is written to `dist`. `npm start` runs the Express server;
+its available features depend on the environment and backend configuration.
 
-사진은 서버에서 최대 5MB/JPEG·PNG·WebP/최소 해상도를 검사하고, EXIF를 제거한 JPEG로 변환하여 LocalRoute의 비공개 `place-photos` 버킷에 저장합니다. 미공개 사진은 작성자·운영자만 읽으며, 사진 검토와 장소 게시를 통과해야 공개 API가 이미지를 제공합니다. 사진 없는 기존 데이터는 빈 상태를 표시합니다. 업로드 파일은 브라우저 저장소에 넣지 않습니다. 이메일 링크를 열거나 페이지를 새로고침하기 전에 아직 업로드하지 않은 사진은 다시 선택해야 합니다.
+For Vercel, follow the [deployment guide](./docs/VERCEL_DEPLOYMENT.md). The
+configured build command is `node scripts/build-vercel-api.mjs`, which prepares
+the private server runtime and builds the frontend. The API entry exports the
+Express application without starting a port listener. Configure deployment
+variables in the hosting project's settings rather than uploading `.env`.
 
-사진 보관 정책을 시행하려면 서버 비밀 환경에서 `npm run photos:cleanup`을 주기적으로 실행해야 합니다. 24시간이 지난 미제출 파일 및 30일이 지난 거절 사진을 최대 100개씩 처리하며 실패한 삭제는 다음 실행에서 재시도합니다. 로컬 테스트가 이 작업을 운영 환경에 예약하지는 않습니다.
+### Photo maintenance
 
-한·영 일정 마법사, 서버 Gemini 후보 선택과 시간/거리/식사 검증, 수정·대체·부분 재생성, LP 예약/유효한 결과 저장 후 원자 차감이 구현되어 있습니다. 실제 유료 생성은 `FEATURE_AI_PLANNING`, `PLANNING_POLICY_APPROVED`, `FEATURE_KAKAO_DISCOVERY`, `KAKAO_TERMS_VERIFIED` 및 DB `lp_policy.planning_enabled`를 검토 후 켜야 합니다. `AI_REQUESTS_PER_HOUR`는 서버 호출 예산입니다. 현재 데모는 가상 장소로만 동작하며 실제 영업시간·교통시간을 확인했다고 표시하지 않습니다.
+```bash
+npm run photos:cleanup
+```
 
-현재 구현: 모바일 탐색·지도·검색/분류·상세·추천 미리보기·로그인 진입·수동 검토 제출·외부 장소 선택/식별 어댑터·브라우저 여행 목록. 실행 상태와 제한은 `/api/health`에서 확인합니다.
+Run cleanup only from an authorized server environment. It processes eligible
+unsubmitted uploads older than 24 hours and rejected photographs older than
+30 days, in batches of up to 100. Failed deletions can be retried by a later run.
+The repository does not automatically schedule this maintenance in production.
 
-PRD 전체 MVP는 작업 중입니다. 원격 DB 스키마는 적용했지만 실제 제공자 권한/비용 검증, 보상/예약 활성화는 완료되지 않았습니다. `QA_REPORT.md`는 독립 리뷰어가 관리하며 구현자가 수정하지 않습니다.
+## Project structure
 
-## 일정·화면 이동과 공유
+```text
+src/
+  planner/                  Preference wizard, itinerary editor, route display, sharing
+  booking/                  Reservation form, consent, API client, date/time prefill
+  ai-assistance/            Editable menu previews and review-assistance UI
+  components/               Discovery, contributions, accounts, maps, and shared UI
+  examples/                 Public Euljiro sample itinerary and booking entry
+  photos/                   Browser-side photo preparation
+  i18n/                     Korean and English messages
+  landing/                  Landing-page data and account state
+server/
+  app.ts                    Express routes and middleware
+  repository.ts             Supabase persistence boundary
+  planner/                  Candidate selection, Gemini orchestration, schedule checks
+  routing/                  Server-only route provider adapters
+  ai-assistance/            Validated AI extraction and moderation assistance
+  booking/                  Booking authorization, provider requests, reconciliation
+  photos.ts                 Upload validation, private access, and review handling
+  visit-rewards/            Visit-feedback eligibility and contributor outcomes
+shared/                     Domain types, schemas, policies, and validation
+supabase/
+  migrations/               PostgreSQL schema, RLS, ledger, and server RPCs
+  templates/                Confirmation and passwordless sign-in email templates
+scripts/                    Import, maintenance, development, and build tools
+  data/                     Operator research, source records, and media provenance
+public/                     Brand assets, licensed photographs, and labeled illustrations
+api/                        Deployment API entry
+server-runtime/             Private runtime bundle target (generated bundles ignored)
+tests/                      Unit, integration, and mocked browser fixtures
+e2e/                        Playwright user-flow tests
+docs/                       Setup, deployment, and recorded release evidence
+```
 
-핵심 화면은 `/plan`, `/plan/new/1`~`4`, `/itineraries/:id`, `/discover`, `/places/:id`, `/saved`, `/contribute`, `/login`, `/account` URL로 구분합니다. 브라우저 뒤로가기와 새로고침을 지원하며 일정 초안은 현재 탭의 sessionStorage에 보관합니다. 유료 요청의 복구 키는 사용자별로 구분하고 원래 동의와 요청 UUID를 재사용합니다.
+## Data, privacy, and credits
 
-여행 목적지는 Kakao 주소 검색의 시·군·구·읍·면 결과를 선택합니다. `FEATURE_KAKAO_DESTINATIONS=true`, `KAKAO_TERMS_VERIFIED=true`, `KAKAO_REST_API_KEY`가 있어야 실제 검색이 켜집니다. 서버가 지역과 좌표를 다시 확인한 뒤 LP를 예약합니다. 후보 검색 범위는 지역 대표 위치의 현지 추천 5km, 외부 활동 3km이며 행정구역 전체의 커버리지를 뜻하지 않습니다. 후보 부족은 무과금 실패입니다.
+Place records, contributor recommendations, restaurant reviews, and ratings of
+individual recommendations are separate objects. Provider IDs are external
+identifiers, not LocalRoute UUIDs. Search and deduplication precede place creation;
+uncertain matches require confirmation.
 
-`FEATURE_KAKAO_ROUTING`, `KAKAO_ROUTING_TERMS_VERIFIED`, `ROUTING_REQUESTS_PER_HOUR`는 자동차·대중교통 조회를 제어하며 기본 false/false/0입니다. 확인된 제공자 이동 시간에 사용자가 선택한 추가 여유 시간을 더해 방문 간격과 비교합니다. 조회 시점 예상이며 미래 운행·접근성·도착을 보장하지 않습니다. 지원하지 않거나 실패한 경로는 미확인으로 남습니다. 여러 서버 인스턴스를 운영하기 전 프로세스별 호출 한도를 중앙화해야 합니다.
+New user contributions require an exact place and a real contributor-taken
+photograph. Menu photos are optional. Uploads are validated, metadata is removed,
+and unreviewed files stay private until human review. The server checks image
+bytes, type, size, and resolution; browser preparation also reduces upload size
+for the hosting platform's request limits.
 
-지도는 컨테이너 크기 변경에 맞춰 갱신하고 WebGL/스타일 장애 시 Leaflet/OpenStreetMap 기본 지도로 전환합니다. 출처 표시와 정상 HTTP 캐시를 유지하며 타일 선다운로드는 하지 않습니다. OSM 공용 타일은 무제한 운영용 SLA를 제공하지 않으므로 실제 트래픽과 정책에 맞는 제공자를 선정해야 합니다.
+Some seeded listings use explicitly labeled **AI food illustrations** for
+presentation. They do not show the actual venue or menu and cannot serve as
+contribution or visit evidence. Approved real photographs take priority. Licensed
+source photographs retain their original attribution and license terms, and
+missing media is not represented as a verified photograph.
 
-저장된 일정은 수정되지 않는 읽기 전용 스냅샷으로 공유할 수 있습니다. 생성 전 공개 범위를 확인하며 1/7/30일 만료와 즉시 링크 폐기를 지원합니다. 링크 토큰은 서버에 SHA-256 해시만 저장합니다. 공유에는 선택한 장소와 시간·출처만 포함하고 원래 입력·식이 제한·예약 연락처·LP·모델의 자유 서술은 제외합니다. 링크를 받은 사람은 일정을 읽을 수 있습니다.
+Gemini calls run only on the server. Menu extraction returns visible names,
+prices, currencies, and uncertainty for user correction. Moderation assistance
+provides evidence and suggested review actions; AI signals alone do not justify
+punishment or LP confiscation. Booking contact details are not sent to Gemini or
+stored in public profiles, Auth metadata, or analytics.
 
-공개 정책은 `/legal/privacy`, `/legal/terms`, `/legal/transfers`, `/legal/location`에서 확인합니다. 확인된 이메일 계정은 회원 기능 사용 전 버전이 기록되는 별도 동의를 완료합니다. 거주 지역 공개는 계정의 동의 설정에서 별도로 변경합니다. 실제 공급자 계약·메일 설정·국외 처리 조건을 확인하기 전 실제 가입/AI/예약의 출시 완료로 간주하지 않습니다.
+The current membership policy provides **50 promotional LP per calendar month**
+under the Asia/Seoul calendar after verified email and required consent. Enhanced
+planning costs **10 LP per travel day**. Promotional credits expire at month end;
+earned credits follow the published policy. `/checkout/test` does not charge
+money; its explicit test flow can grant a fixed, one-time **100 LP test bonus**
+to an eligible verified account. This is not a paid purchase.
+
+Booking confirmation, arrival checks, and uploaded photographs alone do not prove
+a visit or qualify someone for a reward. Receipts are not required for ordinary
+feedback. Reward issuance is separately gated and must be attributable,
+authorized, bounded, and idempotent.
+
+Maps preserve provider attribution. External tile services receive network
+requests, including the user's IP address and the requested map area. The app
+does not collect background location histories. The optional k-skill development
+tools are not part of the public request path; user locations and secrets must
+not be sent through third-party skill proxies.
+
+## Status
+
+LocalRoute is an evolving MVP. The repository implements the planner, discovery,
+contribution, account, consent, media, booking, and sharing flows, with provider
+features controlled by configuration and permission checks. Public examples are
+operator-curated demonstrations, not proof of independent recommendations,
+current opening hours, live availability, or completed reservations.
+
+The [release status log](./docs/LIVE_RELEASE_STATUS.md) records dated deployment,
+provider, database, and test evidence. Provider sandbox results do not establish
+that real booking delivery, merchant confirmation, cancellation, or email delivery
+work end to end. Builds and mocked tests do not replace those checks. Real-money
+checkout and unapproved reward payouts remain outside the demonstrated flow.
+
+[PRD.md](./PRD.md) defines product behavior;
+[AGENTS.md](./AGENTS.md) defines engineering rules. The independent reviewer owns
+[QA_REPORT.md](./QA_REPORT.md).
+
+## License
+
+The application source is licensed under the [Apache License 2.0](./LICENSE).
+Third-party photographs retain their own licenses and attribution requirements;
+see the [photo credits](./public/place-source-photos/ATTRIBUTION.md) and individual
+media source records. The font uses its own OFL license. Repository licensing
+does not grant rights to third-party branding or provider data.
