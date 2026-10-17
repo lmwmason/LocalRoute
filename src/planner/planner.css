@@ -965,8 +965,8 @@
     padding: 9px 13px;
   }
   .wizard-actions {
-    position: sticky;
-    bottom: calc(76px + env(safe-area-inset-bottom));
+    position: static;
+    bottom: auto;
     z-index: 3;
     background: #fffffff5;
     backdrop-filter: blur(16px);

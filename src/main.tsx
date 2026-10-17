@@ -11,8 +11,15 @@ const SharedItineraryPage = React.lazy(
   () => import("./planner/SharedItineraryPage"),
 );
 const LegalSitePage = React.lazy(() => import("./LegalSitePage"));
+const TestCheckout = React.lazy(() => import("./checkout/TestCheckout"));
 function SiteRouter() {
   const location = useLocation();
+  if (location.pathname === "/checkout/test")
+    return (
+      <React.Suspense fallback={<p role="status">LocalRoute…</p>}>
+        <TestCheckout />
+      </React.Suspense>
+    );
   if (location.pathname.startsWith("/legal/"))
     return (
       <React.Suspense fallback={<p role="status">LocalRoute…</p>}>

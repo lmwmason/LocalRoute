@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { legalDocuments, type LegalDocument } from "../shared/legal";
 import { LegalPage } from "./legal";
 import { LanguageSwitch, useI18n } from "./i18n";
+import { BrandLink } from "./components/BrandLink";
 export default function LegalSitePage() {
   const { language } = useI18n();
   const path = useLocation().pathname.split("/")[2];
@@ -11,10 +12,7 @@ export default function LegalSitePage() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <Link to="/plan" className="brand">
-          <img src="/localroute-logo.png" alt="LocalRoute" />
-          <span>LocalRoute</span>
-        </Link>
+        <BrandLink />
         <LanguageSwitch />
       </header>
       <main className="legal-site">

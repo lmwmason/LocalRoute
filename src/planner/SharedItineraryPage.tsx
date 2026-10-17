@@ -6,6 +6,7 @@ import type { Place } from "../../shared/domain";
 import { api } from "../api";
 import { LanguageSwitch, useI18n } from "../i18n";
 import { PlacePhoto } from "../components/PlacePhoto";
+import { BrandLink } from "../components/BrandLink";
 const PlaceMap = lazy(() => import("../components/Map"));
 export default function SharedItineraryPage() {
   const { t, language } = useI18n();
@@ -52,12 +53,7 @@ export default function SharedItineraryPage() {
   return (
     <div className="app-shell shared-itinerary-page">
       <header className="topbar">
-        <a className="brand" href="/">
-          <img src="/localroute-logo.png" alt="LocalRoute" />
-          <span className="brand-word">
-            Local<span>Route</span>
-          </span>
-        </a>
+        <BrandLink />
         <LanguageSwitch />
       </header>
       <main>

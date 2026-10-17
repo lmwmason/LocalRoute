@@ -130,6 +130,8 @@ small {
   border-bottom: 1px solid var(--line);
 }
 .brand {
+  color: var(--ink);
+  text-decoration: none;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1989,4 +1991,22 @@ small {
   align-items: center;
   cursor: pointer;
   font-weight: 700;
+}
+
+.map-panel .leaflet-control-zoom.leaflet-bar a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 24px;
+}
+.map-panel .maplibregl-ctrl-group button {
+  width: 44px;
+  height: 44px;
+}
+
+.map-panel .raster-warning { left:72px; pointer-events:none; }
+@media (max-width: 700px) {
+  .main-app-shell { height:calc(100dvh - 76px - env(safe-area-inset-bottom)); overflow-y:auto; overflow-x:clip; overscroll-behavior-y:contain; scroll-padding-block:16px 24px; }
+  .main-app-shell .site-footer { padding-bottom:24px; }
+  .bottom-nav { min-height:calc(76px + env(safe-area-inset-bottom)); grid-template-columns:repeat(5,minmax(0,1fr)); }
 }
