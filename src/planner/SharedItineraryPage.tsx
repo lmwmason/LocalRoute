@@ -1,9 +1,12 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { MapPin } from "lucide-react";
 import { regionForDestination } from "../../shared/planner";
-import type { SharedItinerary } from "../../shared/sharing";
+import {
+  sharedItinerarySchema,
+  type SharedItinerary,
+} from "../../shared/sharing";
 import type { Place } from "../../shared/domain";
-import { api } from "../api";
+import "./sharing.css";
 import { LanguageSwitch, useI18n } from "../i18n";
 import { PlacePhoto } from "../components/PlacePhoto";
 import { BrandLink } from "../components/BrandLink";
@@ -14,27 +17,53 @@ export default function SharedItineraryPage() {
     [error, setError] = useState(""),
     [dayIndex, setDayIndex] = useState(0),
     [view, setView] = useState<"timeline" | "map">("timeline"),
-    [selected, setSelected] = useState<string | null>(null);
+    [selected, setSelected] = useState<string | null>(null),
+    [attempt, setAttempt] = useState(0);
   useEffect(() => {
     const robots = document.createElement("meta");
     robots.name = "robots";
     robots.content = "noindex,nofollow,noarchive";
-    document.head.append(robots);
+    const referrer = document.createElement("meta");
+    referrer.name = "referrer";
+    referrer.content = "no-referrer";
+    document.head.append(robots, referrer);
     let active = true;
     const token = location.pathname.split("/")[2] || "";
-    api
-      .shared(token)
-      .then((data) => {
-        if (active) setData(data);
+    const controller = new AbortController();
+    void fetch(`/api/shared-itineraries/${encodeURIComponent(token)}`, {
+      signal: controller.signal,
+      cache: "no-store",
+      credentials: "omit",
+      referrerPolicy: "no-referrer",
+    })
+      .then(async (response) => {
+        if (!response.ok)
+          throw new Error(
+            [404, 410].includes(response.status)
+              ? "sharing.unavailable"
+              : "sharing.failed",
+          );
+        const result = sharedItinerarySchema.parse(await response.json());
+        if (active) {
+          setData(result);
+          setError("");
+        }
       })
-      .catch(() => {
-        if (active) setError("sharing.unavailable");
+      .catch((value) => {
+        if (active)
+          setError(
+            value instanceof Error && value.message === "sharing.unavailable"
+              ? "sharing.unavailable"
+              : "sharing.failed",
+          );
       });
     return () => {
       active = false;
+      controller.abort();
       robots.remove();
+      referrer.remove();
     };
-  }, []);
+  }, [attempt]);
   const day = data?.days[dayIndex];
   const places: Place[] =
     day?.stops.map((stop) => ({
@@ -58,14 +87,39 @@ export default function SharedItineraryPage() {
       </header>
       <main>
         {error ? (
-          <div className="empty-state">
+          <div className="empty-state shared-state-card" role="alert">
             <h1>{t(error)}</h1>
+            <p>
+              {error === "sharing.unavailable"
+                ? language === "ko"
+                  ? "만료되거나 철회된 링크는 다시 열 수 없어요. 공유한 사람에게 새 링크를 요청해 주세요."
+                  : "Expired or revoked links cannot be reopened. Ask the owner for a new link."
+                : language === "ko"
+                  ? "연결을 확인하고 다시 시도해 주세요. 일정을 변경하지는 않았어요."
+                  : "Check your connection and try again. The itinerary has not been changed."}
+            </p>
+            {error === "sharing.failed" && (
+              <button
+                type="button"
+                className="primary"
+                onClick={() => {
+                  setError("");
+                  setAttempt(attempt + 1);
+                }}
+              >
+                {language === "ko" ? "다시 불러오기" : "Try loading again"}
+              </button>
+            )}
             <a className="primary" href="/">
               {t("sharing.makeOwn")}
             </a>
           </div>
         ) : !data ? (
-          <p role="status">{t("common.loading")}</p>
+          <p className="shared-state-card" role="status">
+            {language === "ko"
+              ? "공유 일정을 불러오고 있어요…"
+              : "Loading the shared itinerary…"}
+          </p>
         ) : (
           <>
             <span className="badge">
