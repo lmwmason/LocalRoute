@@ -189,6 +189,40 @@ test("direct core pages render without runtime errors", async ({ page }) => {
   }
   expect(errors).toEqual([]);
 });
+test("My trips displays account itineraries without requiring bookmarks", async ({
+  page,
+}) => {
+  await setup(page, "member");
+  const plans = [20, 21, 22, 23].map((day) => ({
+    ...fixturePlan(),
+    id: `90000000-0000-4000-8000-0000000000${day}`,
+    provenance: "operator_example" as const,
+    input: {
+      ...fixturePlan().input,
+      startDate: `2026-10-${day}`,
+      endDate: `2026-10-${day}`,
+    },
+    schedule: { ...fixturePlan().schedule, title: `예약 시연 · 10월 ${day}일` },
+  }));
+  await page.route("**/api/itineraries", (route) =>
+    route.fulfill({
+      json: plans.map((result) => ({ id: result.id, result, revision: 1 })),
+    }),
+  );
+  await page.goto("/saved");
+  await expect(
+    page.getByRole("heading", { name: "저장한 여행 일정", exact: true }),
+  ).toBeVisible();
+  for (const plan of plans)
+    await expect(
+      page.locator(`a[href="/itineraries/${plan.id}"]`),
+    ).toContainText(plan.schedule.title);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
 test("missing place, feedback and report URLs return to discovery", async ({
   page,
 }) => {
