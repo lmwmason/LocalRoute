@@ -6,6 +6,7 @@ const a = "10000000-0000-4000-8000-000000000001";
 const b = "10000000-0000-4000-8000-000000000002";
 const unverified = "10000000-0000-4000-8000-000000000003";
 let db: PGlite;
+let missingIdentityGrantReproduced = false;
 const payload = (publicLocalArea = false) => ({
   requestId: crypto.randomUUID(),
   version: LEGAL_VERSION,
@@ -20,20 +21,34 @@ beforeAll(async () => {
   db = new PGlite();
   // Disposable in-memory fixture; never stores application data or connects remotely.
   await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
-    create schema auth; create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,is_anonymous boolean default false);
+    create schema auth; create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,is_anonymous boolean default false,encrypted_password text);
     create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
     grant usage on schema public,auth to anon,authenticated,service_role;
-    grant select on auth.users to service_role;
     create table public.profiles(user_id uuid primary key,home_city text,home_area text,locality_scope text,public_local_area boolean default false);
     create table public.curator_identities(user_id uuid primary key,local_area_label text);
     create function public.locality_label(text,text,text) returns text language sql as $$select concat_ws(' ',$1,$2)$$;
     grant select,update on public.profiles,public.curator_identities to service_role;
-    insert into auth.users values('${a}','a@test.invalid',now(),false),('${b}','b@test.invalid',now(),false),('${unverified}','c@test.invalid',null,false);
+    insert into auth.users(id,email,email_confirmed_at,is_anonymous) values('${a}','a@test.invalid',now(),false),('${b}','b@test.invalid',now(),false),('${unverified}','c@test.invalid',null,false);
     insert into public.profiles values('${a}','서울','성동구','area',false),('${b}','서울','','city',false);
     insert into public.curator_identities(user_id) values('${a}'),('${b}');`);
   await db.exec(
     readFileSync(
       "supabase/migrations/20261017034938_legal_consents.sql",
+      "utf8",
+    ),
+  );
+  try {
+    await db.transaction(async (tx) => {
+      await tx.exec("set local role service_role");
+      await tx.query("select public.legal_consent_action($1,'status')", [b]);
+    });
+  } catch (error) {
+    missingIdentityGrantReproduced =
+      error instanceof Error && /permission denied.*users/i.test(error.message);
+  }
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261017054300_grant_server_auth_identity_read.sql",
       "utf8",
     ),
   );
@@ -70,6 +85,22 @@ function action(userId: string, value: unknown, name = "record") {
   );
 }
 describe("legal consent actual PostgreSQL authorization and idempotency", () => {
+  it("reproduces live default Auth privileges and fixes first-login status without exposing credentials", async () => {
+    expect(missingIdentityGrantReproduced).toBe(true);
+    const initial = (await action(b, {}, "status")).rows[0].result;
+    expect(initial.current).toBe(false);
+    for (const name of ["anon", "authenticated", "service_role"]) {
+      const privileges = await db.query<{
+        credential: boolean;
+        identity: boolean;
+      }>(
+        "select has_column_privilege($1,'auth.users','encrypted_password','SELECT') as credential, has_column_privilege($1,'auth.users','email_confirmed_at','SELECT') as identity",
+        [name],
+      );
+      expect(privileges.rows[0].credential).toBe(false);
+      expect(privileges.rows[0].identity).toBe(name === "service_role");
+    }
+  });
   it("does not publish locality from untrusted Auth/profile metadata without consent", async () => {
     await db.query(
       "update public.profiles set public_local_area=true where user_id=$1",
