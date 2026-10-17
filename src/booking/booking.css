@@ -51,15 +51,27 @@
   outline: 3px solid #175fce;
   outline-offset: 3px;
 }
-.lr-booking .lr-booking-consent {
-  display: flex;
-  align-items: flex-start;
-}
-.lr-booking-consent input {
-  flex: 0 0 44px;
-  width: 44px;
-  height: 44px;
+.lr-booking form label.lr-booking-consent {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-height: 44px;
   margin: 0;
+  padding: 12px 0;
+  font-size: 0.875rem;
+  line-height: 22px;
+  cursor: pointer;
+}
+.lr-booking label.lr-booking-consent input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  min-height: 22px;
+  min-width: 22px;
+  margin: 0;
+  padding: 0;
+  align-self: start;
+  accent-color: #175fce;
 }
 .lr-booking-note {
   overflow-wrap: anywhere;

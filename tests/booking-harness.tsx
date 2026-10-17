@@ -2,6 +2,7 @@
 import { createRoot } from "react-dom/client";
 import { BookingButton } from "../src/booking/BookingButton";
 import { createBookingApi } from "../src/booking/api";
+import "../src/styles.css";
 const api = createBookingApi(async () => "test-only");
 createRoot(document.getElementById("root")!).render(
   <main style={{ maxWidth: 500, margin: "auto", padding: 8 }}>

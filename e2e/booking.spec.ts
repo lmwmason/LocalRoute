@@ -61,6 +61,24 @@ test("booking review, consent, pending/confirmed and mobile layout", async ({
   });
   await expect(submit).toBeDisabled();
   expect(submissions).toBe(0);
+  const consentLayout = await page
+    .locator(".lr-booking-consent")
+    .evaluate((label) => {
+      const input = label.querySelector("input")!;
+      const row = label.getBoundingClientRect(),
+        box = input.getBoundingClientRect();
+      return {
+        display: getComputedStyle(label).display,
+        columns: getComputedStyle(label).gridTemplateColumns,
+        height: row.height,
+        checkbox: box.width,
+        top: box.top - row.top,
+      };
+    });
+  expect(consentLayout.display).toBe("grid");
+  expect(consentLayout.checkbox).toBe(22);
+  expect(consentLayout.height).toBeGreaterThanOrEqual(44);
+  expect(consentLayout.top).toBe(12);
   await page.getByRole("checkbox").check();
   await submit.focus();
   await page.keyboard.press("Enter");

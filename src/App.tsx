@@ -50,6 +50,7 @@ import { LanguageSwitch, useI18n } from "./i18n";
 import { LegalConsentGate } from "./legal";
 import { MonthlyWallet } from "./components/MonthlyWallet";
 import { SavedItineraries } from "./components/SavedItineraries";
+import { ContributorOutcomes } from "./ContributorOutcomes";
 import { VisitRewardRequestPanel } from "./visit-rewards/VisitRewards";
 import { visitRewardsApi } from "./visit-rewards/host-client";
 import { BookingButton } from "./booking/BookingButton";
@@ -536,7 +537,8 @@ export default function App() {
     setContributePlace(place);
     setPanel("contribute");
   }
-  if (window.location.pathname.startsWith("/admin")) return <Admin />;
+  if (window.location.pathname.startsWith("/admin"))
+    return <Admin key={session?.user.id || "admin-guest"} />;
 
   return (
     <>
@@ -1347,6 +1349,10 @@ export default function App() {
               <LegalConsentGate userId={session?.user.id || ""}>
                 <MonthlyWallet key={session.user.id} userId={session.user.id} />
                 <Workspace />
+                <ContributorOutcomes
+                  userId={session.user.id}
+                  language={language}
+                />
                 <details className="consent-settings">
                   <summary>
                     {language === "ko"
