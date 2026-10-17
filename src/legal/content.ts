@@ -20,7 +20,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "4. 선택 처리와 AI 일정",
-          text: "거주 지역 라벨 공개는 별도 선택이며 거부해도 회원 기능을 이용할 수 있습니다. 동의한 도시·지역 라벨만 추천과 함께 공개하고, 이는 검증된 거주지가 아닙니다. 예약 프로필의 예약자명·연락 전화번호 저장은 별도 화면의 선택 동의로 처리하며 가입에 필요하지 않습니다. 이 정보는 비공개이며 Auth 메타데이터·공개 프로필·AI 입력에 넣지 않습니다. AI 일정 기능이 활성화되면 목적지·여행일·시간·취향·동행·이동수단·예산·요청 문구, 장소 후보 및 추천 문장을 서버에서 Gemini로 보내고 일정·검증 결과를 저장합니다. 민감정보·개인 연락처를 요청 문구에 입력하지 마세요. 메뉴 사진 추출은 기본 설정에서 제공하지 않으며 별도 고지·데이터 처리 확인 후 활성화해야 합니다. AI만으로 자동 제재하지 않습니다.",
+          text: "거주 지역 라벨 공개는 별도 선택이며 거부해도 회원 기능을 이용할 수 있습니다. 동의한 도시·지역 라벨만 추천과 함께 공개하고, 이는 검증된 거주지가 아닙니다. 예약 프로필의 예약자명·연락 전화번호 저장은 별도 화면의 선택 동의로 처리하며 가입에 필요하지 않습니다. 예약 정보는 비공개이며 Auth 메타데이터·공개 프로필·AI 입력에 넣지 않습니다. 현재 무료 AI 일정은 별도 안내에 동의한 뒤 이용하며, 서버가 목적지·여행일·시간·여행 목적·선택한 취향·동행 유형·이동수단·예산·속도·여유 시간과 공개 장소 사실만 골라 Google Gemini에 보냅니다. 이름·이메일·전화번호·원문 식이제한·기여자 추천 문장·사진은 일정 모델에 보내지 않습니다. 입력한 식이제한은 저장된 일정과 서버 검증에 사용될 수 있으므로 개인정보나 민감한 설명을 넣지 마세요. 선택 메뉴 추출은 별도 체크 후 개인정보를 제거한 공공 메뉴 사진만 Gemini에 전송하며, 이 모듈은 원본을 영구 저장하지 않습니다. Google의 입력·출력 처리와 사람 검토 가능성은 기능 안내와 국외 처리 항목을 확인하세요. AI 심사는 비활성이고 AI만으로 자동 제재하지 않습니다.",
         },
         {
           title: "5. 보유와 파기",
@@ -36,7 +36,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "8. 위탁·국외 처리·변경",
-          text: "인증·DB·사진 저장은 Supabase에 위탁하며 확인된 기본 DB 보관 국가는 인도(뭄바이, ap-south-1)입니다. 상세 항목·이전 시기·수탁자 연락처·거부 방법은 국외 이전/처리위탁 안내에 기재합니다. 예약 제출은 기본 비활성이며, 개인위치 추적은 제공하지 않습니다. 방침 변경 시 버전과 시행일을 공개하고, 동의가 필요한 변경은 다시 동의를 받습니다.",
+          text: "인증·DB·기여 사진 저장은 Supabase를 이용하며 확인된 기본 DB 보관 국가는 인도(뭄바이, ap-south-1)입니다. 실제 웹 서비스 localroute.vercel.app의 호스팅·콘텐츠 전송·API 실행에는 Vercel을 이용합니다. Vercel 처리 위치는 Supabase DB 리전과 같다고 보장하지 않습니다. 상세 항목·이전 시기·제공자·미확인 범위·거부 방법은 국외 이전/처리위탁 안내에 기재합니다. 실예약 제출·보상 지급은 비활성이며 개인위치 추적은 제공하지 않습니다. 방침 변경 시 버전과 시행일을 공개하고, 동의가 필요한 변경은 다시 동의를 받습니다.",
         },
       ],
     },
@@ -49,7 +49,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "2. 서비스 범위와 한계",
-          text: "기본 탐색은 무료이며 데모와 실제 자료를 구별합니다. 지역 추천은 개인의 경험·의견으로 전체 업소의 전수조사나 품질 보증이 아닙니다. AI 일정은 초안이며 영업시간·가격·이동시간·접근성·식이 안전·예약 가능성을 보장하지 않습니다. 방문 전 업소와 교통편을 확인하세요. 실시간 교통·위치 추적·방문 자동 인증·계정 자동 삭제를 제공한다고 해석하지 않습니다. 예약 제출은 기본 비활성이며 실제 API 권한 확인과 별도 안내·동의가 필요합니다. 예약 프로필 저장은 실제 예약이 아닙니다.",
+          text: "기본 탐색은 무료이며 데모와 실제 자료를 구별합니다. 독립 기여자의 지역 추천은 개인의 경험·의견입니다. 운영자 초기 추천은 확인한 공개 장소 사실을 바탕으로 별도 표시하며 현지인의 직접 방문·후기·추천으로 간주하지 않습니다. 어느 자료도 전체 업소의 전수조사나 품질 보증이 아닙니다. AI 일정은 초안이며 영업시간·가격·이동시간·접근성·식이 안전·예약 가능성을 보장하지 않습니다. 방문 전 업소와 교통편을 확인하세요. 실시간 교통·위치 추적·방문 자동 인증·계정 자동 삭제를 제공한다고 해석하지 않습니다. 실예약 제출은 비활성이며 실제 API 권한 확인과 별도 안내·동의가 필요합니다. 예약 프로필 저장은 실제 예약이 아닙니다.",
         },
         {
           title: "3. 기여와 권리",
@@ -57,7 +57,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "4. LP와 유료 기능",
-          text: "향상된 일정 기능은 활성화된 경우에만 화면에 가격·잔액·제공 결과·실패 처리 조건을 먼저 표시합니다. 유효한 결과가 저장된 경우에만 서버에서 한 번 차감하며 생성 실패·무효 결과는 과금 대상이 아닙니다. 월 300 프로모션 LP·요청당 100 LP·평가 보상 수치는 검토 중인 시범값으로 지급 약속이 아닙니다. LP는 현금·양도 가능한 재산이 아니며 현금 환급·수익을 보장하지 않습니다. 실제 결제·리워드 출시는 확정 정책을 별도 안내한 후 진행합니다. 법률상 소비자 권리는 제한하지 않습니다.",
+          text: "현재 운영자 초기 추천을 활용하는 AI 일정은 0 LP 무료이며 이 흐름에서 LP를 발급하거나 차감하지 않습니다. 실제 결제와 보상 지급도 비활성입니다. 테스트 결제 화면은 실제 청구·카드 결제·LP 지급을 실행하지 않습니다. 월 300 프로모션 LP·요청당 100 LP·평가 보상은 이전 시범 설계값으로 현재의 지급·청구 약속이 아닙니다. 향후 유료 기능을 도입하면 가격·잔액·제공 결과·실패 처리 조건을 먼저 안내하고 별도 확인을 받습니다. 유효한 결과 저장 전이나 생성 실패·무효 결과에 차감하지 않는 원칙을 유지합니다. LP의 현금 환급·양도·수익은 보장하지 않으며 법률상 소비자 권리를 제한하지 않습니다.",
         },
         {
           title: "5. 검토·중단·책임",
@@ -78,14 +78,18 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "2. 시기·방법·보유·거부",
-          text: "가입·로그인·저장·기능 이용 시 HTTPS API를 통해 전송하고 계정과 기능 제공에 필요한 동안 보관합니다. 목적 달성·탈퇴 요청 시 법정 보존을 제외하고 삭제 처리하며 백업·운영 로그의 실제 잔존 기간과 삭제 절차는 제공자 계약 확인이 필요합니다. 개인정보 보호법 제28조의8 제1항 제1호에 따른 별도 동의를 받습니다. 동의하지 않으면 국외 인증·저장이 필요한 회원 기능은 이용할 수 있으나 공개 탐색·데모는 가능합니다. 철회·이전 중단은 lmw.hpc@gmail.com으로 요청하세요. 이 필수 동의는 Gemini·예약업체 제공·위치 추적 동의를 포함하지 않습니다. 미확정 국외 처리 범위는 별도 확인·고지 전 활성화하지 않아야 합니다.",
+          text: "가입·로그인·저장·기능 이용 시 HTTPS API를 통해 전송하고 계정과 기능 제공에 필요한 동안 보관합니다. 목적 달성·탈퇴 요청 시 법정 보존을 제외하고 삭제 처리하며 백업·운영 로그의 실제 잔존 기간과 삭제 절차는 제공자 계약 확인이 필요합니다. 개인정보 보호법 제28조의8 제1항 제1호에 따른 별도 동의를 받습니다. 동의하지 않으면 국외 인증·저장이 필요한 회원 기능은 이용할 수 없으나 공개 탐색·데모는 가능합니다. 철회·이전 중단은 lmw.hpc@gmail.com으로 요청하세요. 이 필수 동의는 Gemini·예약업체 제공·위치 추적 동의를 포함하지 않습니다. 미확정 국외 처리 범위는 별도 확인·고지 전 활성화하지 않아야 합니다.",
         },
         {
           title: "3. Gemini: 조건부 AI 처리",
-          text: "서버 AI 일정이 활성화되면 Google의 Gemini API에 여행 입력, 후보 장소·추천 문장과 수정 요청을 보냅니다. 기본 설정에서는 장소 사진을 AI에 전송하지 않으며 메뉴 추출·AI 심사도 비활성입니다. 이 기능을 활성화하기 전 사진 속 개인정보 제거와 별도 기능 동의·국외 처리 고지가 필요합니다. Google 약관은 18세 미만 접근 가능 서비스 이용을 제한합니다. 무료 API는 입력·출력을 개선·사람 검토에 사용할 수 있고 개인정보 입력을 금지합니다. 유료 API는 개선 학습에 사용하지 않지만 안전 목적 로그·세계 각지의 일시 처리를 허용합니다. 실제 계정 계약, 수신 법인·국가·보유기간 및 적법한 이전 근거 확인 후 AI 기능을 활성화해야 합니다. 본 가입 동의는 미확정 AI 개인정보 이전을 허용하지 않습니다.",
+          text: "별도 AI 안내에 동의하면 서버가 Google Gemini API에 목적지·날짜·시간·여행 목적·선택형 취향·동행 유형·예산·이동·여행 속도·여유 시간과 공개 장소 사실만 전송합니다. 일정 모델에는 이름·이메일·연락처·원문 식이제한·기여자 추천 문장·사진을 보내지 않습니다. 메뉴 사진 추출은 선택 기능으로, 이름·얼굴·전화번호·영수증 등 개인정보를 제거한 공공 메뉴 사진만 기능별 체크 후 Google에 전송합니다. LocalRoute 추출 모듈은 원본을 영구 저장하지 않으며 Google의 보유와는 별개입니다. AI 심사는 비활성입니다. Google 무료 API는 입력·출력을 제품 개선에 이용하거나 사람이 검토할 수 있으므로 개인정보·민감정보를 전송하면 안 됩니다. Google 약관의 18세 미만 제한 및 지역별 제공 조건이 적용됩니다. Google의 실제 처리 국가·안전 로그·보유 범위가 Supabase 인도 리전과 같다고 보장하지 않습니다. 본 가입 동의가 미고지된 AI 개인정보 이전을 허용하는 것은 아닙니다.",
         },
         {
-          title: "4. 지도·장소 검색·예약",
+          title: "4. Vercel 웹 호스팅과 API 처리",
+          text: "현재 서비스 주소 https://localroute.vercel.app은 Vercel Inc.의 웹 호스팅·콘텐츠 전송·서버 실행을 이용합니다. 페이지 접속과 기능 요청 때 IP·브라우저 정보·요청 URL·시각 및 전송한 API 요청 내용이 이 인프라를 거칠 수 있습니다. 목적은 페이지·API 제공, 보안과 장애 대응입니다. Vercel은 전 세계 네트워크를 사용하며 실제 배포·로그·지원의 전체 처리 국가와 보유기간은 계정 설정·계약에 따라 달라집니다. 이를 인도 보관으로 안내하거나 특정 기간 뒤 모두 삭제된다고 보장하지 않습니다. 제공자 안내: vercel.com/legal/privacy-notice, vercel.com/legal/dpa 및 재수탁자 목록. 문의·처리 중단 요청은 lmw.hpc@gmail.com으로 보내주세요. 호스팅 처리를 거부하면 현재 웹 서비스 접속이 어려울 수 있습니다.",
+        },
+        {
+          title: "5. 지도·장소 검색·예약",
           text: "기본 지도는 브라우저에서 OpenFreeMap 타일·스타일·글꼴을 요청하므로 IP·브라우저 정보와 조회 지도 영역이 외부에 전달됩니다. 운영자는 헝가리 Hyperknot Software Kft.(privacy@openfreemap.org)이며 배포 서버의 모든 처리 국가는 확인되지 않았습니다. 제공자 정책상 기본 접속 로그에는 IP를 저장하지 않으나 오류 로그는 7일, 보안 조사 시 임시 IP 로그는 최대 30일 보관할 수 있습니다. 지도 실패 시 OpenStreetMap Foundation(영국, privacy@osmfoundation.org)의 tile.openstreetmap.org로 대체 타일을 요청할 수 있습니다. 이때도 IP·브라우저·조회 타일 영역이 전달되며 전 세계 CDN에서 처리되고 로그 보유는 해당 정책에 따릅니다. 선택한 지도 URL이 다르면 제공자도 달라지므로 출시 전 고지를 갱신해야 합니다. HeyYumi 검색은 활성화 시 서버에서 검색어를 전송하며, Kakao 활동 검색은 목적지 지역 중심좌표·분류를 전송합니다. 사용자 GPS·예약 연락처를 이 검색에 보내지 않습니다. 예약업체로 고객 정보를 제출하는 기능은 기본 비활성이며, 실제 API 권한·연동 조건은 검증 대상입니다. 향후 예약마다 수신자·항목·목적·보유·국외 처리와 제출 동의를 다시 확인합니다.",
         },
       ],
@@ -126,7 +130,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "4. Optional processing and AI planning",
-          text: "Publishing a self-declared city/area label with recommendations is optional; refusal does not block member features. A public label is not verified residence. Saving a private booking name and phone number requires separate optional consent and is unnecessary for signup. Booking contacts do not belong in Auth metadata, public profiles or AI inputs. If AI planning is enabled, the server sends destination, dates, time windows, preferences, companions, travel mode, budget, request text, candidate places and recommendation text to Gemini, and stores the itinerary and validation result. Do not enter sensitive information or personal contacts in requests. Menu-image extraction is disabled by default and requires verified data handling and separate notice before activation. AI alone does not impose punishment.",
+          text: "Publishing a self-declared city/area label is optional and does not verify residence. Saving a private booking name and phone requires separate optional consent and is unnecessary for signup; booking contacts do not enter Auth metadata, public profiles or AI inputs. Current free AI planning requires its own disclosure confirmation. The server sends only an allowlist of destination, dates, time windows, purpose, selected preferences, companion type, travel mode, budget, pace, buffers and public place facts to Google Gemini. Names, emails, contact details, raw dietary restrictions, contributor recommendation prose and photographs are excluded from the planning model. Dietary input may remain in the saved itinerary and server checks; do not enter personal or sensitive explanations. Optional menu extraction separately asks you to remove personal details and confirm sending a public menu photograph to Gemini. This module does not persist the original image. Provider improvement and human review are explained in the feature and transfer notices. AI moderation is disabled; AI alone does not impose punishment.",
         },
         {
           title: "5. Retention and deletion",
@@ -142,7 +146,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "8. Processors and changes",
-          text: "Supabase provides authentication, database and photo storage. The confirmed primary database is in Mumbai, India (ap-south-1). The transfer/processing notice lists recipients, data, timing and refusal routes. Reservation submission is disabled by default; personal location tracking is unavailable. Changes publish a new version and effective date; changes requiring consent are presented for fresh acceptance.",
+          text: "Supabase provides authentication, database and contribution-photo storage; the confirmed primary database is Mumbai, India (ap-south-1). The live website localroute.vercel.app uses Vercel for hosting, content delivery and API execution. Vercel processing locations are not necessarily the Supabase database region. The transfer notice describes providers, data, timing, unconfirmed details and refusal routes. Real booking submission, reward payouts and personal location tracking are disabled. Notice changes publish a version/effective date and obtain renewed consent when required.",
         },
       ],
     },
@@ -155,7 +159,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "2. Scope and limitations",
-          text: "Basic discovery is free, and demo content is identified. Recommendations are individual opinions, not a complete venue census or quality guarantee. AI itineraries are drafts, not assurances about hours, prices, travel times, accessibility, dietary safety or availability. Check with venues and transport providers before visiting. Real-time traffic, location tracking, automatic visit verification and automatic account erasure are not offered. Reservation submission is disabled by default and requires verified API access and separate notice/consent. Saving a booking profile does not create a reservation.",
+          text: "Basic discovery is free and demo content is identified. Independent local contributions are personal opinions. Operator starter recommendations are separately labeled selections based on checked public place facts; they are not independent local visits, reviews or endorsements. Neither source is a complete venue census or quality guarantee. AI itineraries are drafts, not assurances about hours, prices, travel times, accessibility, dietary safety or availability. Check with venues and transport providers before visiting. Real-time traffic, location tracking, automatic visit verification and automatic account erasure are not offered. Real booking submission is disabled and requires verified API access plus separate notice/consent. Saving a booking profile does not create a reservation.",
         },
         {
           title: "3. Contributions and rights",
@@ -163,7 +167,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "4. LP and enhanced features",
-          text: "When enabled, enhanced planning displays its price, available balance, deliverable and failure terms before confirmation. A server transaction debits once only when a valid result is saved; failed or invalid generations are not chargeable. Monthly 300 promotional LP, 100 LP per request and example reward values are provisional pilot settings, not payment commitments. LP has no guaranteed cash value, transferability or cash-out. Actual payments and rewards require a separate finalized policy before launch. Statutory consumer rights remain intact.",
+          text: "Current AI planning with operator starter recommendations is free at 0 LP; this flow issues and deducts no LP. Real payments and reward payouts are disabled. Test checkout does not charge cards, collect a payment or issue LP. The earlier 300 monthly promotional LP, 100 LP per request and example reward values are prior pilot designs, not current issuance or charging promises. Any future paid feature must explain price, balance, deliverable and failure handling and obtain separate confirmation. Invalid or failed generation is not chargeable and a valid saved result must precede any debit. Cash value, transferability and returns are not guaranteed. Statutory consumer rights remain intact.",
         },
         {
           title: "5. Moderation, interruptions and responsibility",
@@ -188,10 +192,14 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "3. Conditional Gemini processing",
-          text: "When server AI planning is enabled, Google Gemini receives trip inputs, candidate venues/recommendation text and revision requests. By default, venue photos are not sent to AI; menu extraction and AI moderation are disabled. Before activation, remove personal details and provide separate feature consent and overseas-processing notice. Google restricts API clients likely accessed by under-18s. Unpaid API data may support improvement and human review, and must not contain personal information. Paid API content is not used for improvement, but safety logs and temporary global processing remain possible. Verify the actual account contract, recipient, countries, retention and lawful transfer basis before activation. Signup does not authorize unconfirmed AI personal-data transfers.",
+          text: "After separate AI disclosure confirmation, the server sends Google Gemini only destination, dates, times, purpose, selected preferences, companion type, budget, travel mode, pace, buffers and public place facts. The planner excludes names, emails, contacts, raw dietary restrictions, contributor recommendation prose and photographs. Menu extraction is optional: remove names, faces, phone numbers, receipts and other personal information from a public menu photograph, then confirm this separate transfer. LocalRoute does not persist the original menu image; this is distinct from Google's retention. AI moderation is disabled. Google's unpaid API may use inputs/outputs for product improvement and human review, so do not send personal or sensitive information. Google's age and regional availability conditions apply. Actual processing countries, safety logs and retention are not necessarily the Supabase India region. Membership consent does not authorize undisclosed AI personal-data transfers.",
         },
         {
-          title: "4. Maps, place search and reservations",
+          title: "4. Vercel web hosting and API processing",
+          text: "The live service at https://localroute.vercel.app uses Vercel Inc. for web hosting, content delivery and server execution. Page and feature requests may transmit IP/browser information, request URLs/times and submitted API contents through this infrastructure to serve pages/APIs and handle security or outages. Vercel operates a global network; actual deployment, log and support locations and retention depend on account settings and contracts. We do not describe this as India-only storage or promise erasure after an unverified period. Provider information: vercel.com/legal/privacy-notice, vercel.com/legal/dpa and its subprocessor list. Contact lmw.hpc@gmail.com about processing or suspension requests. Refusing hosting processing may prevent access to the current website.",
+        },
+        {
+          title: "5. Maps, place search and reservations",
           text: "The default browser map fetches OpenFreeMap styles, tiles and fonts, exposing IP/browser information and viewed map areas to an external service. Its operator is Hyperknot Software Kft., Hungary (privacy@openfreemap.org); all serving locations have not been confirmed. Its policy excludes IPs from default access logs, but permits error logs for 7 days and temporary security IP logs for up to 30 days. If the map fails, fallback tiles may be requested from tile.openstreetmap.org, operated by the OpenStreetMap Foundation, UK (privacy@osmfoundation.org). IP/browser and requested tile areas reach its global CDN; log retention follows its policy. Changing the map URL changes the provider and requires updated notice before launch. If enabled, server-side HeyYumi search receives search terms; Kakao activity search receives destination-center coordinates and categories, not user GPS or booking contacts. Reservation submission is disabled by default; actual API access and integration terms require verification. Future bookings require confirmation of the recipient, data, purpose, retention, overseas handling and explicit submission consent each time.",
         },
       ],
@@ -217,6 +225,9 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
 };
 
 export const legalSources = [
+  ["Vercel privacy notice", "https://vercel.com/legal/privacy-notice"],
+  ["Vercel DPA", "https://vercel.com/legal/dpa"],
+  ["Vercel subprocessors", "https://vercel.com/legal/sub-processors"],
   ["HeyYumi privacy", "https://heyyumi.ai/legal/privacy"],
   ["Kakao privacy", "https://www.kakao.com/policy/privacy"],
   [

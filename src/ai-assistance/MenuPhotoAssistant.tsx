@@ -103,8 +103,8 @@ export function MenuPhotoAssistant({
       </label>
       <p>
         {t(
-          "메뉴만 보이도록 잘라 주세요. 이름·얼굴·전화번호·영수증 등 개인정보를 제거한 사진만 Google Gemini에 전송해요. 원본 사진은 이 모듈에 저장하지 않아요.",
-          "Crop to the menu only. Remove names, faces, phone numbers, receipts and other private information before sending the photo to Google Gemini. This module does not store the original photo.",
+          "공개된 메뉴만 보이도록 잘라 주세요. 이름·얼굴·전화번호·영수증 등 개인정보를 모두 제거한 사진만 Google Gemini에 전송해요. 무료 Gemini는 입력 사진·추출 결과를 제품 개선에 이용하거나 사람이 검토할 수 있어요. 이 모듈은 원본을 영구 저장하지 않으며 Google의 보유와는 별개예요. 동의하지 않으면 사진 없이 직접 입력할 수 있어요.",
+          "Crop to the public menu only. Remove all names, faces, phone numbers, receipts and other personal information before sending it to Google Gemini. The unpaid Gemini service may use the input photo and extracted output for product improvement or human review. This module does not persist the original image; Google's retention is separate. You can skip extraction and enter menu items manually.",
         )}
       </p>
       <label className="ai-check">
@@ -115,8 +115,8 @@ export function MenuPhotoAssistant({
           disabled={busy}
         />
         {t(
-          "메뉴만 남기고 개인정보를 제거했으며 Gemini 전송에 동의해요.",
-          "I removed private information and consent to sending this menu photo to Gemini.",
+          "공개 메뉴만 남기고 개인정보를 제거했어요. 무료 Gemini의 개선 이용·사람 검토 가능성을 확인했으며 사진 전송에 동의해요.",
+          "I removed personal information from this public menu photo, understand possible improvement use and human review by unpaid Gemini, and consent to sending it.",
         )}
       </label>
       <div className="ai-actions">

@@ -46,6 +46,16 @@ describe("AI assistance interactive components with mocked callbacks", () => {
     return { page, context };
   }
   async function chooseAndExtract(page: Page, ko = false) {
+    expect(
+      await page
+        .getByText(
+          ko
+            ? /무료 Gemini는 입력 사진·추출 결과/
+            : /The unpaid Gemini service may use the input photo/,
+        )
+        .isVisible(),
+    ).toBe(true);
+    expect(await page.getByRole("checkbox").first().isChecked()).toBe(false);
     await page
       .getByLabel(ko ? "메뉴 사진 파일" : "Menu photo file", { exact: true })
       .setInputFiles({
