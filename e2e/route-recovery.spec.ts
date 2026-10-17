@@ -42,7 +42,7 @@ async function setup(
     route.fulfill({
       contentType: "application/javascript",
       body: demo
-        ? `export const supabase=null; export const exchangeAuthCode=()=>undefined;`
+        ? `export const supabase=null; export const exchangeAuthCode=()=>undefined; export const readAuthCallback=()=>({present:false});`
         : `
       let session=${mode === "member" || mode === "deleted" ? JSON.stringify({ access_token: "fixture-not-a-real-token", user }) : "null"};
       export const supabase={auth:{
@@ -52,6 +52,7 @@ async function setup(
         onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})
       }};
       export const exchangeAuthCode=()=>undefined;
+      export const readAuthCallback=()=>({present:false});
     `,
     }),
   );
@@ -105,6 +106,70 @@ function fixturePlan(): Itinerary {
     createdAt: "2026-10-17T00:00:00Z",
   };
 }
+test("an unresolved generation can be stopped to edit dates without another AI call", async ({
+  page,
+}) => {
+  await setup(page, "member");
+  const requestId = "90000000-0000-4000-8000-000000000088";
+  await page.addInitScript(
+    ({ actor, requestId, input }) => {
+      sessionStorage.setItem(
+        `localroute.planning.pending.${actor}`,
+        JSON.stringify({
+          requestId,
+          input,
+          expectedCost: 0,
+          policyVersion: "fixture",
+          consent: true,
+        }),
+      );
+    },
+    { actor: user.id, requestId, input: fixturePlan().input },
+  );
+  await page.route("**/api/planning/quote", (route) =>
+    route.fulfill({
+      json: {
+        enabled: true,
+        cost: 0,
+        promo: 100,
+        earned: 0,
+        held: 0,
+        policyVersion: "fixture",
+      },
+    }),
+  );
+  let cancelled = 0,
+    generated = 0;
+  await page.route("**/api/planning/cancel/*", (route) => {
+    cancelled++;
+    return route.fulfill({ json: { status: "failed" } });
+  });
+  await page.route("**/api/planning/generate", (route) => {
+    generated++;
+    return route.fulfill({ status: 503, json: {} });
+  });
+  await page.goto("/plan/new/4");
+  const back = page.getByRole("button", { name: "이전", exact: true });
+  await expect(back).toBeEnabled();
+  await back.click();
+  await expect(page).toHaveURL(/\/plan\/new\/3$/);
+  await expect.poll(() => cancelled).toBe(1);
+  await expect(back).toBeEnabled();
+  await back.click();
+  await back.click();
+  await expect(page).toHaveURL(/\/plan\/new\/1$/);
+  await page.getByLabel("마지막 날", { exact: true }).fill("2026-11-04");
+  await expect(page.getByLabel("마지막 날", { exact: true })).toHaveValue(
+    "2026-11-04",
+  );
+  expect(
+    await page.evaluate(
+      (actor) => sessionStorage.getItem(`localroute.planning.pending.${actor}`),
+      user.id,
+    ),
+  ).toBeNull();
+  expect(generated).toBe(0);
+});
 test("direct core pages render without runtime errors", async ({ page }) => {
   await setup(page, "demo");
   const errors: string[] = [];

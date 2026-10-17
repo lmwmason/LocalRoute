@@ -57,7 +57,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "4. LP와 유료 기능",
-          text: "현재 운영자 초기 추천을 활용하는 AI 일정은 0 LP 무료이며 이 흐름에서 LP를 발급하거나 차감하지 않습니다. 실제 결제와 보상 지급도 비활성입니다. 테스트 결제 화면은 실제 청구·카드 결제·LP 지급을 실행하지 않습니다. 월 300 프로모션 LP·요청당 100 LP·평가 보상은 이전 시범 설계값으로 현재의 지급·청구 약속이 아닙니다. 향후 유료 기능을 도입하면 가격·잔액·제공 결과·실패 처리 조건을 먼저 안내하고 별도 확인을 받습니다. 유효한 결과 저장 전이나 생성 실패·무효 결과에 차감하지 않는 원칙을 유지합니다. LP의 현금 환급·양도·수익은 보장하지 않으며 법률상 소비자 권리를 제한하지 않습니다.",
+          text: "이메일 인증과 필수 동의를 마친 회원에게 월 기본 50 LP를 월 1회 지급하며 월말에 만료됩니다. 기존 지급 기록은 유지합니다. AI 일정 생성은 여행 날짜를 포함해 하루당 10 LP이며 생성 전 총액·잔액을 안내하고 별도 확인을 받습니다. 유효한 일정이 저장된 뒤에만 한 번 차감하며 생성 실패·무효 결과에는 차감하지 않습니다. 실제 금전 결제는 비활성입니다. 테스트 충전은 실제 청구 없이 인증·동의 계정당 1회 무료 테스트 보너스 100 LP를 지급하는 체험이며 유료 구매가 아닙니다. 방문 평가 보상은 해당 추천에 대한 방문 검토와 적격성 확인 후 별도 정책에 따라 지급합니다. LP의 현금 환급·양도·수익은 보장하지 않으며 법률상 소비자 권리를 제한하지 않습니다.",
         },
         {
           title: "5. 검토·중단·책임",
@@ -167,7 +167,7 @@ export const notices: Record<"ko" | "en", Record<LegalDocument, Notice>> = {
         },
         {
           title: "4. LP and enhanced features",
-          text: "Current AI planning with operator starter recommendations is free at 0 LP; this flow issues and deducts no LP. Real payments and reward payouts are disabled. Test checkout does not charge cards, collect a payment or issue LP. The earlier 300 monthly promotional LP, 100 LP per request and example reward values are prior pilot designs, not current issuance or charging promises. Any future paid feature must explain price, balance, deliverable and failure handling and obtain separate confirmation. Invalid or failed generation is not chargeable and a valid saved result must precede any debit. Cash value, transferability and returns are not guaranteed. Statutory consumer rights remain intact.",
+          text: "Members with verified email and current required consent receive 50 LP once each month, expiring at month end. Previous grants remain unchanged. AI itinerary generation costs 10 LP per inclusive travel day. The total and balance are shown before separate confirmation. Debit occurs once only after a valid itinerary is saved; failed or invalid generation is not charged. Real-money payments are disabled. Test checkout awards a free 100-LP test bonus once per verified consenting account without charging money; it is not a paid purchase. Visitor-feedback rewards require review of the attributable recommendation and eligibility under a separate policy. Cash value, transferability and returns are not guaranteed. Statutory consumer rights remain intact.",
         },
         {
           title: "5. Moderation, interruptions and responsibility",

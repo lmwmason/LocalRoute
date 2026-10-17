@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import {
   regionForDestination,
   tripSchema,
+  tripDates,
   scheduleSchema,
   evaluateSchedule,
   type Itinerary,
@@ -175,39 +176,42 @@ export function Planner({
       setQuote({
         enabled: true,
         cost: 0,
-        promo: 300,
+        promo: 50,
         earned: 0,
         held: 0,
         policyVersion: "demo",
       });
       return;
     }
+    let active = true;
+    setQuote(null);
     if (signedIn)
       api
-        .quote()
-        .then(setQuote)
-        .catch((e) => setError(e.message));
-  }, [step, signedIn]);
+        .quote(userId, tripDates(input.startDate, input.endDate).length)
+        .then((value) => {
+          if (active) setQuote(value);
+        })
+        .catch((e) => {
+          if (active) setError(e.message);
+        });
+    return () => {
+      active = false;
+    };
+  }, [step, signedIn, userId, input.startDate, input.endDate]);
   function update<K extends keyof TripDraft>(key: K, value: TripDraft[K]) {
-    if (pending.current) {
-      setError(t("errors.REQUEST_STATUS_UNKNOWN"));
-      return;
-    }
     setInput((old) => ({ ...old, [key]: value }));
+    setConsent(false);
     setError("");
   }
   function toggle<K extends "activities" | "foodTypes">(
     key: K,
     value: TripInput[K][number],
   ) {
-    if (pending.current) {
-      setError(t("errors.REQUEST_STATUS_UNKNOWN"));
-      return;
-    }
     setInput((previous) => ({
       ...previous,
       [key]: toggleChoice<string>(previous[key], value),
     }));
+    setConsent(false);
     setError("");
   }
   function next() {
@@ -318,15 +322,43 @@ export function Planner({
       } else setError(t("planner.generating"));
     } catch (e) {
       if ((e as Error).message === "REQUEST_NOT_FOUND" && pending.current) {
-        try {
-          // Explicit recovery reuses the persisted key and original consent; never create a second job.
-          const recovered = await api.generate(pending.current, userId);
-          if ("schedule" in recovered) await complete(recovered);
-          else setError(t("errors.REQUEST_STATUS_UNKNOWN"));
-        } catch (error) {
-          setError(t(`errors.${(error as Error).message}`));
-        }
+        // Status checks never send another model request. Keep unknown work
+        // separate until the traveler explicitly chooses to stop or retry.
+        setError(t("planner.requestMissing"));
       } else setError(t((e as Error).message));
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function backToEdit() {
+    setStep((n) => n - 1);
+    setConsent(false);
+    setError("");
+    const previous = pending.current;
+    if (!previous) return;
+    setBusy(true);
+    try {
+      const outcome = await api.cancelPlan(previous.requestId, userId);
+      if (outcome.status === "not_found" && previous.expectedCost > 0) {
+        setError(t("planner.requestMissing"));
+        return;
+      }
+      persistPending(userId, null);
+      pending.current = null;
+      setError(
+        t(
+          outcome.status === "ready"
+            ? "planner.previousSaved"
+            : "planner.editReady",
+        ),
+      );
+      if (outcome.status === "ready")
+        void api
+          .plans()
+          .then((plans) => setSavedPlans(plans.map((p) => p.result)))
+          .catch(() => {});
+    } catch {
+      setError(t("planner.editWhilePending"));
     } finally {
       setBusy(false);
     }
@@ -492,7 +524,7 @@ export function Planner({
                     onChange={(destination) =>
                       update("destination", destination)
                     }
-                    disabled={busy || Boolean(pending.current)}
+                    disabled={busy}
                   />
                 )}
                 <div className="two-columns">
@@ -770,8 +802,8 @@ export function Planner({
                 {quote?.starter && (
                   <p className="notice-box">
                     {language === "ko"
-                      ? "무료 초기 일정 · 운영자가 수집한 실제 장소를 초기 추천으로 사용하며 독립적인 현지인 방문 후기는 아직 확인되지 않았어요. LP 발급·차감이나 실제 결제는 없어요. 여행 지역·날짜·취향은 Google Gemini로 전송해 일정을 만들며, 무료 API의 입력·출력은 서비스 개선과 검토에 사용될 수 있어요. 이름·연락처·식이 제한 원문은 전송하지 않아요."
-                      : "Free starter itinerary · Real source-based places are used as operator starter picks; independent local visits are not yet verified. No LP is issued or charged and no payment occurs. Trip areas, dates and preferences are sent to Google Gemini; free API inputs and outputs may be used for service improvement and review. Names, contact details and dietary text are excluded."}
+                      ? "운영자가 수집한 실제 장소를 초기 추천으로 사용하며 독립적인 현지인 방문 후기는 아직 확인되지 않았어요. 하루당 10 LP이며 검증된 일정이 저장된 뒤에만 차감해요. 실제 금전 결제는 없어요. 여행 지역·날짜·취향은 Google Gemini로 전송하며 무료 API의 입력·출력은 서비스 개선과 검토에 사용될 수 있어요. 이름·연락처·식이 제한 원문은 전송하지 않아요."
+                      : "Operator starter picks use researched real places; independent local visits are not yet verified. The cost is 10 LP per travel day, charged only after a validated itinerary is saved. No real money is charged. Trip areas, dates and preferences go to Google Gemini; free API inputs and outputs may be used for improvement and review. Names, contact details and dietary text are excluded."}
                   </p>
                 )}
                 <p className="fine-print">
@@ -792,8 +824,8 @@ export function Planner({
                   <span>
                     {quote?.starter
                       ? language === "ko"
-                        ? "초기 추천의 출처·미확인 정보와 Gemini 처리 안내를 확인하고 무료 일정 생성을 요청해요."
-                        : "I have read the starter-source, uncertainty and Gemini processing notice and request a free itinerary."
+                        ? "위 LP 총액, 초기 추천의 출처·미확인 정보와 Gemini 처리 안내를 확인하고 일정 생성을 요청해요."
+                        : "I confirm the total LP cost, starter sources, unverified information and Gemini processing notice, and request this itinerary."
                       : t("planner.confirm")}
                   </span>
                 </label>
@@ -819,17 +851,15 @@ export function Planner({
                 <Sparkles size={24} />
                 <p>{t("planner.generating")}</p>
                 <small>{t("planner.checking")}</small>
+                <small>{t("planner.validationRetries")}</small>
               </div>
             )}
             <div className="wizard-actions">
               <button
                 type="button"
                 className="secondary"
-                disabled={busy || Boolean(pending.current)}
-                onClick={() => {
-                  setStep((n) => n - 1);
-                  setError("");
-                }}
+                disabled={busy}
+                onClick={() => void backToEdit()}
               >
                 <ArrowLeft size={17} />
                 {t("common.back")}
@@ -838,7 +868,7 @@ export function Planner({
                 className="primary"
                 disabled={
                   busy ||
-                  Boolean(pending.current) ||
+                  (step === 4 && Boolean(pending.current)) ||
                   (step === 4 &&
                     (!consent ||
                       (!config.demo && (!signedIn || !quote?.enabled))))

@@ -11,9 +11,9 @@ LocalRoute is a travel itinerary scheduler built around a map of independently r
 
 **Product promise:** Find local places, understand why someone recommends them, and turn them into a trip without tedious research.
 
-### Initial live catalog and free starter itineraries
+### Initial live catalog and source-backed starter itineraries
 - The initial published catalog contains source-checked real places collected by the operator. These are operator starter picks, never fabricated independent recommendations, reviews or verified visits. Keep their source links visible and allow genuine local contributions to build the differentiating layer.
-- With `FEATURE_STARTER_ITINERARIES=true`, generation requires the `planner-ai-v1` processing notice and an enabled server policy with cost exactly 0 LP. Do not issue promotional LP or debit the ledger for this mode. A nonzero policy disables starter generation; it must never silently become a paid request.
+- With `FEATURE_STARTER_ITINERARIES=true`, generation requires the `planner-ai-v1` processing notice and an enabled server policy. Latest founder pricing is 10 LP per inclusive travel day (1–5 days), disclosed as a total before explicit confirmation. Debit only after a validated itinerary is saved. The separate membership allowance issues 50 LP once monthly after verified email and current required consent. Keep operator sources distinct from independent local endorsements.
 - Gemini receives only the allowlisted trip settings and public place facts. Names, contact information, raw dietary restrictions, contributor prose and photographs are excluded from itinerary prompts. Menu-photo extraction is a separate, optional, explicitly consented flow with editable/manual entry and no automatic publication.
 - Approved licensed operator photographs are distinct from contributor-taken photographs. Display attribution and provenance; unavailable photographs remain empty. AI illustrations are not venue photographs and do not satisfy the registration photograph requirement.
 - The public Euljiro sample includes Hide Me Please Euljiro as a café. Its times are example planned visits, not verified opening hours or booking availability. Actual booking remains disabled until venue support, account permissions and product licensing are verified; displaying the sample does not submit a booking.
@@ -150,11 +150,11 @@ One-name search + optional photo + one-sentence endorsement; minimal typing. Do 
 
 ## 9. LP economy — configurable pilot policy
 ### Spending
-- Monthly promotional allowance: **300 LP**, provisioned once per calendar month in configured timezone; expires at month end.
-- Enhanced recommendation request: **100 LP**, equivalent to three promotional requests/month if user has no earned LP.
+- Founder update: monthly membership allowance is **50 LP**, issued once per calendar month (Asia/Seoul) on an eligible member's first balance lookup; expires at month end. Email ownership verification and current required consent are mandatory. Retain previous grants unchanged and never grant twice for the same user/month.
+- Personalized itinerary generation costs **10 LP per travel day**, inclusive of start/end dates: 1 day 10 LP, 2 days 20 LP, up to 5 days 50 LP. Server and DB independently validate the dates and total; retries of the same request never charge twice. Failed or invalid generation costs 0 LP.
 - Earned LP is tracked separately from expiring promotional LP; promotional balance is spent first.
 - Map browsing, basic place details, and ordinary saving are free.
-- Define exactly what one 100 LP request returns (number of places, itinerary output, reroll/refund rules) before public launch.
+- Each generation purchases one validated saved itinerary covering the confirmed dates; newly confirmed regeneration is a new request at the displayed daily rate.
 ### Earning
 - Receipt-free visit verification: do not require a receipt for feedback or make receipt scanning the default verification flow. A voluntary arrival check is only supporting evidence; a reservation confirmation, a place photograph, a claimed visit or proximity alone never triggers LP. Verified partner QR/merchant acknowledgement and human review are possible verification channels; label unavailable integrations honestly. Keep feedback available when stronger proof is absent, marked unverified and without an automatic reward.
 - Rewards are tied to **attributable, eligible, independently verified** recommendation outcomes, not mere place creation or exposure.
@@ -163,6 +163,8 @@ One-name search + optional photo + one-sentence endorsement; minimal typing. Do 
 - Only the actual attributable endorsement(s) can receive a share; total reward for one eligible visit is bounded by that event's payout budget. Do not pay every endorser of a restaurant.
 - Owner/self-affiliated recommendations are not reward eligible; suspicious feedback is queued.
 - Payout only after verification; ledger is append-only, atomic, idempotent, and auditable. Disputes/reversals create new ledger entries.
+- Members complete a post-visit place-satisfaction survey and separately assess the specific recommendation they followed. Eligible outcomes credit the attributable contributor; place satisfaction must never be silently counted as endorsement helpfulness or pay every contributor to the place.
+- Paid LP top-ups are a future acquisition channel. `/checkout/test` never charges real money. Its explicit test flow may award a fixed 100-LP free test bonus once per verified, consenting account; this is not a paid purchase. Enforce the single grant server-side and in the ledger.
 ### Financial caveat
 LP is an in-product, non-transferable utility credit in MVP: **no cash redemption or guaranteed monetary value**. Model the cost of promotional issuance, Gemini usage, and possible future perks before launch. The payout table, monthly caps, and exchange rate are provisional and require pilot data.
 

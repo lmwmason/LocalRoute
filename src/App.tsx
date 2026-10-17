@@ -48,6 +48,7 @@ import { PlacePhoto } from "./components/PlacePhoto";
 import { PlaceOrigin } from "./components/PlaceOrigin";
 import { LanguageSwitch, useI18n } from "./i18n";
 import { LegalConsentGate } from "./legal";
+import { MonthlyWallet } from "./components/MonthlyWallet";
 import { VisitRewardRequestPanel } from "./visit-rewards/VisitRewards";
 import { visitRewardsApi } from "./visit-rewards/host-client";
 import { BookingButton } from "./booking/BookingButton";
@@ -1332,6 +1333,7 @@ export default function App() {
             <p>{session?.user.email}</p>
             {!config.demo && (
               <LegalConsentGate userId={session?.user.id || ""}>
+                <MonthlyWallet key={session.user.id} userId={session.user.id} />
                 <Workspace />
                 <details className="consent-settings">
                   <summary>
@@ -1358,9 +1360,9 @@ export default function App() {
               </LegalConsentGate>
             )}
             <div className="notice-box">
-              {t(
-                "LP 적립·유료 추천은 정책 검증 후 제공됩니다. 현재 보상이나 차감은 발생하지 않아요.",
-              )}
+              {language === "ko"
+                ? "기본 LP는 매월 50 LP, 일정 생성은 하루당 10 LP예요. 유효한 일정 저장 후에만 차감하며 실제 금전 결제는 하지 않아요. 추천 보상은 방문 검토와 적격성 확인을 거쳐 지급돼요."
+                : "Receive 50 LP each month. Itineraries cost 10 LP per day, charged only after a valid result is saved. No real-money payment occurs. Recommendation rewards require visit review and eligibility checks."}
             </div>
             <button
               className="secondary full"
