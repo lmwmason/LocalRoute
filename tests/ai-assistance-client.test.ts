@@ -1,5 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { createAiAssistanceClient } from "../src/ai-assistance/client";
+import { preparePhotoUpload } from "../src/photos/prepare-upload";
+
+vi.mock("../src/photos/prepare-upload", () => ({
+  preparePhotoUpload: vi.fn(
+    async () =>
+      new File(["normalized JPEG fixture"], "localroute-photo.jpg", {
+        type: "image/jpeg",
+      }),
+  ),
+}));
 
 const options = { language: "en", privacyConfirmed: true } as const;
 const file = () =>
@@ -17,7 +27,7 @@ const ready = {
 };
 
 describe("AI assistance same-origin client", () => {
-  it("sends raw file bytes, explicit privacy options and session token only to the local endpoint", async () => {
+  it("sends locally normalized JPEG bytes, explicit privacy options and session token only to the local endpoint", async () => {
     const fetcher = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(new Response(JSON.stringify(ready)));
@@ -35,7 +45,7 @@ describe("AI assistance same-origin client", () => {
       credentials: "same-origin",
       headers: {
         Authorization: "Bearer session-unit",
-        "Content-Type": "image/png",
+        "Content-Type": "image/jpeg",
       },
     });
     expect(init?.body).toBeInstanceOf(File);
@@ -126,5 +136,20 @@ describe("AI assistance same-origin client", () => {
     });
     expect(fetcher.mock.calls[0][0]).toBe("/api/ai-assistance/review");
     expect(JSON.parse(String(fetcher.mock.calls[0][1]?.body))).toEqual(input);
+  });
+  it("does not call the API when local normalization fails", async () => {
+    vi.mocked(preparePhotoUpload).mockRejectedValueOnce(
+      new Error("photos.error.decode"),
+    );
+    const fetcher = vi.fn<typeof fetch>();
+    const client = createAiAssistanceClient({
+      token: async () => "fixture",
+      fetcher,
+    });
+    expect(await client.extractMenu(file(), options)).toEqual({
+      status: "failed",
+      code: "invalid_photo",
+    });
+    expect(fetcher).not.toHaveBeenCalled();
   });
 });

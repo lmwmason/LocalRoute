@@ -9,6 +9,7 @@ import {
   type MenuAssistanceResult,
   type ReviewAssistanceResult,
 } from "../../shared/ai-assistance";
+import { preparePhotoUpload } from "../photos/prepare-upload";
 
 /** Same-origin API only. Token supplier obtains the existing user's session;
  * the server independently validates the session, email and stored roles.
@@ -69,14 +70,27 @@ export function createAiAssistanceClient(options: {
         !["image/jpeg", "image/png", "image/webp"].includes(file.type)
       )
         return { status: "failed", code: "invalid_photo" };
+      let photo: File;
+      try {
+        // Menu preprocessing on the server uses the same 320px minimum.
+        photo = await preparePhotoUpload(file, { minimumDimension: 320 });
+      } catch (error) {
+        return {
+          status: "failed",
+          code:
+            error instanceof Error && error.message === "photos.error.size"
+              ? "photo_too_large"
+              : "invalid_photo",
+        };
+      }
       return send(
         "menu",
         {
           headers: {
-            "Content-Type": file.type,
+            "Content-Type": photo.type,
             "X-Menu-Options": JSON.stringify(parsed.data),
           },
-          body: file,
+          body: photo,
         },
         menuAssistanceResultSchema,
       );

@@ -10,6 +10,7 @@ import type {
   Feedback,
   Workspace,
 } from "../shared/community";
+import { preparePhotoUpload } from "./photos/prepare-upload";
 async function request<T>(
   path: string,
   init: RequestInit = {},
@@ -167,17 +168,18 @@ export const api = {
     target: unknown,
     file: File,
   ): Promise<{ id: string }> => {
+    const photo = await preparePhotoUpload(file);
     const token = (await supabase?.auth.getSession())?.data.session
       ?.access_token;
     const response = await fetch(`/api/place-photos/${requestId}`, {
       method: "POST",
       headers: {
-        "Content-Type": file.type,
+        "Content-Type": photo.type,
         "X-Place-Target": encodeURIComponent(JSON.stringify(target)),
         "X-Photo-Consent": "real-place-photo-v1",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: file,
+      body: photo,
     });
     const body = await response.json().catch(() => null);
     if (!response.ok) throw new Error(body?.error || "photos.error.upload");
