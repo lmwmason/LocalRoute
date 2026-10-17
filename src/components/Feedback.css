@@ -1,0 +1,128 @@
+.feedback-form {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.feedback-form .feedback-fields,
+.feedback-form .feedback-helpfulness {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.feedback-form .feedback-section {
+  border: 1px solid #dce3ee;
+  border-radius: 14px;
+  padding: 16px;
+  margin: 20px 0;
+  min-width: 0;
+}
+.feedback-form legend,
+.feedback-form h4 {
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0;
+  max-width: 100%;
+}
+.feedback-form p {
+  line-height: 1.65;
+}
+.feedback-form .feedback-hint {
+  color: #52627a;
+  font-size: 0.85rem;
+  margin: 8px 0 16px;
+}
+.feedback-form .feedback-error {
+  color: #b42318;
+  font-size: 0.9rem;
+}
+.feedback-form .feedback-fields label.feedback-field {
+  display: block;
+  margin: 18px 0 6px;
+}
+.feedback-form .feedback-fields label.feedback-field input,
+.feedback-form .feedback-fields label.feedback-field textarea,
+.feedback-form .feedback-fields label.feedback-field select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin-top: 8px;
+  font: inherit;
+}
+.feedback-form .feedback-fields label.feedback-field select {
+  padding: 12px;
+  border: 1px solid #aebdd0;
+  border-radius: 10px;
+  background: white;
+}
+.feedback-form .feedback-stars {
+  display: flex;
+  gap: 4px;
+  margin-top: 12px;
+}
+.feedback-form .feedback-fields label.feedback-star {
+  position: relative;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 56px;
+  margin: 0;
+  cursor: pointer;
+}
+.feedback-form .feedback-fields label.feedback-star input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.feedback-form .feedback-star span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-radius: 8px;
+  color: #3659a2;
+}
+.feedback-form .feedback-star input:checked + span {
+  background: #e8efff;
+}
+.feedback-form .feedback-star input:focus-visible + span {
+  outline: 3px solid #245de0;
+  outline-offset: 1px;
+}
+.feedback-form .feedback-fields label.feedback-check {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-height: 44px;
+  padding: 11px 0;
+  margin: 0;
+  line-height: 22px;
+}
+.feedback-form .feedback-fields label.feedback-check input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+}
+.feedback-form blockquote {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f2f5fa;
+  border-radius: 8px;
+  white-space: pre-wrap;
+}
+.feedback-form button {
+  min-height: 48px;
+}
+.feedback-form :disabled {
+  cursor: wait;
+}
+.feedback-success:focus {
+  outline: none;
+}
