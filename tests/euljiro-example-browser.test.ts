@@ -38,21 +38,39 @@ describe("public Euljiro example page", () => {
         try {
           const page = await context.newPage(),
             errors: string[] = [],
-            writes: string[] = [];
+            writes: string[] = [],
+            bookingRequests: string[] = [];
           page.setDefaultTimeout(10000);
           page.on("pageerror", (error) => errors.push(error.message));
           await context.route("**/*", (route) => {
             const request = route.request(),
               url = new URL(request.url());
             if (request.method() !== "GET") writes.push(url.pathname);
+            if (
+              url.pathname.startsWith("/api/") &&
+              url.pathname.includes("booking")
+            )
+              bookingRequests.push(url.pathname);
             if (url.pathname === "/api/places")
               return route.fulfill({
                 json: {
                   places: [
                     {
-                      id: "00000000-0000-4000-8000-000000000098",
+                      id: "5e5098cd-0fbd-43c7-b9f4-5b81d8e3720c",
                       name: "하이드미플리즈 을지로점",
                       address: "서울 중구 을지로11길 33 2층",
+                      displayMedia: {
+                        assetType: "photo",
+                        assetPath:
+                          "/place-display-media/hidemeplease-euljiro-founder.jpg",
+                        alt: "Canonical database image fixture",
+                        credit: "Fixture photographer",
+                        licenseLabel: "CC BY-SA 4.0",
+                        sourceUrl: "https://example.test/verified-source",
+                        observedAt: "2026-10-17T05:15:37Z",
+                        changes:
+                          "Test fixture only; image is not evidence of a cafe visit",
+                      },
                       officialSources: [
                         {
                           url: "https://www.spacecloud.kr/space/59739",
@@ -96,13 +114,45 @@ describe("public Euljiro example page", () => {
             });
           await page
             .locator(
-              '.example-place-actions a[href="/places/00000000-0000-4000-8000-000000000098"]',
+              '.example-place-actions a[href="/places/5e5098cd-0fbd-43c7-b9f4-5b81d8e3720c"]',
             )
             .waitFor();
           expect(await page.locator(".example-stop").count()).toBe(3);
+          const booking = page.locator(".euljiro-booking-panel");
+          await booking
+            .getByText(
+              language === "ko"
+                ? /현재 예약 기능이 꺼져/
+                : /Bookings are currently disabled/,
+            )
+            .waitFor();
+          expect(await booking.locator("form,input,button").count()).toBe(0);
           expect(
-            await page.locator(".example-booking button").isDisabled(),
-          ).toBe(true);
+            await booking
+              .locator('a[href="https://www.spacecloud.kr/space/59739"]')
+              .count(),
+          ).toBe(1);
+          const canonicalImage = page
+            .locator(".example-stop")
+            .nth(1)
+            .locator(".example-stop-image img");
+          await canonicalImage.waitFor();
+          await canonicalImage.scrollIntoViewIfNeeded();
+          expect(await canonicalImage.getAttribute("src")).toBe(
+            "/place-display-media/hidemeplease-euljiro-founder.jpg",
+          );
+          expect(await canonicalImage.getAttribute("alt")).toBe(
+            "Canonical database image fixture",
+          );
+          await expect
+            .poll(() =>
+              canonicalImage.evaluate(
+                (image) =>
+                  (image as HTMLImageElement).complete &&
+                  (image as HTMLImageElement).naturalWidth > 0,
+              ),
+            )
+            .toBe(true);
           expect(
             await page
               .locator('.example-place-actions a[href^="/places/"]')
@@ -157,6 +207,7 @@ describe("public Euljiro example page", () => {
             ),
           ).toBeLessThanOrEqual(1);
           expect(writes).toEqual([]);
+          expect(bookingRequests).toEqual([]);
           expect(errors).toEqual([]);
         } finally {
           await context.close();
