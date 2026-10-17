@@ -45,7 +45,9 @@ beforeAll(async () => {
     grant usage on schema storage to anon,authenticated;
     grant all on storage.objects to anon,authenticated;
     create policy legacy_other_app_policy on storage.objects for all to anon,authenticated using(true) with check(true);`);
-  await db.exec("alter default privileges in schema public grant execute on functions to anon,authenticated");
+  await db.exec(
+    "alter default privileges in schema public grant execute on functions to anon,authenticated",
+  );
   for (const migration of migrations) await db.exec(migration.sql);
   for (const id of [owner, stranger, moderator, unverified])
     await db.query("insert into auth.users values($1,$2,$3,false)", [
@@ -278,9 +280,44 @@ describe("release security: complete migration set in disposable PostgreSQL", ()
       rpc(stranger, "planning_action", "status", {}, key),
     ).rejects.toThrow(/not found/);
     const result = {
-      evaluation: { valid: true },
+      evaluation: {
+        valid: true,
+        errors: [],
+        warnings: [],
+        checks: {
+          stopCount: 2,
+          localMeals: 0,
+          preferenceMatches: 0,
+          verifiedHours: 0,
+        },
+      },
       provenance: "gemini",
       catalog: [{ id: "one" }, { id: "two" }],
+      schedule: {
+        title: "Accounting regression fixture",
+        summary: "Synthetic stops for accounting checks only.",
+        days: [
+          {
+            date: "2026-11-01",
+            stops: [
+              {
+                candidateId: "one",
+                start: "10:00",
+                end: "11:00",
+                purpose: "visit",
+                explanation: "First synthetic fixture stop.",
+              },
+              {
+                candidateId: "two",
+                start: "11:30",
+                end: "12:30",
+                purpose: "visit",
+                explanation: "Second synthetic fixture stop.",
+              },
+            ],
+          },
+        ],
+      },
     };
     await rpc(owner, "planning_action", "finalize", { result }, key);
     await rpc(owner, "planning_action", "finalize", { result }, key);

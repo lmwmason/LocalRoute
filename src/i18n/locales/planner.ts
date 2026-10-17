@@ -162,6 +162,14 @@ export const ko: Record<string, string> = {
   "quality.BREAK_REQUIRED": "긴 일정에는 쉬는 시간이 필요해요.",
   "quality.ACTIVITY_REQUIRED": "식사 외의 즐길 거리도 포함해 주세요.",
   "quality.PREFERENCES_NOT_MATCHED": "선택한 취향에 맞는 장소가 부족해요.",
+  "quality.ACTIVITY_PREFERENCES_NOT_MATCHED":
+    "선택한 활동을 일정에 반영해 주세요.",
+  "quality.FOOD_PREFERENCES_NOT_MATCHED":
+    "선택한 음식 취향을 식사에 반영해 주세요.",
+  "quality.ACTIVITY_PREFERENCE_UNAVAILABLE":
+    "선택한 활동에 맞는 확인된 장소가 부족해요.",
+  "quality.FOOD_PREFERENCE_UNAVAILABLE":
+    "선택한 음식에 맞는 확인된 식당이나 식사 시간이 부족해요.",
   "quality.PACE_OVERLOAD": "선택한 속도에 비해 방문지가 많아요.",
   "quality.DIETARY_UNVERIFIED": "식단 제한을 충족하는지 확인되지 않았어요.",
   "quality.STATUS_NEEDS_VERIFICATION":
@@ -338,6 +346,14 @@ export const en: Record<string, string> = {
   "quality.ACTIVITY_REQUIRED": "Include an experience beyond food.",
   "quality.PREFERENCES_NOT_MATCHED":
     "The stops do not match your selected interests.",
+  "quality.ACTIVITY_PREFERENCES_NOT_MATCHED":
+    "Include an activity matching your interests.",
+  "quality.FOOD_PREFERENCES_NOT_MATCHED":
+    "Include a meal matching your food preferences.",
+  "quality.ACTIVITY_PREFERENCE_UNAVAILABLE":
+    "Not enough identified places match your activity preferences.",
+  "quality.FOOD_PREFERENCE_UNAVAILABLE":
+    "Matching restaurants or a suitable meal window are unavailable.",
   "quality.PACE_OVERLOAD": "There are too many stops for your preferred pace.",
   "quality.DIETARY_UNVERIFIED": "Dietary suitability has not been verified.",
   "quality.STATUS_NEEDS_VERIFICATION":

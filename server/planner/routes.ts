@@ -14,7 +14,11 @@ import type { Actor, Repository } from "../repository";
 import type { ServerConfig } from "../config";
 import { AppError } from "../errors";
 import { Gemini } from "../gemini";
-import { KakaoActivities, localCandidates } from "./catalog";
+import {
+  KakaoActivities,
+  localCandidates,
+  deduplicateCandidates,
+} from "./catalog";
 import { generateValidated, type PinnedStop } from "./generate";
 import { createKakaoRouting } from "../routing";
 import { assessTransport } from "./transport";
@@ -53,14 +57,17 @@ function currentCatalog(
   input: TripInput,
 ) {
   // Keep canonical LocalRoute facts when the current sources share an ID.
-  return [
-    ...new Map(
-      [...activities, ...localCandidates(places, input)].map((candidate) => [
-        candidate.id,
-        candidate,
-      ]),
-    ).values(),
-  ];
+  return deduplicateCandidates(
+    [
+      ...new Map(
+        [...activities, ...localCandidates(places, input)].map((candidate) => [
+          candidate.id,
+          candidate,
+        ]),
+      ).values(),
+    ],
+    places,
+  );
 }
 function unavailablePins(
   schedule: Schedule,
@@ -302,12 +309,10 @@ export function attachPlanner(
         day.stops.some((stop) => !allowedIds.has(stop.candidateId)),
       )
     ) {
-      res
-        .status(422)
-        .json({
-          error: "SCHEDULE_QUALITY_FAILED",
-          issues: [{ code: "UNKNOWN_PLACE" }],
-        });
+      res.status(422).json({
+        error: "SCHEDULE_QUALITY_FAILED",
+        issues: [{ code: "UNKNOWN_PLACE" }],
+      });
       return;
     }
     if (typeof original.input.destination === "string")
