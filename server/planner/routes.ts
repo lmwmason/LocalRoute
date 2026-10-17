@@ -120,10 +120,19 @@ export function attachPlanner(
     });
   app.get("/api/planning/quote", async (req, res) => {
     const user = await actor(req);
+    const days = z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(5)
+      .default(1)
+      .parse(req.query.days);
     if (!repository) {
       res.json({
         enabled: false,
-        cost: 100,
+        cost: 10 * days,
+        dailyCost: 10,
+        days,
         promo: null,
         earned: null,
         held: 0,
@@ -137,13 +146,14 @@ export function attachPlanner(
       null,
       {},
     )) as Record<string, unknown>;
+    const dailyCost = z.number().int().min(0).parse(quote.cost);
     res.json({
       ...quote,
+      cost: dailyCost * days,
+      dailyCost,
+      days,
       starter: config.starterPlanning,
-      enabled:
-        config.planning &&
-        quote.enabled === true &&
-        (!config.starterPlanning || quote.cost === 0),
+      enabled: config.planning && quote.enabled === true,
     });
   });
   app.get("/api/itineraries", async (req, res) => {
@@ -201,11 +211,7 @@ export function attachPlanner(
     const user = await actor(req);
     if (!config.planning) throw new AppError(503, "PLANNING_DISABLED");
     const payload = generateSchema.parse(req.body);
-    if (
-      config.starterPlanning &&
-      (payload.expectedCost !== 0 ||
-        payload.aiConsentVersion !== "planner-ai-v1")
-    )
+    if (config.starterPlanning && payload.aiConsentVersion !== "planner-ai-v1")
       throw new AppError(400, "STARTER_CONSENT_REQUIRED");
     // Replays are resolved before provider calls; reserve validates the original payload fingerprint.
     try {
@@ -263,8 +269,11 @@ export function attachPlanner(
       return;
     }
     try {
-      if (config.starterPlanning && reservation.cost !== 0)
-        throw new AppError(409, "STARTER_MUST_BE_FREE");
+      if (
+        !Number.isInteger(reservation.cost) ||
+        reservation.cost !== payload.expectedCost
+      )
+        throw new AppError(409, "PRICE_CONFIRMATION_REQUIRED");
       const pins: PinnedStop[] = [];
       let original: Itinerary | undefined;
       if (payload.sourcePlanId) {

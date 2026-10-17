@@ -33,7 +33,11 @@ vi.mock("../server/legal", async (load) => {
 });
 let db: PGlite, user: string, other: string, id: string;
 const intent = {
-  input: { destination: "seongsu" },
+  input: {
+    destination: "seongsu",
+    startDate: "2026-11-01",
+    endDate: "2026-11-01",
+  },
   expectedCost: 100,
   policyVersion: "cancel-fixture",
   consent: true,

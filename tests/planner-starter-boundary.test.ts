@@ -225,7 +225,55 @@ function setup(
 }
 
 afterEach(() => vi.unstubAllGlobals());
-describe("free operator starter HTTP boundary", () => {
+describe("operator starter HTTP price and AI consent boundary", () => {
+  it.each([1, 2, 5])(
+    "quotes the configured daily price for %s days",
+    async (days) => {
+      const test = setup({ quoteCost: 10 });
+      const response = await request(test.app)
+        .get(`/api/planning/quote?days=${days}`)
+        .set("Authorization", "Bearer valid");
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({
+        enabled: true,
+        starter: true,
+        dailyCost: 10,
+        days,
+        cost: 10 * days,
+      });
+    },
+  );
+  it.each(["0", "6", "1.5", "no", "", "1&days=2"])(
+    "rejects invalid day counts before wallet operations (%s)",
+    async (days) => {
+      const test = setup({ quoteCost: 10 });
+      const response = await request(test.app)
+        .get(`/api/planning/quote?days=${days}`)
+        .set("Authorization", "Bearer valid");
+      expect(response.status).toBe(400);
+      expect(test.planning).not.toHaveBeenCalled();
+    },
+  );
+  it("accepts and saves a confirmed 10 LP starter itinerary once", async () => {
+    const test = setup({ reservationCost: 10, quoteCost: 10 });
+    const body = { ...payload(), expectedCost: 10 };
+    const first = await request(test.app)
+      .post("/api/planning/generate")
+      .set("Authorization", "Bearer valid")
+      .send(body);
+    expect(first.status).toBe(201);
+    expect(first.body.cost).toBe(10);
+    const replay = await request(test.app)
+      .post("/api/planning/generate")
+      .set("Authorization", "Bearer valid")
+      .send(body);
+    expect(replay.status).toBe(200);
+    expect(replay.body).toEqual(first.body);
+    expect(
+      test.planning.mock.calls.filter((call) => call[1] === "finalize"),
+    ).toHaveLength(1);
+    expect(test.gemini.structured).toHaveBeenCalledTimes(1);
+  });
   it.each([undefined, null, "old-version"])(
     "requires the explicit current AI disclosure version (%s)",
     async (version) => {
@@ -242,8 +290,8 @@ describe("free operator starter HTTP boundary", () => {
     },
   );
 
-  it.each([1, 100, -1, null, "0"])(
-    "does not permit an unconfirmed nonzero/invalid starter price (%s)",
+  it.each([-1, null, "0"])(
+    "does not permit an invalid starter price (%s)",
     async (expectedCost) => {
       const test = setup();
       const response = await request(test.app)
@@ -259,9 +307,9 @@ describe("free operator starter HTTP boundary", () => {
 
   it.each([
     [0, true],
-    [100, false],
+    [100, true],
   ])(
-    "enables a starter quote only at a zero policy price (%s)",
+    "enables a starter quote at the configured policy price (%s)",
     async (quoteCost, enabled) => {
       const test = setup({ quoteCost: quoteCost as number });
       const response = await request(test.app)
@@ -298,7 +346,7 @@ describe("free operator starter HTTP boundary", () => {
     { reservationCost: null },
     { missingCost: true },
   ])(
-    "releases a nonzero or missing server reservation before generation providers run",
+    "releases a mismatched or missing server reservation before generation providers run",
     async (options) => {
       const test = setup(options);
       const response = await request(test.app)
@@ -306,7 +354,7 @@ describe("free operator starter HTTP boundary", () => {
         .set("Authorization", "Bearer valid")
         .send(payload());
       expect(response.status).toBe(409);
-      expect(response.body.error).toBe("STARTER_MUST_BE_FREE");
+      expect(response.body.error).toBe("PRICE_CONFIRMATION_REQUIRED");
       expect(test.planning.mock.calls.map((call) => call[1])).toEqual([
         "status",
         "reserve",
@@ -314,7 +362,7 @@ describe("free operator starter HTTP boundary", () => {
         "fail",
       ]);
       expect(test.planning.mock.calls.at(-1)?.[3]).toEqual({
-        code: "STARTER_MUST_BE_FREE",
+        code: "PRICE_CONFIRMATION_REQUIRED",
       });
       expect(test.places).not.toHaveBeenCalled();
       expect(test.activities.search).not.toHaveBeenCalled();

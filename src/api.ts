@@ -69,16 +69,24 @@ export const api = {
     request("/me/booking-profile", { method: "DELETE" }),
   skipBookingProfile: () =>
     request("/me/booking-profile/skip", { method: "POST" }),
-  quote: (expectedUserId?: string) =>
+  quote: (expectedUserId?: string, days = 1) =>
     request<{
       enabled: boolean;
       starter?: boolean;
       cost: number;
+      dailyCost?: number;
+      days?: number;
       promo: number | null;
       earned: number | null;
       held: number;
       policyVersion: string;
-    }>("/planning/quote", {}, expectedUserId),
+    }>(
+      days === 1
+        ? "/planning/quote"
+        : `/planning/quote?days=${encodeURIComponent(days)}`,
+      {},
+      expectedUserId,
+    ),
   plan: (id: string) =>
     request<Itinerary>(`/itineraries/${encodeURIComponent(id)}`),
   plans: () =>
