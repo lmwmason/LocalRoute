@@ -19,6 +19,17 @@ export function routeTab(path: string): "plan" | "explore" | "trip" {
   return "explore";
 }
 export function readAppRoute(path: string, search: string, state: unknown) {
+  const known =
+    [
+      "/",
+      "/plan",
+      "/discover",
+      "/saved",
+      ...Object.values(panelPaths),
+    ].includes(path) ||
+    /^\/plan\/new\/[1-4]$/.test(path) ||
+    /^\/(?:places|itineraries)\/[^/]+$/.test(path) ||
+    path.startsWith("/admin");
   const data =
     state && typeof state === "object"
       ? (state as { backgroundPath?: unknown; overlay?: unknown })
@@ -49,6 +60,7 @@ export function readAppRoute(path: string, search: string, state: unknown) {
       ? new URLSearchParams(background.split("?")[1] || "").get("place")
       : null);
   return {
+    known,
     tab,
     panel,
     placeId,

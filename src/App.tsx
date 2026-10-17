@@ -46,6 +46,8 @@ import { BookingProfile } from "./components/BookingProfile";
 import { PlacePhoto } from "./components/PlacePhoto";
 import { LanguageSwitch, useI18n } from "./i18n";
 import { LegalConsentGate } from "./legal";
+import { VisitRewardRequestPanel } from "./visit-rewards/VisitRewards";
+import { visitRewardsApi } from "./visit-rewards/host-client";
 import { BookingButton } from "./booking/BookingButton";
 import { bookingApi } from "./booking/client";
 
@@ -80,6 +82,8 @@ export default function App() {
   routeRef.current = route;
   const { tab, panel, loginOverlay } = route;
   const [places, setPlaces] = useState<Place[]>(config.demo ? demoPlaces : []);
+  const placesRef = useRef(places);
+  placesRef.current = places;
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("전체");
   const [saved, setSaved] = useState(readSaved);
@@ -95,25 +99,40 @@ export default function App() {
   const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(!config.demo);
   const [reload, setReload] = useState(0);
+  const [placeLookup, setPlaceLookup] = useState<{
+    id: string;
+    loading: boolean;
+    error: string;
+  } | null>(null);
+  const [placeRetry, setPlaceRetry] = useState(0);
   useEffect(() => {
     const id = route.placeId || route.targetId;
-    if (config.demo || !id || places.some((place) => place.id === id)) return;
+    if (
+      config.demo ||
+      !id ||
+      placesRef.current.some((place) => place.id === id)
+    )
+      return;
     let active = true;
+    setPlaceLookup({ id, loading: true, error: "" });
     api
       .place(id)
       .then((place) => {
-        if (active)
+        if (active) {
           setPlaces((old) =>
             old.some((item) => item.id === place.id) ? old : [...old, place],
           );
+          setPlaceLookup({ id, loading: false, error: "" });
+        }
       })
       .catch((error: Error) => {
-        if (active) setNotice(error.message);
+        if (active)
+          setPlaceLookup({ id, loading: false, error: error.message });
       });
     return () => {
       active = false;
     };
-  }, [route.placeId, route.targetId, places]);
+  }, [route.placeId, route.targetId, placeRetry]);
   const closeOverlay = useCallback(() => {
     const current = routeRef.current;
     if (current.overlay) navigate(-1);
@@ -204,7 +223,13 @@ export default function App() {
     api
       .places(controller.signal)
       .then((data) => {
-        setPlaces(data.places);
+        setPlaces((previous) => {
+          const id = routeRef.current.placeId || routeRef.current.targetId;
+          const directPlace = previous.find((place) => place.id === id);
+          return directPlace && !data.places.some((place) => place.id === id)
+            ? [...data.places, directPlace]
+            : data.places;
+        });
         setLoadError("");
       })
       .catch((error) => {
@@ -217,7 +242,33 @@ export default function App() {
   }, [reload]);
   useEffect(() => {
     if (!supabase) return;
+    const client = supabase;
     let active = true;
+    let authRevision = 0;
+    let authEventSeen = false;
+    async function verifySession(next: Session | null, revision: number) {
+      if (!active || revision !== authRevision) return;
+      if (!next) {
+        if (active) setSession(null);
+        return;
+      }
+      try {
+        // A locally cached session can outlive an account deleted in Supabase.
+        const { data, error } = await client.auth.getUser(next.access_token);
+        if (!active || revision !== authRevision) return;
+        if (error || !data.user || data.user.id !== next.user.id) {
+          setSession(null);
+          await client.auth.signOut({ scope: "local" });
+          return;
+        }
+        setSession({ ...next, user: data.user });
+        setLoginOverlay(false);
+      } catch {
+        if (!active || revision !== authRevision) return;
+        setSession(null);
+        await client.auth.signOut({ scope: "local" }).catch(() => {});
+      }
+    }
     const code = new URLSearchParams(window.location.search).get("code");
     if (code)
       void exchangeAuthCode(code)?.then(({ error }) => {
@@ -227,16 +278,27 @@ export default function App() {
           navigate(readDraft() ? "/contribute" : "/plan", { replace: true });
         }
       });
-    void supabase.auth.getSession().then(({ data }) => {
-      if (active) setSession(data.session);
-    });
+    void client.auth
+      .getSession()
+      .then(({ data }) => {
+        if (active && !authEventSeen)
+          void verifySession(data.session, ++authRevision);
+      })
+      .catch(() => {
+        if (active && !authEventSeen) setSession(null);
+      });
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, next) => {
-      setSession(next);
-      if (next) {
-        setLoginOverlay(false);
-      }
+    } = client.auth.onAuthStateChange((_event, next) => {
+      authEventSeen = true;
+      const revision = ++authRevision;
+      setSession((current) =>
+        current?.user.id === next?.user.id ? current : null,
+      );
+      // Auth callbacks run under Supabase's lock; verify after it is released.
+      setTimeout(() => {
+        if (active) void verifySession(next, revision);
+      }, 0);
     });
     return () => {
       active = false;
@@ -271,6 +333,21 @@ export default function App() {
   const tripPlaces = saved
     .map((id) => places.find((p) => p.id === id))
     .filter((p): p is Place => Boolean(p));
+  const missingPlaceId =
+    route.placeId && !selected
+      ? route.placeId
+      : route.targetId &&
+          !contributePlace &&
+          ["feedback", "report", "contribute"].includes(panel || "")
+        ? route.targetId
+        : null;
+  const missingPlacePanel =
+    Boolean(missingPlaceId) ||
+    (["feedback", "report"].includes(panel || "") && !contributePlace);
+  const placeLoading =
+    !config.demo &&
+    Boolean(missingPlaceId) &&
+    (placeLookup?.id !== missingPlaceId || placeLookup.loading);
   function openContribution(place?: Place) {
     setContributePlace(place);
     setPanel("contribute");
@@ -282,7 +359,7 @@ export default function App() {
       <a className="skip-link" href="#main">
         {t("본문으로 바로 가기")}
       </a>
-      <div className="app-shell">
+      <div className="app-shell main-app-shell">
         <header className="topbar">
           <button
             className="brand"
@@ -353,10 +430,30 @@ export default function App() {
               </span>
             </div>
           )}
-          {tab === "plan" ? (
+          {!route.known ? (
+            <section className="empty-state">
+              <h1>
+                {language === "ko"
+                  ? "페이지를 찾을 수 없어요"
+                  : "Page not found"}
+              </h1>
+              <p>
+                {language === "ko"
+                  ? "주소를 확인하거나 여행 계획 화면으로 이동해 주세요."
+                  : "Check the address or return to the trip planner."}
+              </p>
+              <button
+                className="primary"
+                onClick={() => navigate("/plan", { replace: true })}
+              >
+                {t("common.plan")}
+              </button>
+            </section>
+          ) : tab === "plan" ? (
             <Suspense fallback={<p role="status">{t("planner.checking")}</p>}>
               <MemberConsent userId={session?.user.id}>
                 <Planner
+                  key={session?.user.id || "guest"}
                   signedIn={Boolean(session)}
                   userId={session?.user.id}
                   onLogin={() => setLoginOverlay(true)}
@@ -515,7 +612,11 @@ export default function App() {
                         <button
                           className="place-card-main"
                           onClick={() => setSelected(p)}
-                          aria-label={`${p.name} 자세히 보기`}
+                          aria-label={
+                            language === "ko"
+                              ? `${p.name} 자세히 보기`
+                              : `View details for ${p.name}`
+                          }
                         >
                           <PlacePhoto
                             id={p.photo?.id}
@@ -715,6 +816,11 @@ export default function App() {
           </span>
           <p>{t("누군가의 동네가, 당신의 좋은 여행이 되도록.")}</p>
           <div className="legal-page-links">
+            <a href="/checkout/test">
+              {language === "ko"
+                ? "LP 충전 체험 · 실제 결제 없음"
+                : "Try LP checkout · no charge"}
+            </a>
             <a href="/legal/privacy">
               {language === "ko" ? "개인정보 처리방침" : "Privacy"}
             </a>
@@ -920,7 +1026,46 @@ export default function App() {
           </div>
         </Modal>
       )}
-      {panel === "contribute" && (
+      {missingPlacePanel && (
+        <Modal
+          title={language === "ko" ? "장소 확인" : "Find a place"}
+          onClose={closeOverlay}
+        >
+          <div className="empty-state">
+            {placeLoading ? (
+              <p role="status">{t("장소를 불러오는 중이에요…")}</p>
+            ) : (
+              <>
+                <h2>
+                  {language === "ko"
+                    ? "장소를 확인할 수 없어요"
+                    : "This place is unavailable"}
+                </h2>
+                <p role="alert">
+                  {language === "ko"
+                    ? "삭제되었거나 아직 공개되지 않은 장소일 수 있어요. 목록에서 장소를 다시 선택해 주세요."
+                    : "The place may be removed or unpublished. Choose a place from discovery to continue."}
+                </p>
+                {!config.demo && missingPlaceId && (
+                  <button
+                    className="secondary"
+                    onClick={() => setPlaceRetry((value) => value + 1)}
+                  >
+                    {t("다시 시도")}
+                  </button>
+                )}
+                <button
+                  className="primary"
+                  onClick={() => navigate("/discover", { replace: true })}
+                >
+                  {t("동네 발견")}
+                </button>
+              </>
+            )}
+          </div>
+        </Modal>
+      )}
+      {panel === "contribute" && !missingPlacePanel && (
         <Modal title={t("맛집 추천하기")} onClose={() => setPanel(null)}>
           <MemberConsent userId={session?.user.id}>
             <ContributionForm
@@ -953,6 +1098,17 @@ export default function App() {
             {!config.demo && (
               <LegalConsentGate userId={session?.user.id || ""}>
                 <Workspace />
+                <details className="consent-settings">
+                  <summary>
+                    {language === "ko"
+                      ? "방문 검토 신청과 처리 상태"
+                      : "Visit review requests and status"}
+                  </summary>
+                  <VisitRewardRequestPanel
+                    api={visitRewardsApi}
+                    language={language}
+                  />
+                </details>
                 <BookingProfile />
                 <details className="consent-settings" id="consent-settings">
                   <summary>

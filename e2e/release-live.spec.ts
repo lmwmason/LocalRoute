@@ -63,6 +63,7 @@ async function boundaries(page: Page, signedIn: boolean) {
     const session=${signedIn ? JSON.stringify({ access_token: "test-only-not-a-jwt", user }) : "null"};
     export const supabase={auth:{
       getSession:async()=>({data:{session}}),
+      getUser:async()=>({data:{user:session?.user||null},error:null}),
       onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}}),
       signInWithOtp:async(payload)=>{const r=await fetch('/__release_auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});return r.json()},
       signOut:async()=>{await fetch('/__release_signout',{method:'POST'});return {error:null}}
@@ -346,7 +347,7 @@ for (const language of ["ko", "en"] as const) {
       expect(sent).toHaveLength(3);
       expect(sent[0]).toMatchObject({ options: { shouldCreateUser: false } });
     });
-    test("verified legal-status failure blocks planning, retry restores it, and public legal URLs work", async ({
+    test("verified legal-status failure blocks planning and retry restores it", async ({
       page,
     }) => {
       await boundaries(page, true);
@@ -375,7 +376,12 @@ for (const language of ["ko", "en"] as const) {
       await expect(page.locator(".planner-page")).toBeVisible();
       await page.locator('footer a[href="/legal/privacy"]').click();
       await expect(page.locator(".legal-page")).toBeVisible();
-      for (const documentId of ["privacy", "terms", "transfers", "location"]) {
+    });
+    for (const documentId of ["privacy", "terms", "transfers", "location"]) {
+      test(`public legal document ${documentId} supports direct loading and refresh`, async ({
+        page,
+      }) => {
+        await boundaries(page, true);
         await page.goto(`/legal/${documentId}`);
         await expect(page.locator(".legal-page")).toHaveAttribute(
           "lang",
@@ -395,7 +401,7 @@ for (const language of ["ko", "en"] as const) {
           const box = await link.boundingBox();
           expect(box!.height).toBeGreaterThanOrEqual(44);
         }
-      }
-    });
+      });
+    }
   });
 }

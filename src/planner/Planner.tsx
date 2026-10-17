@@ -18,10 +18,8 @@ import { toggleChoice } from "../../shared/preferences";
 import { DestinationSearch } from "./DestinationSearch";
 import { PlannerWelcome } from "./PlannerWelcome";
 import { readPending, persistPending } from "./pending";
+import { readTripDraft, writeTripDraft, type TripDraft } from "./trip-draft";
 type Quote = Awaited<ReturnType<typeof api.quote>>;
-type TripDraft = Omit<TripInput, "destination"> & {
-  destination: TripInput["destination"] | null;
-};
 type PendingPayload = Parameters<typeof api.generate>[0];
 function initialTrip(language: "ko" | "en"): TripInput {
   const today = new Date().toLocaleDateString("sv-SE");
@@ -88,19 +86,14 @@ export function Planner({
     navigate = useNavigate();
   const routeStep = /^\/plan\/new\/([1-4])$/.exec(location.pathname);
   const step = routeStep ? Number(routeStep[1]) : 0;
+  const itineraryId = location.pathname.match(/^\/itineraries\/([^/]+)$/)?.[1];
   function setStep(next: number | ((current: number) => number)) {
     const value = typeof next === "function" ? next(step) : next;
     navigate(value > 0 ? `/plan/new/${value}` : "/plan");
   }
   const [input, setInput] = useState<TripDraft>(() => {
-      try {
-        const draft = tripSchema.safeParse(
-          JSON.parse(sessionStorage.getItem("localroute.trip.draft") || "null"),
-        );
-        if (draft.success) return draft.data;
-      } catch {
-        /* storage is optional until paid confirmation */
-      }
+      const draft = readTripDraft(userId);
+      if (draft) return draft;
       return config.demo
         ? initialTrip(language)
         : { ...initialTrip(language), destination: null };
@@ -109,22 +102,26 @@ export function Planner({
     [quote, setQuote] = useState<Quote | null>(null),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [result, setResult] = useState<Itinerary | null>(readDemoPlan),
+    [result, setResult] = useState<Itinerary | null>(() =>
+      config.demo ? readDemoPlan() : null,
+    ),
     [savedPlans, setSavedPlans] = useState<Itinerary[]>([]),
     [pins, setPins] = useState<string[]>([]),
-    [sourceId, setSourceId] = useState<string | undefined>();
+    [sourceId, setSourceId] = useState<string | undefined>(),
+    [planLookup, setPlanLookup] = useState<{
+      id: string;
+      loading: boolean;
+      error: string;
+    } | null>(null),
+    [planRetry, setPlanRetry] = useState(0);
   const pending = useRef<PendingPayload | null>(null),
     inFlight = useRef(false);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    try {
-      sessionStorage.setItem("localroute.trip.draft", JSON.stringify(input));
-    } catch {
-      /* optional draft persistence */
-    }
-  }, [input]);
+    writeTripDraft(input, userId);
+  }, [input, userId]);
   useEffect(() => {
-    const id = location.pathname.match(/^\/itineraries\/([^/]+)$/)?.[1];
+    const id = itineraryId;
     if (!id || result?.id === id) return;
     const local = config.demo
       ? readDemoPlan()
@@ -132,19 +129,24 @@ export function Planner({
     if (local?.id === id) setResult(local);
     else if (!config.demo && signedIn) {
       let active = true;
+      setPlanLookup({ id, loading: true, error: "" });
       api
         .plan(id)
         .then((plan) => {
-          if (active) setResult(plan);
+          if (active) {
+            setResult(plan);
+            setPlanLookup({ id, loading: false, error: "" });
+          }
         })
         .catch((error: Error) => {
-          if (active) setError(error.message);
+          if (active)
+            setPlanLookup({ id, loading: false, error: error.message });
         });
       return () => {
         active = false;
       };
     }
-  }, [location.pathname, result?.id, savedPlans, signedIn]);
+  }, [itineraryId, result?.id, savedPlans, signedIn, planRetry]);
   useEffect(() => {
     if (config.demo) return;
     const saved = readPending(userId);
@@ -286,7 +288,7 @@ export function Planner({
         };
         persistPending(userId, payload);
         pending.current = payload;
-        const generated = await api.generate(payload);
+        const generated = await api.generate(payload, userId);
         if ("schedule" in generated) await complete(generated);
         else setError(t("errors.REQUEST_STATUS_UNKNOWN"));
       }
@@ -315,7 +317,7 @@ export function Planner({
       if ((e as Error).message === "REQUEST_NOT_FOUND" && pending.current) {
         try {
           // Explicit recovery reuses the persisted key and original consent; never create a second job.
-          const recovered = await api.generate(pending.current);
+          const recovered = await api.generate(pending.current, userId);
           if ("schedule" in recovered) await complete(recovered);
           else setError(t("errors.REQUEST_STATUS_UNKNOWN"));
         } catch (error) {
@@ -355,6 +357,65 @@ export function Planner({
         </button>
       </>
     );
+  if (itineraryId) {
+    const needsLogin = !config.demo && !signedIn;
+    const loading =
+      !config.demo &&
+      !needsLogin &&
+      (planLookup?.id !== itineraryId || planLookup.loading);
+    return (
+      <section className="planner-page empty-state">
+        <h1>
+          {language === "ko"
+            ? needsLogin
+              ? "로그인 후 일정을 확인해 주세요"
+              : loading
+                ? "일정을 불러오고 있어요"
+                : "일정을 불러오지 못했어요"
+            : needsLogin
+              ? "Sign in to view your itinerary"
+              : loading
+                ? "Loading your itinerary"
+                : "Itinerary unavailable"}
+        </h1>
+        {loading ? (
+          <p role="status">{t("planner.checking")}</p>
+        ) : (
+          <>
+            <p role={needsLogin ? undefined : "alert"}>
+              {language === "ko"
+                ? needsLogin
+                  ? "일정을 만든 계정으로 로그인해 주세요."
+                  : config.demo
+                    ? "이 브라우저에 저장된 체험 일정이 없어요. 새 체험 일정을 만들어 주세요."
+                    : "삭제된 일정이거나 접근 권한이 없을 수 있어요. 연결 상태를 확인하고 다시 시도해 주세요."
+                : needsLogin
+                  ? "Use the account that created this itinerary."
+                  : config.demo
+                    ? "This demo itinerary is not saved in this browser. Create a new demo itinerary."
+                    : "The itinerary may be deleted or belong to another account. Check your connection and try again."}
+            </p>
+            {needsLogin ? (
+              <button className="primary" onClick={onLogin}>
+                {t("로그인")}
+              </button>
+            ) : !config.demo ? (
+              <button
+                className="secondary"
+                onClick={() => setPlanRetry((value) => value + 1)}
+              >
+                {t("common.retry")}
+              </button>
+            ) : null}
+          </>
+        )}
+        <button className="text-button" onClick={() => navigate("/plan")}>
+          {t("common.plan")}
+          <ArrowRight size={17} />
+        </button>
+      </section>
+    );
+  }
   return (
     <section className="planner-page">
       {step === 0 ? (
