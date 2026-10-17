@@ -113,7 +113,7 @@ describe("meal coverage windows", () => {
     await expect(
       generateValidated(model, input, demoCatalog),
     ).rejects.toMatchObject({ message: "SCHEDULE_QUALITY_FAILED" });
-    expect(calls).toBe(2);
+    expect(calls).toBe(3);
   });
 });
 

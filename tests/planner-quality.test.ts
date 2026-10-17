@@ -143,7 +143,7 @@ describe("server schedule quality pipeline", () => {
     await expect(
       generateValidated(changed, plannerInput, demoCatalog, [pin]),
     ).rejects.toMatchObject({ message: "SCHEDULE_QUALITY_FAILED" });
-    expect(tries).toBe(2);
+    expect(tries).toBe(3);
   });
   it("never calls Gemini when identified candidates are insufficient", async () => {
     const fn = vi.fn();

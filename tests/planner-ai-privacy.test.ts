@@ -203,7 +203,7 @@ describe("planner model data minimization", () => {
     await expect(
       generateValidated(model, input, demoCatalog),
     ).rejects.toMatchObject({ message: "SCHEDULE_QUALITY_FAILED" });
-    expect(inputs).toHaveLength(2);
+    expect(inputs).toHaveLength(3);
     expect(JSON.stringify(inputs)).not.toContain("PRIVATE_MEDICAL_RESTRICTION");
     expect(JSON.stringify(inputs[1])).toContain("DIETARY_UNVERIFIED");
   });
@@ -235,7 +235,7 @@ describe("planner model data minimization", () => {
     await expect(
       generateValidated(model, plannerInput, demoCatalog, [], lookup),
     ).rejects.toMatchObject({ message: "SCHEDULE_QUALITY_FAILED" });
-    expect(inputs).toHaveLength(2);
+    expect(inputs).toHaveLength(3);
     expect(JSON.stringify(inputs)).not.toContain("PRIVATE_PROVIDER_URL");
     const repair = inputs[1] as {
       validationErrorsFromPreviousAttempt: {
