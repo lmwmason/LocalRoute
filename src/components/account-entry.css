@@ -1,0 +1,38 @@
+.account-entry {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 14px;
+  border: 1px solid #dce4ef;
+  border-radius: 14px;
+  background: white;
+  color: #224b8c;
+  font-size: 0.8rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.account-entry:hover {
+  background: #edf4ff;
+}
+@media (max-width: 760px) {
+  .main-app-shell .topbar {
+    height: auto;
+    min-height: 82px;
+    padding-block: 12px;
+    flex-wrap: wrap;
+  }
+  .main-app-shell .top-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .main-app-shell .topbar .brand {
+    flex: 1 0 auto;
+  }
+  .main-app-shell .account-entry {
+    font-size: 0.75rem;
+    padding-inline: 10px;
+  }
+}

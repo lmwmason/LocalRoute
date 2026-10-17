@@ -51,6 +51,7 @@ import { VisitRewardRequestPanel } from "./visit-rewards/VisitRewards";
 import { visitRewardsApi } from "./visit-rewards/host-client";
 import { BookingButton } from "./booking/BookingButton";
 import { bookingApi } from "./booking/client";
+import { AccountEntry } from "./components/AccountEntry";
 
 const Map = lazy(() => import("./components/Map"));
 const Planner = lazy(() =>
@@ -544,7 +545,7 @@ export default function App() {
             className="brand"
             aria-label={t("LocalRoute 홈")}
             onClick={() => {
-              setTab("plan");
+              navigate("/");
               setQuery("");
               setCategory("전체");
             }}
@@ -584,17 +585,10 @@ export default function App() {
             >
               <Plus size={17} /> {t("맛집 추천하기")}
             </button>
-            <button
-              className="avatar-button"
-              aria-label={session ? t("내 계정") : t("로그인")}
+            <AccountEntry
+              member={Boolean(session)}
               onClick={() => setPanel(session ? "profile" : "login")}
-            >
-              {session ? (
-                (session.user.email?.[0] || "L").toUpperCase()
-              ) : (
-                <span>{t("로그인")}</span>
-              )}
-            </button>
+            />
           </div>
         </header>
 
