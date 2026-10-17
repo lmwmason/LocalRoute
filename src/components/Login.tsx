@@ -10,6 +10,7 @@ import {
   requiredAccepted,
 } from "../legal/ConsentFields";
 import { LegalNotices } from "../legal/LegalPage";
+import { saveSignupConsent } from "../legal/signup-consent";
 import "./Login.css";
 
 export function Login() {
@@ -76,6 +77,17 @@ export function Login() {
               ),
             );
             return;
+          }
+          if (!error && mode === "signup") {
+            const saved = saveSignupConsent({ email, language, choices });
+            if (!saved) {
+              setStatus(
+                language === "ko"
+                  ? "인증 링크를 보냈어요. 이 브라우저가 임시 저장을 허용하지 않아 이메일 확인 후 동의를 다시 확인해야 해요."
+                  : "Verification link sent. This browser blocks temporary storage, so confirm consent again after verifying your email.",
+              );
+              return;
+            }
           }
           setStatus(
             error
@@ -153,8 +165,8 @@ export function Login() {
           />
           <p className="fine-print">
             {language === "ko"
-              ? "이메일 확인 후 동의를 다시 확인하고 서버에 기록해야 가입 절차가 완료됩니다. 지역 공개는 그때 선택할 수 있어요. 예약자명·전화번호는 가입에 필요하지 않습니다."
-              : "After email verification, reconfirm consent for server recording to complete membership. Area publication is optional at that step. Booking names and phone numbers are not required to sign up."}
+              ? "선택한 동의는 이 브라우저에 최대 1시간 임시 보관하고 이메일 확인 후 서버에 기록해요. 다른 브라우저에서 열거나 임시 저장이 불가능하면 다시 확인해야 해요. 지역 공개는 동의 설정에서 별도로 선택할 수 있어요. 예약자명·전화번호는 가입에 필요하지 않습니다."
+              : "Your choices are kept temporarily in this browser for up to one hour and recorded on the server after email verification. Another browser or blocked storage requires confirmation again. Area publication is optional in consent settings. Booking names and phone numbers are not required to sign up."}
           </p>
         </>
       )}
