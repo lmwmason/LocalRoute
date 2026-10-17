@@ -102,8 +102,7 @@ describe("server schedule quality pipeline", () => {
       structured: async <T>(schema: z.ZodType<T>) => {
         tries++;
         const altered = structuredClone(valid);
-        altered.days[0].stops[0].explanation =
-          "A changed explanation that violates the exact pin.";
+        altered.days[0].stops[0].start = "09:35";
         return schema.parse(altered);
       },
     };
