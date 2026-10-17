@@ -1,0 +1,32 @@
+[
+  {
+    "sourceUrl": "https://korean.visitseoul.net/citycenter/%EC%9A%B0%EB%9E%98%EC%98%A5-Wooraeok/KOP003207",
+    "observedAt": "2026-10-17T05:15:37Z",
+    "name": "우래옥",
+    "address": "서울 중구 창경궁로 62-29",
+    "lat": 37.5681902336,
+    "lng": 126.9987367702,
+    "kind": "restaurant",
+    "category": "한식"
+  },
+  {
+    "sourceUrl": "https://www.spacecloud.kr/space/59739",
+    "observedAt": "2026-10-17T05:15:37Z",
+    "name": "하이드미플리즈 을지로점",
+    "address": "서울 중구 을지로11길 33 2층",
+    "lat": 37.5679039,
+    "lng": 126.99073307,
+    "kind": "cafe",
+    "category": "카페"
+  },
+  {
+    "sourceUrl": "https://korean.visitseoul.net/area/%ED%83%91%EA%B3%A8%EA%B3%B5%EC%9B%90/KOP001577",
+    "observedAt": "2026-10-17T05:15:37Z",
+    "name": "탑골공원",
+    "address": "서울 종로구 종로 99",
+    "lat": 37.571236,
+    "lng": 126.988331,
+    "kind": "attraction",
+    "category": "역사공원"
+  }
+]
